@@ -1,0 +1,7 @@
+-cp src/main/haxe
+-main Shortcut
+-lib thx.core
+-lib maybe
+-lib Parsex
+-lib pointwise
+-neko shortcut.n

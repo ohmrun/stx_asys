@@ -1,0 +1,20 @@
+-lib stx_maybe
+-lib tink_core
+-lib pointwise
+-lib stx_addendum
+-lib latah
+-lib stx_tuple
+-lib stx_chunk
+
+
+
+hxml/common.hxml
+hxml/libs.hxml
+hxml/test/libs.hxml
+
+#--each
+#--macro allowPackage("sys")
+#hxml/test/nodejs.hxml
+#--next
+hxml/test/neko.hxml
+-cmd neko test/neko_test.n

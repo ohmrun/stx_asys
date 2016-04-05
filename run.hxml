@@ -1,0 +1,8 @@
+-cp src/main/haxe
+-cp src/local/haxe
+-main Run
+-lib thx.core
+-lib maybe
+-lib Parsex
+-lib pointwise
+-neko src/main/haxe/run.n
