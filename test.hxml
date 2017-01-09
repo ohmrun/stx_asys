@@ -1,7 +1,10 @@
+-lib thx.core
 -lib stx_maybe
 -lib tink_core
 -lib pointwise
--lib stx_addendum
+-lib stx_proxy
+-lib stx_simplex
+-lib arrowlets
 -lib latah
 -lib stx_tuple
 -lib stx_chunk

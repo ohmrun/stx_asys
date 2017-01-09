@@ -1,4 +1,4 @@
-package asys.io;
+package stx.io;
 
 using stx.Arrays;
 

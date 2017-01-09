@@ -1,6 +1,6 @@
-package asys.io;
+package stx.io;
 
-@:enum abstract Chunk(String) from String to String{
+@:enum abstract Peck(String) from String to String{
   var I8      = 'i8';
 
   var I16BE   = 'i16+';
@@ -15,7 +15,7 @@ package asys.io;
 
   var I32BE   = 'i32+';
   var I32LE   = 'i32-';
-  
+
   var FBE     = 'fbe';
   var FLE     = 'fle';
   var DBE     = 'dbe';

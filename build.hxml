@@ -1,3 +1,4 @@
+-lib thx.core
 -lib stx_maybe
 -lib tink_core
 -lib pointwise
