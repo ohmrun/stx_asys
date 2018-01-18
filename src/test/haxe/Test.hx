@@ -1,10 +1,6 @@
 package;
 
-using stx.async.Arrowlet;
-import stx.proxy.data.Proxy;
-import stx.io.Peck;
-import stx.io.proxy.Process;
-
+import stx.simplex.Package;
 using Lambda;
 
 class Test{
@@ -14,7 +10,7 @@ class Test{
   public function new(){
     var runner = new utest.Runner();
     var tests : Array<Dynamic> = [
-      new ProcessTest(),
+      //new ProcessTest(),
       //new asys.FilePathTest(),
       /*
       #if nodehx
@@ -32,6 +28,30 @@ class Test{
     runner.run();
   }
 }
+class ThreadTest{
+  public function new(){}
+}
+typedef RemoteThread<I> = Emiter<I>;
+
+class RemoteThreads{
+  static public function create<I>(){
+    var incremental_backoff = 0.2;
+    var stack               = [];
+    
+    var thread = neko.vm.Thread.create(
+      () -> {
+        var message = neko.vm.Thread.readMessage(false);
+        if(message == null){
+
+        }
+      }
+    );
+    return Wait(
+      (i:I) -> 
+    )
+  }
+}
+/*
 class ProcessTest{
   public function new(){}
   public function test(){
@@ -47,3 +67,4 @@ class ProcessTest{
     }
   }
 }
+*/

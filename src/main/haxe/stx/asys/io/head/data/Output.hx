@@ -1,4 +1,4 @@
-package asys.ifs;
+package stx.asys.io.head.data;
 
 interface Output{
   //function writeUInt8(value:Int):Void;

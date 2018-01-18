@@ -1,4 +1,14 @@
 -lib tink_core
 -lib stx_chunk
 -lib pointwise
--lib latah
+-lib thx.core
+-lib stx_maybe
+-lib tink_core
+-lib stx_tuple
+-lib arrowlets
+-lib stx_error
+-lib stx_vouch
+-lib tink_streams
+-lib stx_simplex
+-lib utest
+

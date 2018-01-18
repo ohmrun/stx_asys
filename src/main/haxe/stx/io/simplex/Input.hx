@@ -64,8 +64,8 @@ class Input{
         PString(ip.readLine());
     };
   }
-  static public function apply(ip:haxe.io.Input):stx.Simplex<Peck,Iota,Error>{
-    function producer(un:Peck):stx.Simplex<Peck,Iota,Error>{
+  static public function apply(ip:haxe.io.Input):Simplex<Peck,Iota,Error>{
+    function producer(un:Peck):Simplex<Peck,Iota,Error>{
       var o = null;
           o = try{
             Emit(pull(ip,un),Wait(producer));

@@ -1,4 +1,4 @@
-package sys.fs;
+package stx.asys.fs.head.data;
 
 @:enum abstract Flags(String) from String to String{
   /**

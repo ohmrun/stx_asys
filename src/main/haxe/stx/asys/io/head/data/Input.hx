@@ -1,4 +1,4 @@
-package asys.ifs;
+package stx.asys.io.head.data;
 
 interface Input{
   function readUInt16LE():Int;
