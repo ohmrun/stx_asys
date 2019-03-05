@@ -1,12 +1,15 @@
-package asys;
+package stx.asys.core.body;
 
-import tink.core.Error;
 
 class Errors{
- static public inline function not_implemented(){
-  return new tink.core.Error(NotImplemented,'function not implemented');
- }
- static public inline function internal_error(?e:Dynamic){
-  return tink.core.Error.withData(ErrorCode.InternalError,'internal error',e);
+ static public inline function not_implemented(f:Fault){
+  return f.because('function not implemented',NotImplemented);
+}
+static public inline function internal_error(f:Fault,?e:Dynamic){
+  return f.carrying('internal error',e);
+}
+ static public inline function eof(f:Fault){
+   //Fault.EOF
+   return f.because("eof");
  }
 }

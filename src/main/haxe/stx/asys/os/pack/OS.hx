@@ -1,6 +1,0 @@
-package asys;
-
-
-class OS{
-  
-}

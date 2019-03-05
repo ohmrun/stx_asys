@@ -1,4 +1,4 @@
-package asys;
+package stx.asys.io.pack;
 
 class Buffer{
   

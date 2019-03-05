@@ -1,10 +1,81 @@
-package asys.io;
+package stx.asys.io.pack;
 
 import haxe.io.Input in StdInput;
 
-import asys.ifs.Input in IInput;
+import stx.asys.io.head.Data.Input in IInput;
 
 class Input implements IInput{
+  static public inline function pull(ip:haxe.io.Input,un:Peck):Iota{
+    return switch (un) {
+      case I8      :
+        PInt(ip.readInt8());
+      case I16BE   :
+        ip.bigEndian = true;
+        PInt(ip.readInt16());
+      case I16LE   :
+        ip.bigEndian = false;
+        PInt(ip.readInt16());
+      case UI16BE  :
+        ip.bigEndian = true;
+        PInt(ip.readUInt16());
+      case UI16LE  :
+        ip.bigEndian = false;
+        PInt(ip.readUInt16());
+
+      case I24BE   :
+        ip.bigEndian = true;
+        PInt(ip.readInt24());
+      case I24LE   :
+        ip.bigEndian = false;
+        PInt(ip.readInt24());
+      case UI24BE  :
+        ip.bigEndian = true;
+        PInt(ip.readUInt24());
+      case UI24LE  :
+        ip.bigEndian = false;
+        PInt(ip.readUInt24());
+
+      case I32BE   :
+        ip.bigEndian = true;
+        PInt(ip.readInt32());
+      case I32LE   :
+        ip.bigEndian = false;
+        PInt(ip.readInt32());
+      case FBE     :
+        ip.bigEndian = true;
+        PFloat(ip.readFloat());
+      case FLE     :
+        ip.bigEndian = false;
+        PFloat(ip.readFloat());
+      case DBE     :
+        ip.bigEndian = true;
+        PFloat(ip.readDouble());
+      case DLE     :
+        ip.bigEndian = false;
+        PFloat(ip.readDouble());
+      case LINE    :
+        PString(ip.readLine());
+    };
+  }
+  static public function apply(ip:haxe.io.Input):Simplex<Peck,Iota,Noise>{
+    function producer(un:Peck):Simplex<Peck,Iota,Noise>{
+      var o = null;
+          o = try{
+            Constructors.emit(
+              pull(ip,un),
+              Constructors.wait(producer)
+            );
+          }catch(e:Error){
+            Constructors.fail(e);
+          }catch(d:Dynamic){
+            Constructors.fail(Error.withData(500,'Error in Input',d));
+          }
+      return o;
+    }
+    return Wait(producer);
+  }
+
+  var _input : StdInput;
   public function new(_input:StdInput){
     this._input = _input;
   }
@@ -16,14 +87,14 @@ class Input implements IInput{
     _input.bigEndian = true;
     return _input.readUInt16();
   }
-  public function readUInt32LE():Int{
-    _input.bigEndian = false;
-    return _input.readUInt32();
-  }
-  public function readUInt32BE():Int{
-    _input.bigEndian = true;
-    return _input.readUInt32();
-  }
+  // public function readUInt32LE():Int{
+  //   _input.bigEndian = false;
+  //   return _input.readUInt32();
+  // }
+  // public function readUInt32BE():Int{
+  //   _input.bigEndian = true;
+  //   return _input.readUInt32();
+  // }
   public function readInt8():Int{
     return _input.readByte();
   }

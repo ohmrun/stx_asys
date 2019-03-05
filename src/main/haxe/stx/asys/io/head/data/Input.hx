@@ -3,8 +3,9 @@ package stx.asys.io.head.data;
 interface Input{
   function readUInt16LE():Int;
   function readUInt16BE():Int;
-  function readUInt32LE():Int;
-  function readUInt32BE():Int;
+
+  //function readUInt32LE():Int;
+  //function readUInt32BE():Int;
 
   function readInt8():Int;
   function readInt16LE():Int;

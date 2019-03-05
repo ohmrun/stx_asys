@@ -3,5 +3,5 @@ hxml/common.hxml
 hxml/libs.hxml
 hxml/test/libs.hxml
 
-
 hxml/test/neko.hxml
+#-cmd neko test/neko_test.n

@@ -4,8 +4,8 @@ interface Output{
   //function writeUInt8(value:Int):Void;
   function writeUInt16LE(value:Int):Void;
   function writeUInt16BE(value:Int):Void;
-  function writeUInt32LE(value:Int):Void;
-  function writeUInt32BE(value:Int):Void;
+  //function writeUInt32LE(value:Int):Void;
+  //function writeUInt32BE(value:Int):Void;
 
   function writeInt8(value:Int):Void;
   function writeInt16LE(value:Int):Void;

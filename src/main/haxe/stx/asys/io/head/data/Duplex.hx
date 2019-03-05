@@ -1,5 +1,5 @@
-package asys.ifs;
+package stx.asys.io.head.data;
 
-interface Duplex implements Input implements Output{
+interface Duplex extends Input extends Output{
       
 }

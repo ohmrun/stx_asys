@@ -1,0 +1,4 @@
+package stx.asys.io.file.head.data;
+
+//here be dragons
+typedef Instruction = Control<CQRS<Peck,Value>>;

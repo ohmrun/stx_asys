@@ -1,13 +1,11 @@
 -lib tink_core
--lib stx_chunk
 -lib pointwise
 -lib thx.core
--lib stx_maybe
 -lib tink_core
--lib stx_tuple
 -lib arrowlets
--lib stx_error
--lib stx_vouch
+-lib stx_core
+-lib stx_assert
+-lib pointwise
 -lib tink_streams
 -lib stx_simplex
 -lib utest

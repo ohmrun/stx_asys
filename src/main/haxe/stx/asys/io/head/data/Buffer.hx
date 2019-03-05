@@ -1,8 +1,8 @@
-package asys.ifs;
+package stx.asys.io.head.data; 
 
 interface Buffer {
 
-  var length(get_length,null):Int;
+  var length(get,null):Int;
   private function get_length():Int;
   
   function copy(targetBuffer:Buffer,targetStart:Int,sourceStart:Int,sourceEnd:Int):Void;
