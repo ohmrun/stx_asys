@@ -1,12 +1,13 @@
 -lib tink_core
+-lib tink_streams
+
 -lib pointwise
--lib thx.core
--lib tink_core
+
 -lib arrowlets
 -lib stx_core
 -lib stx_assert
--lib pointwise
--lib tink_streams
+-lib stx_test
+
 -lib stx_simplex
--lib utest
+
 

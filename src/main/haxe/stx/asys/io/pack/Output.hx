@@ -5,7 +5,7 @@ import haxe.io.Output in StdOutput;
 import stx.asys.io.head.Data.Output in IOutput;
 
 class Output implements IOutput{
-  static public inline function push(op:haxe.io.Output,value:Value):Surprise<Noise,Error>{
+  static public inline function push(op:haxe.io.Output,value:Packet):Surprise<Noise,Error>{
     var valAsInt    = null;
     var valAsString = null;
     var valAsFloat  = null;
@@ -17,6 +17,8 @@ class Output implements IOutput{
         valAsFloat  = fl;
       case PInt(int):
         valAsInt    = int;
+      default:
+        __.fault().because("unsupported operation");
     }
     switch(value.type){
       case I8      :
@@ -68,6 +70,7 @@ class Output implements IOutput{
     }
     return Future.sync(Success(Noise));
   }
+  /*
   static public function apply(opt:haxe.io.Output):Sink<Value>{
     return Constructors.wait(
       function recurse(val:Value):Sink<Value>{
@@ -80,7 +83,7 @@ class Output implements IOutput{
           return Constructors.hold(out);
         }
     );
-  } 
+  }*/
   private var _output : StdOutput;
 
   public function new(_output){
