@@ -1,21 +1,10 @@
-package asys;
+package stx.asys.fs.pack;
 
-import sys.fs.Flags;
-import asys.ifs.File;
+import stx.asys.fs.head.data.Fs in FsI;
 
-import stx.async.Promise;
+class Fs implements FsI{
+  public function new(){
 
-import tink.core.Error;
-import tink.core.Future;
-
-import stx.Path;
-
-import haxe.ds.StringMap;
-
-import sys.fs.Stats;
-
-#if hxnodejs
-  typedef Fs = js.node.Fs;
-#else
-  typedef Fs = sync.asys.Fs;
-#end
+  }
+  public var separator(default,null):Separator = PosixSeparator;
+}

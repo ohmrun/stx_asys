@@ -1,4 +1,4 @@
 package stx.asys.fs;
 
-typedef File        = stx.asys.fs.pack.File;
-typedef Separator   = stx.asys.fs.pack.Separator; 
+typedef Directory<T:Projectable<Certainty>> = stx.asys.fs.pack.Directory<T>;
+typedef File<T:Projectable<Certainty>>      = stx.asys.fs.pack.File<T>;

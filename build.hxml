@@ -1,7 +1,24 @@
 --macro allowPackage("sys")
 hxml/common.hxml
-hxml/libs.hxml
-hxml/test/libs.hxml
+
+-lib tink_core
+-lib tink_streams
+
+-lib pointwise
+
+-lib arrowlets
+-lib stx_core
+-lib stx_assert
+-lib stx_test
+
+-lib stx_simplex
+-lib Parsex
+-lib stx_parse
+-lib stx_filepath
 
 hxml/test/neko.hxml
-#-cmd neko test/neko_test.n
+
+-cp src/main/haxe
+-cp src/test/haxe
+-main Test
+-cmd neko test/neko_test.n
