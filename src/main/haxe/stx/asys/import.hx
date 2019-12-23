@@ -4,7 +4,7 @@ import tink.CoreApi;
 
 import stx.fn.head.Data;
 import stx.core.head.Data;
-import stx.simplex.core.head.Data;
+
 import stx.asys.core.head.Data;
 import stx.filepath.head.Data;
 
@@ -13,10 +13,6 @@ import stx.fp.Package;
 import stx.core.Package;
 import stx.asys.fs.Package;
 import stx.filepath.Package;
-
-
-import stx.simplex.Package;
-import stx.simplex.core.Package;
 
 using stx.core.Lift;
 using stx.assert.Lift;

@@ -1,6 +1,0 @@
--cp src/main/haxe
--cp src/test/haxe
-
--lib hxnodejs
--main Test
--js test/js_test.js
