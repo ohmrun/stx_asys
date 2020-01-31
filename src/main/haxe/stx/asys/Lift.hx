@@ -1,3 +1,7 @@
 package stx.asys;
 
-typedef Errors = stx.asys.core.body.Errors;
+class Lift{
+  static public function asys(__:Wildcard){
+    return new stx.asys.Module();
+  }
+}

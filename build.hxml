@@ -5,17 +5,16 @@
 
 -lib utest
  
--lib arrowlets
-
--lib stx
 -lib Parsex
 
+-lib stx_core
+-lib stx_arrowlet
 -lib stx_parse
 -lib stx_filepath
+-lib stx_di
 
 -cp src/main/haxe
--cp src/test/haxe
 -main Main
 --interp
 
--D test
+-D test=stx_asys

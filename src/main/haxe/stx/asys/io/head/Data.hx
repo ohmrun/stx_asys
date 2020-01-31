@@ -1,6 +1,5 @@
 package stx.asys.io.head;
 
-typedef Buffer  = stx.asys.io.head.data.Buffer;
-typedef Duplex  = stx.asys.io.head.data.Duplex;
-typedef Input   = stx.asys.io.head.data.Input;
-typedef Output  = stx.asys.io.head.data.Output;
+typedef IOFailure       = stx.asys.io.head.data.IOFailure;
+typedef InputRequest    = stx.asys.io.head.data.InputRequest;
+typedef InputResponse   = stx.asys.io.head.data.InputResponse;

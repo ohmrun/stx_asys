@@ -1,6 +1,5 @@
 package stx.asys.fs.head.data;
 
-
 @:enum abstract Mode(Int){
   var EXEC            = 1;
   var WRITE           = 2;

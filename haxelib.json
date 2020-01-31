@@ -11,13 +11,15 @@
     ],
     "releasenote": "",
     "version": "0.0.1",
-    "url": "",
+    "url": "http://www.example.com",
     "dependencies": {
         "tink_core": "",
-        "pointwise": "",
-        "stx_simplex": "",
+
+        "stx_core": "",
+        "stx_fn": "",
         "stx_assert": "",
-        "stx_core": ""
+        "stx_run": "",
+        "stx_filepath": ""
     },
     "classPath": "src/main/haxe"
 }

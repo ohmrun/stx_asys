@@ -1,5 +1,6 @@
 package stx.asys.core.head.data;
 
 enum SysFailure{
-  EOF;
+  EnvironmentVariablesInaccessible;
+  SubSystem(err:Dynamic);
 }
