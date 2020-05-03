@@ -1,0 +1,15 @@
+package stx.fs.path.pack;
+
+import stx.fs.path.type.Location in LocationT;
+
+abstract Location(LocationT) from LocationT to LocationT{
+  public function new(self) this = self;
+  static public function lift(self:LocationT):Location return new Location(self);
+  
+
+  
+
+  public function prj():LocationT return this;
+  private var self(get,never):Location;
+  private function get_self():Location return lift(this);
+}

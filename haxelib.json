@@ -10,16 +10,21 @@
         "0b1kn00b"
     ],
     "releasenote": "",
-    "version": "0.0.1",
+    "version": "0.1.0",
     "url": "http://www.example.com",
     "dependencies": {
         "tink_core": "",
+        
+        "stx_pico": "",
+        "stx_nano": "",
 
-        "stx_core": "",
         "stx_fn": "",
         "stx_assert": "",
         "stx_run": "",
-        "stx_filepath": ""
+        "stx_arrowlet": "",
+
+        "stx_parse" : "",
+        "jali"   : ""
     },
     "classPath": "src/main/haxe"
 }

@@ -1,0 +1,8 @@
+package stx.fs.type;
+
+interface Volume{
+  public function index(dir:Directory):IO<Array<String>,FSFailure>;
+  public function parent(dir:Directory):Res<Directory,PathFailure>;
+
+  public function read(archive:Archive,?binary : Bool = false):IO<FileInput,FSFailure>;
+}

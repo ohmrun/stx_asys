@@ -1,20 +1,27 @@
---macro allowPackage("sys")
+-main Main
+--interp
+#-js test.js
+
+-lib utest
 
 -lib tink_core
 -lib tink_streams
 
--lib utest
- 
--lib Parsex
+#-lib hxnodejs
 
--lib stx_core
+-lib stx_pico
+-lib stx_nano
+-lib stx_run
 -lib stx_arrowlet
 -lib stx_parse
--lib stx_filepath
--lib stx_di
+-lib stx_show
+
+-lib jali
 
 -cp src/main/haxe
--main Main
---interp
 
 -D test=stx_asys
+#-D error_stack
+
+#-cmd node test.js
+#--connect 9090

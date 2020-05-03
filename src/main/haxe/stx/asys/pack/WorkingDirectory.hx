@@ -1,11 +1,11 @@
 package stx.asys.pack;
 
-abstract WorkingDirectory(Relative) from Relative to Relative{
+abstract WorkingDirectory(Directory) from Directory to Directory{
   public function new(self){
     this = self;
   }
   /*
-  public function navigate(path:FilePath):IO<FilePath,FilePathFailure>{
+  public function navigate(path:FilePath):Proceed<FilePath,PathFailure>{
     return () -> {
       return switch(path.head){
         case FPRoot(_):

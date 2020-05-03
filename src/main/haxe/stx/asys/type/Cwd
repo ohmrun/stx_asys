@@ -1,0 +1,6 @@
+package stx.asys.type;
+
+interface Cwd{
+  public function pop():Channel<HasDevice,Directory,FSFailure>;
+  public function put(str:Directory):Command<HasDevice,FSFailure>;
+}
