@@ -9,7 +9,7 @@ typedef StdInput            = haxe.io.Input;
 typedef StdOutput           = haxe.io.Output;
 
 typedef Input              = stx.io.pack.Input;
-//typedef Output             = stx.io.pack.Output;
+typedef Output             = stx.io.pack.Output;
 
 typedef StdOut             = stx.io.pack.StdOut;
 typedef StdIn              = stx.io.pack.StdIn;
