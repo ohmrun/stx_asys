@@ -22,7 +22,7 @@
         "stx_assert": "",
         "stx_run": "",
         "stx_arrowlet": "",
-
+        "stx_proxy" : "",
         "stx_parse" : "",
         "jali"   : ""
     },

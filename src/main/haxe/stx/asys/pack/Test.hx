@@ -20,12 +20,13 @@ class DirDrillTest extends utest.Test{
   public function test_cwd_crunch(async:utest.Async){
     var cwd = new Cwd();
         cwd.pop()
-           .prepare(dev,
+           .environment(dev,
              (x) -> {
                trace(x);
                Rig.pass();
                async.done();
-             }
+             },
+             __.raise
           ).submit();
 
   }
@@ -34,29 +35,34 @@ class DirDrillTest extends utest.Test{
 
     var cwd = new Cwd();
         cwd.pop()
-           .prepare(dev,
-              Sink.unit().stage(
-                (x) -> {
-                  Rig.pass();
-                  async.done();
-                  trace(x);
-                },
-                (_) -> {}
-              )
+           .environment(
+             dev,
+             (x) -> {
+              Rig.pass();
+              async.done();
+              trace(x);
+            },
+            __.raise
            ).submit();
   }
   //@Ignored
   @:timout(6000)
   public function test(async:utest.Async){
-    var cwd   = new Cwd();
-    cwd.pop().reframe().arrange(
-      Directory._.term
-    ).evaluation()
-     .prepare(__.success(LocalHost.unit().toHasDevice()),
-      (x) -> {
-        trace(x);
-        async.done();
-      }
+    var cwd 	= new Cwd();
+		var host 	= LocalHost.unit().toHasDevice();
+    cwd.pop()
+      .process((dir:Directory) -> dir.into(['src', 'main', 'haxe', 'stx', 'fs']))
+      .reframe()
+      .arrange(
+        Directory._.tree
+      ).evaluation()
+       .environment(
+         host,
+        (x) -> {
+          trace(x);
+        },
+        __.raise
      ).submit();
+     //crunch
   }
 }

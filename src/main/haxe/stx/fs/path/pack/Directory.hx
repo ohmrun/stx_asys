@@ -151,14 +151,14 @@ private class DirectoryLift{
       (e) -> e.fault().of(UnknownFSError(e.data))
     );
   }
-  static public function tree(dir:Directory):Attempt<HasDevice,Term<Entry>,Dynamic>{
-    __.log().close()('term: $dir');
+  static public function tree(dir:Directory):Attempt<HasDevice,Jali<Entry>,Dynamic>{
+    __.log().close()('Jali: $dir');
     var init  = Arrange.fromFun1Attempt(entries);
-    var pure  = (entry) -> Term.make().datum(entry);
-    var make  = Term.make();
+    var pure  = (entry) -> Jali.make().datum(entry);
+    var make  = Jali.make();
     var c     = Cascade.pure(__.success(dir)).reframe().arrange(entries);
     
-    function fn(either:Either<String,Entry>,t:Term<Entry>){
+    function fn(either:Either<String,Entry>,t:Jali<Entry>){
       __.log().close().trace(either);
       return switch(either){
         case Left(string) : tree(dir.into([string])).process(
@@ -167,11 +167,11 @@ private class DirectoryLift{
         case Right(entry) : Attempt.pure(__.success(t.concat(make.datum(entry))));
       }
     }
-    var ut  = Arrange.pure(Term.unit());
+    var ut  = Arrange.pure(Jali.unit());
     var d   = Arrange.bind_fold.bind(fn).fn().then( _ -> _.defv(ut));
     var e   = c.rearrange(d);
     var f = e.prefix(
-      (env) -> __.couple(Term.make().unit(),env)
+      (env) -> __.couple(Jali.make().unit(),env)
     );
     //$type(a);
     // $type(b);

@@ -34,6 +34,13 @@ class Volume implements VolumeApi extends Clazz{
       __.failure(__.fault().of(FileUnreadable(e)));
     }
   }
+  public function write(archive:Archive,?binary = false):Proceed<FileOutput,FSFailure>{
+    return () -> try{
+      __.success(StdFile.write(archive.canonical(sep),binary));
+    }catch(e:Dynamic){
+      __.failure(__.fault().of(FileUnwriteable(e)));
+    }
+  }
   // public function has(path:Path):Channel<Shell,Bool>{
   //   return ((env:Shell) -> {
       

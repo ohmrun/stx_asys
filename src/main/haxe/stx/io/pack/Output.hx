@@ -1,23 +1,23 @@
 package stx.io.pack;
 
-typedef OutputDef = Arrowlet<Packet,ClientT<Noise,Packet,Noise,IOFailure>>;
-
-import stx.proxy.core.head.data.Client  in ClientT;
-import stx.proxy.core.head.data.Server  in ServerT;
-import stx.io.pack.StdOut          in AsysStdOut;
+typedef OutputDef = Unary<Packet,ClientDef<Noise,Packet,Noise,IOFailure>>;
 
 @:forward abstract Output(OutputDef) from OutputDef to OutputDef{
-  public function new(opt:AsysStdOut){
+  public function new(opt:StdOut){
     var rec = null;
         rec = 
-          function rec(pkt:Packet):ClientT<Noise,Packet,Noise,IOFailure>{ 
-            return Later(
-              Receiver.lift(opt.apply(pkt).fold(
-                (err:TypedError<IOFailure>) -> Ended(End(err)),
-                ()                          -> Await(Noise,rec)
-              )(Automation.unit()))
-            );
+          function(pkt:OutputRequet):ClientDef<Noise,Packet,Noise,IOFailure>{ 
+            return __.belay(opt.apply(pkt).
+              then(
+                (report) -> report.fold(
+                  (err:TypedError<IOFailure>) -> Ended(End(err)),
+                  ()                          -> switch(pkt){
+                    case OReqValue(_) : Await(Noise,rec);
+                    case OReqClose:   : __.ended(Tap);
+                  }
+                )
+              ));
           }
-    return __.arw().fn()(rec);
+    return rec;
   }
 }

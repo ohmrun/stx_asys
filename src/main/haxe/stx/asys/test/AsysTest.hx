@@ -24,7 +24,7 @@ class AsysTest extends utest.Test{
   public function test(){
     trace(Sys.getCwd());
     var path        = __.asys().local().device.shell.cwd.pop();
-    var next        = path.receive(Devices.local());   
+    //var next        = path.receive(Devices.local());   
      //     path.deliver(
     //       (x) -> Assert.pass()
     //     ).crunch();

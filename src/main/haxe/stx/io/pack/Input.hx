@@ -1,20 +1,25 @@
 package stx.io.pack;
 
-import stx.proxy.core.head.data.Server  in ServerT;
-import stx.io.pack.StdIn           in AsysStdIn;
-typedef InputDef  = Arrow<InputRequest,Closed,Noise,InputRequest,InputResponse,Noise,IOFailure>
+
+typedef InputDef  = ProxyCat<InputRequest,Closed,Noise,InputRequest,InputResponse,Noise,IOFailure>;
 
 @:forward abstract Input(InputDef) from InputDef{
-  public function new(ipt:AsysStdIn){
-    var rec : Arrow<InputRequest,Closed,Noise,InputRequest,InputResponse,Noise,IOFailure> = null;
-        rec = new Arrow(
-          Attempts.fromIOConstructor(ipt.apply).prj().postfix(
-            Res._.fold.bind(
-              (x)         -> Yield(x,rec),
-              (e)         -> Ended(__.failure(e))
-            )
-          )
+  public function new(ipt:StdIn){
+    var rec : ProxyCat<InputRequest,Closed,Noise,InputRequest,InputResponse,Noise,IOFailure> = null;
+        rec = new ProxyCat(
+          function rec(req):Proxy<Closed,Noise,InputRequest,InputResponse,Noise,IOFailure>{
+            var effect = 
+              ipt.apply(req)
+               .process((res) -> switch(res){
+                 case IResSpent : __.ended(Tap);
+                 default        : __.yield(res,rec);
+               }
+              ).control(
+                (e:Err<IOFailure>) -> Ended(End(e))
+              );
+            return __.belay(effect);
+          }
         );
-    this = (rec:InputT);
+    this = (rec:InputDef);
   }
 }

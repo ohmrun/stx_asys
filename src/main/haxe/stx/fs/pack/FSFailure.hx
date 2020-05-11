@@ -3,6 +3,7 @@ package stx.fs.pack;
 enum FSFailure{
   IsNotADirectory;
   FileUnreadable(dyn:Dynamic);
+  FileUnwriteable(dyn:Dynamic);
   UnknownFSError(?dyn:Dynamic);
   AlreadyExists;
   CannotReadDirectory;

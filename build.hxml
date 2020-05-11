@@ -4,6 +4,7 @@
 
 -lib utest
 
+  
 -lib tink_core
 -lib tink_streams
 
@@ -15,6 +16,7 @@
 -lib stx_arrowlet
 -lib stx_parse
 -lib stx_show
+-lib stx_proxy
 
 -lib jali
 
