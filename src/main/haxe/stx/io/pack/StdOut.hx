@@ -10,14 +10,17 @@ abstract StdOut(StdOutput) from StdOutput{
   public function apply(type:OutputRequest):Execute<IOFailure>{
     return StdOutLift.push(this,type);
   }
+  public inline function push(value:OutputRequest):Execute<IOFailure>{
+    return _.push(this,value);
+  }
 }
 class StdOutLift{
   static public inline function push(op:StdOutput,value:OutputRequest):Execute<IOFailure>{
     function fn(){
-      var output      = None;
-      var valAsInt    = None;
-      var valAsString = None;
-      var valAsFloat  = None;
+      var output      = Option.unit();
+      var valAsInt    = Option.unit();
+      var valAsString = Option.unit();
+      var valAsFloat  = Option.unit();
 
       switch(value){
         case OReqClose:

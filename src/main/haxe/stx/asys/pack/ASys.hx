@@ -1,11 +1,20 @@
 package stx.asys.pack;
 
-class ASys implements stx.asys.type.ASys{
+
+interface ASysApi{
+  public function sleep(float:Float):Future<Noise>;
+}
+
+class ASys implements ASysApi{
   public function new(){}
   
-  public function sleep(t):Bang{
-    return Bang.pure(
-      Sys.sleep.bind(t)
+  public function sleep(t):Future<Noise>{
+    return Future.irreversible(
+      (cb) -> {
+        Sys.sleep(t);
+        cb(Noise);
+      }
     );
   }
+  
 }

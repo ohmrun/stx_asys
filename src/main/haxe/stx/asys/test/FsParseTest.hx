@@ -8,55 +8,55 @@ class FsParseTest extends utest.Test{
 
   var up            : String = "..";
   public function test(){
-    var o = p.parse(up.reader());
+    var o = p.forward(up.reader()).fudge();
     //log(o);
     res(o);
   }
   var current       : String = ".";
   public function testCurrent(){
-    var o = p.parse(current.reader());
+    var o = p.forward(current.reader()).fudge();
     //log(o);
     res(o);
   }
   var ok_simple     : String = "/a/b/c";
   public function testSimple(){
-    var o = p.parse(ok_simple.reader());
+    var o = p.forward(ok_simple.reader()).fudge();
     //log(o);
     res(o);
   }
   var ok_relative   : String = "../../a/b/c";
   public function testSimpleRelative(){
-    var o = p.parse(ok_relative.reader());
+    var o = p.forward(ok_relative.reader()).fudge();
     //log(o);
     res(o);
   }
   var ok_file       : String = "./odd.thing/test.txt";
   public function testSimpleFile(){
-    var o = p.parse(ok_file.reader());
+    var o = p.forward(ok_file.reader()).fudge();
     log(o);
     res(o);
   }
   public function testFileExt(){
-    var o = p.parse(ok_file_no_ext.reader());
+    var o = p.forward(ok_file_no_ext.reader()).fudge();
     res(o);
   }
   public function testDir(){
-    var o = p.parse(ok_dir.reader());
+    var o = p.forward(ok_dir.reader()).fudge();
     res(o);
   }
   public function testDotFolder(){
-    var o = p.parse(ok_dot_folder.reader());
+    var o = p.forward(ok_dot_folder.reader()).fudge();
     res(o);
   }
   public function testJustDown(){
-    var o = p.parse(q_just_down.reader());
+    var o = p.forward(q_just_down.reader()).fudge();
     res(o);
   }
   public function testCompile(){
-    var o = p.parse(ok_compile.reader());
+    var o = p.forward(ok_compile.reader()).fudge();
   } 
   public function testDownDown(){
-    var o = p.parse(q_down_down.reader());
+    var o = p.forward(q_down_down.reader()).fudge();
     res(o);
   }
   function res(o:ParseResult<Dynamic,Dynamic>){

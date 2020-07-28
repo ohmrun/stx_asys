@@ -2,7 +2,9 @@ package stx;
 
 class Io{}
 
+#if (sys || nodejs)
 typedef StdFile             = sys.io.File;
+#end
 typedef StdPath             = haxe.io.Path;
 
 typedef StdInput            = haxe.io.Input;

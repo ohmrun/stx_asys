@@ -2,20 +2,20 @@ package stx.asys.pack;
 
 
 interface CwdApi{
-  public function pop():Attempt<HasDevice,Directory,FSFailure>;
-  public function put(str:Directory):Command<HasDevice,FSFailure>;
+  public function pop():Attempt<HasDevice,Directory,FsFailure>;
+  public function put(str:Directory):Command<HasDevice,FsFailure>;
 }
 
 class Cwd implements CwdApi extends Clazz{
-  public function pop():Attempt<HasDevice,Directory,FSFailure>{
+  public function pop():Attempt<HasDevice,Directory,FsFailure>{
     return 
       Path.parse(Sys.getCwd())
       .attempt(Raw._.toDirectory)
       .errata(
-        e -> e.map(FilePathMalformed)
+        e -> e.map(E_Fs_Path)
       );
   }
-  public function put(dir:Directory):Command<HasDevice,FSFailure>{
+  public function put(dir:Directory):Command<HasDevice,FsFailure>{
     return Command.fromFun1Report(
       (env:HasDevice) -> {
         var val = Report.unit();

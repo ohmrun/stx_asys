@@ -1,9 +1,8 @@
 package stx.io.pack;
 
-
 typedef InputDef  = ProxyCat<InputRequest,Closed,Noise,InputRequest,InputResponse,Noise,IOFailure>;
 
-@:forward abstract Input(InputDef) from InputDef{
+@:callable @:forward abstract Input(InputDef) from InputDef{
   public function new(ipt:StdIn){
     var rec : ProxyCat<InputRequest,Closed,Noise,InputRequest,InputResponse,Noise,IOFailure> = null;
         rec = new ProxyCat(
@@ -20,6 +19,6 @@ typedef InputDef  = ProxyCat<InputRequest,Closed,Noise,InputRequest,InputRespons
             return __.belay(effect);
           }
         );
-    this = (rec:InputDef);
+    this = (Unary.lift(rec):InputDef);
   }
 }

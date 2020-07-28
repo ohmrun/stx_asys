@@ -1,6 +1,8 @@
 package stx.io.pack;
 
+@:using(stx.io.pack.StdIn.StdInLift)
 abstract StdIn(StdInput) from StdInput{
+  static public var _(default,never) = StdInLift;
   public function new(self){
     this = self;
   }
@@ -9,6 +11,9 @@ abstract StdIn(StdInput) from StdInput{
   }
   public function prj():StdInput{
     return this;
+  }
+  public function pull(un:InputRequest):Proceed<InputResponse,IOFailure>{
+    return _.pull(this,un);
   }
 }
 class StdInLift{
@@ -25,14 +30,15 @@ class StdInLift{
       }catch(e:Dynamic){
         err  = __.fault().of(Subsystem(Custom(e)));
       }
-      var out : Res<InputResponse,IOFailure> = __.option(err).map(__.failure).def(
-        ()-> __.success(prim)
+      var out : Res<InputResponse,IOFailure> = __.option(err).map(__.reject).def(
+        ()-> __.accept(prim)
       );
       return out;
     };
   }
   static function apply(ip:StdInput,un:InputRequest):InputResponse{
     return switch(un){
+      //case IReqStart    : 
       case IReqValue(x) :
         var prim = 
           switch(x){

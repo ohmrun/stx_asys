@@ -13,7 +13,7 @@ typedef RawDef<T:HasDevice> = Channel<String,Array<Token>,PathFailure>;
         ).parse(string.reader())
          .fold(
           (a,_)               -> __.success(a),
-          (e,xs,is_error)     -> __.failure(__.fault().of(ParseFailed(MalformedSource(Failure(e,xs,is_error)))))    
+          (e,xs,is_error)     -> __.failure(__.fault().of(E_Path_Parse(MalformedSource(Failure(e,xs,is_error)))))    
         )
       );
   }

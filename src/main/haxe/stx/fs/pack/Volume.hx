@@ -1,10 +1,10 @@
 package stx.fs.pack;
 
 interface VolumeApi{
-  public function index(dir:Directory):Proceed<Array<String>,FSFailure>;
+  public function index(dir:Directory):Proceed<Array<String>,FsFailure>;
   public function parent(dir:Directory):Res<Directory,PathFailure>;
 
-  public function read(archive:Archive,?binary : Bool = false):Proceed<FileInput,FSFailure>;
+  public function read(archive:Archive,?binary : Bool = false):Proceed<FileInput,FsFailure>;
 }
 
 class Volume implements VolumeApi extends Clazz{
@@ -13,7 +13,7 @@ class Volume implements VolumeApi extends Clazz{
     super();
     this.sep = sep;
   }
-  public function index(dir:Directory):Proceed<Array<String>,FSFailure>{
+  public function index(dir:Directory):Proceed<Array<String>,FsFailure>{
     return Proceed.fromFunXR(
       FileSystem.readDirectory.bind(dir.canonical(sep))
     ).errata(
@@ -22,23 +22,23 @@ class Volume implements VolumeApi extends Clazz{
   }
   public function parent(dir:Directory):Res<Directory,PathFailure>{
     return (dir.track.length > 0).if_else(
-      () -> __.success(Directory.make(dir.drive,new Track(dir.track.rdropn(1)))),
-      () -> __.failure(__.fault().of(ReachedRoot))
+      () -> __.accept(Directory.make(dir.drive,new Track(dir.track.rdropn(1)))),
+      () -> __.reject(__.fault().of(E_Path_ReachedRoot))
     );
   }
 
-  public function read(archive:Archive,?binary = false):Proceed<FileInput,FSFailure>{
+  public function read(archive:Archive,?binary = false):Proceed<FileInput,FsFailure>{
     return () -> try{
-      __.success(StdFile.read(archive.canonical(sep),binary));
+      __.accept(StdFile.read(archive.canonical(sep),binary));
     }catch(e:Dynamic){
-      __.failure(__.fault().of(FileUnreadable(e)));
+      __.reject(__.fault().of(FileUnreadable(e)));
     }
   }
-  public function write(archive:Archive,?binary = false):Proceed<FileOutput,FSFailure>{
+  public function write(archive:Archive,?binary = false):Proceed<FileOutput,FsFailure>{
     return () -> try{
-      __.success(StdFile.write(archive.canonical(sep),binary));
+      __.accept(StdFile.write(archive.canonical(sep),binary));
     }catch(e:Dynamic){
-      __.failure(__.fault().of(FileUnwriteable(e)));
+      __.reject(__.fault().of(FileUnwriteable(e)));
     }
   }
   // public function has(path:Path):Channel<Shell,Bool>{

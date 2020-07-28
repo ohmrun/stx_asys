@@ -10,7 +10,7 @@ typedef EntryDef = {
 @:forward abstract Entry(EntryDef) from EntryDef to EntryDef{
   public function new(self) this = self;
   static public function lift(self:EntryDef):Entry return new Entry(self);
-  static public function parse(str:String){
+  @:from static public function parse(str:String){
     var val = str.split(".");
     return switch(val.length){
       case 0  : throw "WOBBLARIA";
@@ -31,8 +31,15 @@ typedef EntryDef = {
       ext -> '${this.name}.$ext'
     ).defv(this.name);
   }  
-
+  public function toString(){
+    return if(this.ext == null){
+      '${this.name}';
+    }else{
+      '${this.name}.${this.ext}';
+    }
+  }
   public function prj():EntryDef return this;
   private var self(get,never):Entry;
   private function get_self():Entry return lift(this);
+
 }

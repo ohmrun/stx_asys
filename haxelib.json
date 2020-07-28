@@ -20,11 +20,11 @@
 
         "stx_fn": "",
         "stx_assert": "",
-        "stx_run": "",
+        "stx_async": "",
         "stx_arrowlet": "",
         "stx_proxy" : "",
         "stx_parse" : "",
-        "jali"   : ""
+        "pml"       : ""
     },
     "classPath": "src/main/haxe"
 }

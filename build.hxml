@@ -1,29 +1,3 @@
--main Main
---interp
-#-js test.js
-
--lib utest
-
-  
--lib tink_core
--lib tink_streams
-
-#-lib hxnodejs
-
--lib stx_pico
--lib stx_nano
--lib stx_run
--lib stx_arrowlet
--lib stx_parse
--lib stx_show
--lib stx_proxy
-
--lib jali
-
--cp src/main/haxe
-
--D test=stx_asys
-#-D error_stack
-
-#-cmd node test.js
-#--connect 9090
+src/main/hxml/extra.hxml
+src/main/hxml/libs.hxml
+src/main/hxml/hxnodejs.hxml

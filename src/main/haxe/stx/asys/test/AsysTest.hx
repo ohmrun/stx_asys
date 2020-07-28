@@ -1,13 +1,13 @@
 package stx.asys.test;
 
 class AsysTest extends utest.Test{
-  var local = Devices.local();
+  var local = Device.local();
   @Ignored
   public function testA(async:utest.Async){
     Proceed.pure(Sys.getCwd());
     
     // __.channel().io(__.into2(Paths._.toDirectory)).toChannel().prepare(
-    //   __.success(Devices.local()),
+    //   __.accept(Devices.local()),
     //   Strand.unit()
     // ).crunch();
     //var get_path  = __.asys().path(Sys.getCwd()).fudge(local);
@@ -40,9 +40,9 @@ class AsysTest extends utest.Test{
     var next = path.process(
       (dir:Directory) -> dir.into(['testing'])
     ).reframe()
-     .commander(Directory._.inject);
+     .commandment(Directory._.inject);
 
-    //next.evaluation().prepare(__.success(local),Automation.unit()).crunch();
+    //next.evaluation().prepare(__.accept(local),Automation.unit()).crunch();
 
   }
 }

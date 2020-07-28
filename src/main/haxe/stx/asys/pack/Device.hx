@@ -1,6 +1,13 @@
 package stx.asys.pack;
 
-class Device implements stx.asys.type.Device{
+interface DeviceApi{
+  public var distro(default,null)     : Distro;
+  public var volume(default,null)     : VolumeApi;
+  public var shell(default,null)      : Shell;
+  public var sep(default,null)        : Separator;
+}
+
+class Device implements DeviceApi{
   public function new(distro){
     this.distro   = distro;
     this.sep      = distro.is_windows() ? WinSeparator : PosixSeparator;
@@ -17,5 +24,14 @@ class Device implements stx.asys.type.Device{
 
   @:to public function toHasDevice():HasDevice{
     return { device : this }
+  }
+  static public function local():HasDevice{
+    return { device : new Device(new Distro()) };
+  }
+  static public function windows():HasDevice{
+    return { device : new Device(Windows) };
+  }
+  static public function linux():HasDevice{
+    return { device : new Device(Linux) };
   }
 }

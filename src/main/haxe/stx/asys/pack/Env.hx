@@ -5,10 +5,10 @@ interface EnvApi{
 }
 class Env implements EnvApi extends Clazz{
   public function get(str:String):Proceed<String,ASysFailure>{
-    return () -> try{
-      __.success(Sys.getEnv(str));
+    return Proceed.fromFunXRes(() -> try{
+      __.accept(Sys.getEnv(str));
     }catch(e:Dynamic){
-      __.failure(__.fault().of(EnvironmentVariablesInaccessible));
-    }
+      __.reject(__.fault().of(E_EnvironmentVariablesInaccessible));
+    });
   }
 }

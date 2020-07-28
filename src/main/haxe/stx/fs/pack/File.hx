@@ -1,40 +1,43 @@
 package stx.fs.pack;
 
+import sys.io.FileInput;
+import sys.io.FileOutput;
+
 class File extends Clazz{
-  public function read(path:String,?binary = false):Proceed<FileInput,FSFailure>{
+  public function read(path:String,?binary = false):Proceed<FileInput,FsFailure>{
     return () -> {
       var out = null;
       try{
-        out = __.success(StdFile.read(path,binary));
+        out = __.accept(StdFile.read(path,binary));
       }catch(e:Dynamic){
-        out = __.failure(__.fault().of(FileUnreadable(e)));
+        out = __.reject(__.fault().of(FileUnreadable(e)));
       }  
       return out;
     }
   }
-  public function exists(str:String):Proceed<Bool,FSFailure>{
+  public function exists(str:String):Proceed<Bool,FsFailure>{
     return () -> {
       var out = null;
       try{
-        out = __.success(FileSystem.exists(str));
+        out = __.accept(FileSystem.exists(str));
       }catch(e:Dynamic){
-        out = __.failure(__.fault().of(UnknownFSError(e)));
+        out = __.reject(__.fault().of(UnknownFSError(e)));
       }  
       return out;
     };
   }
-  public function is_dir(str:String):Proceed<Bool,FSFailure>{
+  public function is_dir(str:String):Proceed<Bool,FsFailure>{
     return () -> {
       var out = null;
       try{
-        out = __.success(FileSystem.isDirectory(str));
+        out = __.accept(FileSystem.isDirectory(str));
       }catch(e:Dynamic){
-        out = __.failure(__.fault().of(UnknownFSError(e)));
+        out = __.reject(__.fault().of(UnknownFSError(e)));
       }  
       return out;
     };
   }
-  public function put(archive:Archive,data:String):Command<HasDevice,FSFailure>{
+  public function put(archive:Archive,data:String):Command<HasDevice,FsFailure>{
     return (env:HasDevice) -> {
       var out = Report.unit();
       try{

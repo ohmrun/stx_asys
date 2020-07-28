@@ -1,14 +1,16 @@
-package stx.asys;
+package stx;
 
-interface ASysApi{
-  public function sleep(float:Float):Bang;
+class LiftASys{
+  static public function asys(__:Wildcard){
+    return new stx.asys.Module();
+  } 
+  static public function localhost(__:Wildcard):Device{
+    return new Device(new Distro());
+  }
 }
-
-typedef StdFile           = sys.io.File;
-
-typedef ASysFailure        = stx.asys.pack.ASysFailure;
-
+typedef ASysApi           = stx.asys.pack.ASys.ASysApi; 
 typedef ASys              = stx.asys.pack.ASys; 
+
 typedef ByteSize          = stx.asys.pack.ByteSize;
 typedef Packet            = stx.asys.pack.Packet;
 typedef Distro            = stx.asys.pack.Distro;
@@ -23,29 +25,5 @@ typedef HasDevice         = stx.asys.pack.HasDevice;
 
 typedef Shell             = stx.asys.pack.Shell;
 
+typedef TargetSum         = stx.asys.pack.Target.TargetSum;
 typedef Target            = stx.asys.pack.Target;
-
-typedef Devices           = stx.asys.head.Devices;
-typedef Targets           = stx.asys.body.Targets;
-
-
-
-
-class Pack{
-  
-}
-class LiftAsys{
-  static public function asys(__:Wildcard){
-    return new stx.asys.Module();
-  }
-  
-}
-class LiftDrive{
-  static public function canonical(drive:Drive,env:HasDevice):String{
-    var sep = '${env.device.sep}';
-    return switch(drive){
-      case Some(name)       : 'name$sep';
-      case None             :  sep;
-    }
-  }
-}

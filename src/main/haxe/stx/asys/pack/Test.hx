@@ -1,68 +1,51 @@
 package stx.asys.pack;
 
-import utest.Assert in Rig;
-
 import stx.asys.test.*;
 
 class Test extends Clazz{
   public function deliver():Array<Dynamic>{
+    trace(
+      "test"
+    );
     return [
       new FsParseTest(),
       new AsysTest(),
+      new SocketTest(),
       new DirDrillTest(),
-    ].last().toArray();
+      new ArchiveTest(),
+      new EnvTest(),
+      new FsTest()
+    ];//.last().toArray();
   }
 }
-class DirDrillTest extends utest.Test{
-  var dev = LocalHost.unit().toHasDevice();
-  
-  @Ignored
-  public function test_cwd_crunch(async:utest.Async){
-    var cwd = new Cwd();
-        cwd.pop()
-           .environment(dev,
-             (x) -> {
-               trace(x);
-               Rig.pass();
-               async.done();
-             },
-             __.raise
-          ).submit();
 
+class EnvTest extends utest.Test{
+  public function test_get(){
+    var env    = __.asys().local().device.env;
+    var path   = env.get("UNKNOWN");
+        path.environment(
+          __.log().sink(),
+          __.log().sink()
+        ).crunch();
   }
-  @Ignored
-  public function test_cwd_submit(async:utest.Async){
-
-    var cwd = new Cwd();
-        cwd.pop()
-           .environment(
-             dev,
-             (x) -> {
-              Rig.pass();
-              async.done();
-              trace(x);
-            },
-            __.raise
-           ).submit();
+}
+class SocketTest extends utest.Test{
+  public function test(){
+    var input = Shell.unit().stdin();
+    var proxy = input(IReqValue(ByteSize.LINE));
   }
-  //@Ignored
-  @:timout(6000)
-  public function test(async:utest.Async){
-    var cwd 	= new Cwd();
-		var host 	= LocalHost.unit().toHasDevice();
-    cwd.pop()
-      .process((dir:Directory) -> dir.into(['src', 'main', 'haxe', 'stx', 'fs']))
-      .reframe()
-      .arrange(
-        Directory._.tree
-      ).evaluation()
-       .environment(
-         host,
-        (x) -> {
-          trace(x);
-        },
-        __.raise
-     ).submit();
-     //crunch
+}
+class ArchiveTest extends utest.Test{
+  public function test_non_existent_get(){
+    var arc : Archive = {
+      drive : None,
+      track : ["nope"],
+      entry : "not.here"
+    };
+    arc.val().environment(
+      __.asys().local(),
+      __.log().sink(),
+      __.crack
+    ).crunch();
   }
 }

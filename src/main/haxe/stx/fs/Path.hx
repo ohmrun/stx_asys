@@ -1,17 +1,37 @@
 package stx.fs;
 
+typedef LiftString = stx.fs.path.lift.LiftString;
+
+class PathApi extends Clazz{
+  public function archive(str:String):Archive{
+    return Path.parse(str)
+        .attempt(Raw._.toArchive)
+        .forward(__.asys().local())//HMMMM
+        .fudge();
+  }
+}
 class Path{
+  static public function path(wildcard:Wildcard){
+    return new PathApi();
+  }
   static public function parse(str:String):Attempt<HasDevice,Raw,PathFailure>{
-    return Attempt.fromFun1Res(
-      (env:HasDevice) -> 
-        env.device.distro.is_windows().if_else(
-          () -> new Windows().asBase(),
-          () -> new Posix().asBase()
-        ).parse(str.reader())
-         .fold(
-          (a)     -> __.success(a.with),
-          (e)     -> __.failure(__.fault().of(ParseFailed(MalformedSource(e))))    
-        )
+    return Attempt.fromFun1Proceed(
+      (env:HasDevice) -> {
+        return Proceed.fromForward(__.option(str).map(
+          (s:String) -> env.device.distro.is_windows().if_else(
+            () -> new Windows().asBase(),
+            () -> new Posix().asBase()
+          ).asParser()
+           .forward(s.reader())
+           .process(
+             (res:ParseResult<String,Array<Token>>) -> res.fold(
+              (a)     -> __.accept((a.with.defv([]):Raw)),
+              (e)     -> e.toRes().errate( (e) -> e.toPathParseFailure().toPathFailure() ) 
+           )
+          )
+        ).defv(Forward.pure(__.reject(__.fault().of(E_Path_PathParse(E_PathParse_EmptyInput)))))
+        );
+      }
     );
   }
 }
@@ -32,7 +52,7 @@ typedef Directory                     = stx.fs.path.pack.Directory;
 /**
  * A reference to the root of a volume.
 **/
-typedef DriveDef                      = stx.core.pack.Option<String>;
+typedef DriveDef                      = stx.pico.Option<String>;
 typedef Drive                         = DriveDef;
 
 /**
@@ -78,7 +98,7 @@ typedef Move                          = MoveSum;
 **/
 typedef Name                          = String;
 
-typedef PathFailure                   = stx.fs.path.pack.PathFailure;
+typedef PathFailure                   = stx.fail.PathFailure;
 
 typedef AddressDef                    = stx.fs.path.pack.Address.AddressDef;
 /**
@@ -126,3 +146,12 @@ typedef AttachmentDef                 = stx.fs.path.pack.Attachment.AttachmentDe
 typedef Attachment                    = stx.fs.path.pack.Attachment;
 
 
+class LiftDrive{
+  static public function canonical(drive:Drive,env:HasDevice):String{
+    var sep = '${env.device.sep}';
+    return switch(drive){
+      case Some(name)       : 'name$sep';
+      case None             :  sep;
+    }
+  }
+}

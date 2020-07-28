@@ -1,14 +1,16 @@
 package stx.fs.path.pack;
 
+using eu.ohmrun.Pml;
+
 /**
   Represents an absolute path between the root of a file system
-  to a known directory 
+  to a known directory.
 **/
 typedef DirectoryDef = {
   var drive : Drive;
   var track : Track;
 }
-
+@:using(stx.fs.path.pack.Directory.DirectoryLift)
 @:forward abstract Directory(DirectoryDef) from DirectoryDef to DirectoryDef{
   public function new(self) this = self;
   static public var _(default,never) = DirectoryLift;
@@ -35,10 +37,10 @@ typedef DirectoryDef = {
       F -> lift
     );
   }
-  public function attach():Command<HasDevice,FSFailure>       return _.attach(self);
-  public function inject():Command<HasDevice,FSFailure>       return _.inject(self);
+  public function attach():Command<HasDevice,FsFailure>       return _.attach(self);
+  public function inject():Command<HasDevice,FsFailure>       return _.inject(self);
 
-  public function exists():Attempt<HasDevice,Bool,FSFailure>       return _.exists(self);
+  public function exists():Attempt<HasDevice,Bool,FsFailure>  return _.exists(self);
 
   public function prj():DirectoryDef return this;
   private var self(get,never):Directory;
@@ -68,19 +70,18 @@ typedef DirectoryDef = {
   public function entry(entry:Entry):Archive{
     return Archive.make(this.drive,this.track,entry);
   }
-  public function entries():Attempt<HasDevice,Array<Either<String,Entry>>,FSFailure>{
-    return _.entries(this);
-  }
   static public var pos = __.here();
 }
-private class DirectoryLift{
-
-  static public function entries(self:Directory):Attempt<HasDevice,Array<Either<String,Entry>>,FSFailure>{
+class DirectoryLift{
+  static public function down(self:Directory,next:String):Directory{
+    return Directory.make(self.drive,self.track.snoc(next));
+  }
+  static public function entries(self:Directory):Attempt<HasDevice,Array<Either<String,Entry>>,FsFailure>{
     return (env:HasDevice) -> {
       var sep     = env.device.sep;
       var path    = self.canonical(sep);
-      var out     = __.failure(__.fault().of(AlreadyExists));
-      return out  = __.success(
+      var out     = __.reject(__.fault().of(AlreadyExists));
+      return out  = __.accept(
         FileSystem.readDirectory(path).map(
           (str:String) ->  FileSystem.isDirectory(self.into([str]).canonical(sep)).if_else(
             () -> __.left(str),
@@ -90,24 +91,24 @@ private class DirectoryLift{
       );
     };
   }
-  static public function attach(self:Directory):Command<HasDevice,FSFailure>{
+  static public function attach(self:Directory):Command<HasDevice,FsFailure>{
     return (env:HasDevice) -> {
       var str = self.canonical(env.device.sep);
       return try{
         FileSystem.createDirectory(str);
         Report.unit();
       }catch(e:Dynamic){
-        Report.pure(__.fault().of(FSFailure.CannotCreate(str)));
+        Report.pure(__.fault().of(CannotCreate(str)));
       }
     };
   }
-  static public function inject(self:Directory):Command<HasDevice,FSFailure>{
+  static public function inject(self:Directory):Command<HasDevice,FsFailure>{
     return (env:HasDevice) -> {
       return Execute.bind_fold(
-        (next:Array<String>,memo:Report<FSFailure>) -> {
+        (next:Array<String>,memo:Report<FsFailure>) -> {
           var path = Directory.fromArray(next);
           return memo.fold(
-            (v:Err<FSFailure>) -> Execute.pure(v),
+            (v:Err<FsFailure>) -> Execute.pure(v),
             ()  -> exists(path).forward(env).point(
               (b) -> b.if_else(
                 () -> cast Execute.unit(),//TODO wtf
@@ -130,14 +131,14 @@ private class DirectoryLift{
     }
   }
 
-  static public function exists(self:Directory):Attempt<HasDevice,Bool,FSFailure>{
+  static public function exists(self:Directory):Attempt<HasDevice,Bool,FsFailure>{
     return (env:HasDevice) -> try{
-      __.success(FileSystem.exists(self.canonical(env.device.sep)));
+      __.accept(FileSystem.exists(self.canonical(env.device.sep)));
     }catch(e:Dynamic){
-      __.failure(__.fault().of(UnknownFSError(e)));
+      __.reject(__.fault().of(UnknownFSError(e)));
     }  
   }
-  static public function parent(self:Directory):Proceed<Directory,FSFailure>{
+  static public function parent(self:Directory):Proceed<Directory,FsFailure>{
     var fn = () -> {
       var track = self.track.snapshot();
           track.pop();
@@ -151,27 +152,35 @@ private class DirectoryLift{
       (e) -> e.fault().of(UnknownFSError(e.data))
     );
   }
-  static public function tree(dir:Directory):Attempt<HasDevice,Jali<Entry>,Dynamic>{
-    __.log().close()('Jali: $dir');
+  static public function tree(dir:Directory):Cascade<HasDevice,Expr<Entry>,FsFailure>{
+    __.log().close()('tree: $dir');
     var init  = Arrange.fromFun1Attempt(entries);
-    var pure  = (entry) -> Jali.make().datum(entry);
-    var make  = Jali.make();
-    var c     = Cascade.pure(__.success(dir)).reframe().arrange(entries);
+    var c     = Cascade.pure(dir).reframe().arrange(entries);
     
-    function fn(either:Either<String,Entry>,t:Jali<Entry>){
+    function fn(either:Either<String,Entry>,t:Expr<Entry>):Cascade<HasDevice,Expr<Entry>,FsFailure>{
       __.log().close().trace(either);
       return switch(either){
-        case Left(string) : tree(dir.into([string])).process(
-          Process.fromFun1R((t1) -> make.subtree(t,make.code(string,[t1])))
-        );
-        case Right(entry) : Attempt.pure(__.success(t.concat(make.datum(entry))));
+        case Left(string) : 
+          var into = dir.into([string]);
+          __.log().close()(into);
+          var next = tree(into);
+          __.log().close()(next);
+          
+          next.process(
+            function(t1){
+              return t.conflate(Group(Cons(Label(string),Cons(t1,Nil))));
+            }
+          );
+        case Right(entry) : Cascade.pure(
+            t.conflate(Value(entry))
+          );
       }
     }
-    var ut  = Arrange.pure(Jali.unit());
+    var ut  = Arrange.pure(Empty);
     var d   = Arrange.bind_fold.bind(fn).fn().then( _ -> _.defv(ut));
-    var e   = c.rearrange(d);
+    var e   = c.arrangement(d).toCascade();
     var f = e.prefix(
-      (env) -> __.couple(Jali.make().unit(),env)
+      (env) -> __.couple(Empty,env)
     );
     //$type(a);
     // $type(b);
@@ -181,6 +190,6 @@ private class DirectoryLift{
     //$type(e);
     //$type(f);
 
-    return Attempt.lift(f);
+    return Cascade.lift(f);
   }
 }

@@ -22,7 +22,7 @@ class RawLift {
 		var rest = arr.tail();
 		return switch(head){
 			case None :
-				__.success(Address.unit());
+				__.accept(Address.unit());
 			case Some(v) :
 				var is_denormalised 					= false;
 				var is_absolute 							= false;
@@ -50,15 +50,15 @@ class RawLift {
 					case FPTRel:
 					default : 
 						trace(v);
-						error = __.fault().of(ParseFailed(NoHeadNode));
+						error = __.fault().of(E_Path_PathParse(E_PathParse_NoHeadNode));
 				}
 				for(node in rest){
 					switch (node){
 						case FPTSep : 
 						case FPTDrive(name):
-							error = __.fault().of(ParseFailed(MisplacedHeadNode));
+							error = __.fault().of(E_Path_PathParse(E_PathParse_MisplacedHeadNode));
 						case FPTRel:
-							error = __.fault().of(ParseFailed(MisplacedHeadNode));
+							error = __.fault().of(E_Path_PathParse(E_PathParse_MisplacedHeadNode));
 						case FPTUp:
 							body.prj().push(From);
 						case FPTDown(str):
@@ -73,7 +73,7 @@ class RawLift {
 					}
 				}
 				if(error!=null){
-					__.failure(error);
+					__.reject(error);
 				}else{
 					var track = if(!is_denormalised){
 						Track.lift(body.map(
@@ -85,7 +85,7 @@ class RawLift {
 					}else{
 						[];
 					}
-					__.success(Address.make(
+					__.accept(Address.make(
 						head,
 						is_denormalised.if_else(
 							() -> Left(body),
@@ -103,22 +103,22 @@ class RawLift {
 				var track = raw.tail().lfold(
 					(next:Token,memo:Res<Array<String>,PathFailure>) -> memo.fold(
 						(arr) -> switch(next){
-							case FPTDrive(_) 	: __.failure(__.fault().of(ParseFailed(MisplacedHeadNode)));
-							case FPTRel				: __.failure(__.fault().of(ParseFailed(MisplacedHeadNode)));
-							case FPTUp				: __.failure(__.fault().of(ParseFailed(UnexpectedDenormalisedPath(raw))));
-							case FPTSep				: __.success(arr);
-							case FPTDown(str) : __.success(arr.snoc(str));
-							case FPTFile(_,_) : __.failure(__.fault().of(ParseFailed(UnexpectedFileInDirectory(raw))));
+							case FPTDrive(_) 	: __.reject(__.fault().of(E_Path_PathParse(E_PathParse_MisplacedHeadNode)));
+							case FPTRel				: __.reject(__.fault().of(E_Path_PathParse(E_PathParse_MisplacedHeadNode)));
+							case FPTUp				: __.reject(__.fault().of(E_Path_PathParse(E_PathParse_UnexpectedDenormalisedPath(raw))));
+							case FPTSep				: __.accept(arr);
+							case FPTDown(str) : __.accept(arr.snoc(str));
+							case FPTFile(_,_) : __.reject(__.fault().of(E_Path_PathParse(E_PathParse_UnexpectedFileInDirectory(raw))));
 						},
-						(err) -> __.failure(err)
+						(err) -> __.reject(err)
 					),
-					__.success([])
+					__.accept([])
 				);
 				track.map(
 					(track:Track) -> Directory.make(drive,track)
 				);
 			default : 
-					__.failure(__.fault().of(ParseFailed(NoHeadNode)));
+					__.reject(__.fault().of(E_Path_PathParse(E_PathParse_NoHeadNode)));
 		}).broker(
 			F -> F.then(Proceed.fromRes).then(
 				(io) -> io
@@ -131,23 +131,23 @@ class RawLift {
 				Res.lift(raw.tail().lfold(
 					(next:Token,memo:Res<MaybeAttachment,PathFailure>) -> memo.fold(
 						(v) -> switch(next){
-							case FPTDrive(_) 	: __.failure(__.fault().of(ParseFailed(MisplacedHeadNode)));
-							case FPTRel				: __.failure(__.fault().of(ParseFailed(MisplacedHeadNode)));
-							case FPTUp				: __.success(v.snoc(From));
-							case FPTDown(str) : __.success(v.snoc(Into(str)));
-							case FPTFile(n,e) : __.success(v.name({ name : n, ext : e }));
-							case FPTSep				: __.success(v);
+							case FPTDrive(_) 	: __.reject(__.fault().of(E_Path_PathParse(E_PathParse_MisplacedHeadNode)));
+							case FPTRel				: __.reject(__.fault().of(E_Path_PathParse(E_PathParse_MisplacedHeadNode)));
+							case FPTUp				: __.accept(v.snoc(From));
+							case FPTDown(str) : __.accept(v.snoc(Into(str)));
+							case FPTFile(n,e) : __.accept(v.name({ name : n, ext : e }));
+							case FPTSep				: __.accept(v);
 						},
-						__.failure
+						__.reject
 					),
-					__.success(new MaybeAttachment())
+					__.accept(new MaybeAttachment())
 				)).flat_map(
 					(x) -> x.fst().fold(
-						(drive) -> __.success(Attachment.make(drive,x.snd())),
-						() 			-> __.failure(__.fault().of(ParseFailed(NoFileFoundOnAttachment(raw))))
+						(drive) -> __.accept(Attachment.make(drive,x.snd())),
+						() 			-> __.reject(__.fault().of(E_Path_PathParse(E_PathParse_NoFileFoundOnAttachment(raw))))
 					)
 				);
-			default : __.failure(__.fault().of(ParseFailed(MalformedRaw(raw))));
+			default : __.reject(__.fault().of(E_Path_PathParse(E_PathParse_MalformedRaw(raw))));
 		}
 	}
 	static public function toArchive(raw:Raw):Res<Archive,PathFailure>{
@@ -157,27 +157,27 @@ class RawLift {
 				var track = raw.tail().lfold(
 					(next:Token,memo:Res<Couple<Option<Entry>,Array<String>>,PathFailure>) -> memo.fold(
 						(tp) -> switch(next){
-							case FPTDrive(_) 				: __.failure(__.fault().of(ParseFailed(MisplacedHeadNode)));
-							case FPTRel							: __.failure(__.fault().of(ParseFailed(MisplacedHeadNode)));
-							case FPTUp							: __.failure(__.fault().of(ParseFailed(UnexpectedDenormalisedPath(raw))));
-							case FPTSep							: __.success(tp);
-							case FPTDown(str) 			: __.success(tp.map(arr->arr.snoc(str)));
-							case FPTFile(nm,null) 	: __.success(tp.map(arr->arr.snoc(nm)));
-							case FPTFile(nm,ext) 	  : __.success(tp.lmap(_ -> __.option(Entry.make(nm,ext))));
+							case FPTDrive(_) 				: __.reject(__.fault().of(E_Path_PathParse(E_PathParse_MisplacedHeadNode)));
+							case FPTRel							: __.reject(__.fault().of(E_Path_PathParse(E_PathParse_MisplacedHeadNode)));
+							case FPTUp							: __.reject(__.fault().of(E_Path_PathParse(E_PathParse_UnexpectedDenormalisedPath(raw))));
+							case FPTSep							: __.accept(tp);
+							case FPTDown(str) 			: __.accept(tp.map(arr->arr.snoc(str)));
+							case FPTFile(nm,null) 	: __.accept(tp.map(arr->arr.snoc(nm)));
+							case FPTFile(nm,ext) 	  : __.accept(tp.lmap(_ -> __.option(Entry.make(nm,ext))));
 						},
-						__.failure
+						__.reject
 					),
-					__.success(__.couple(__.option(null),[]))
+					__.accept(__.couple(__.option(null),[]))
 				);
 				track.fold(
 					(tp) -> tp.fst().fold(
-						(entry) -> __.success(Archive.make(drive,tp.snd(),entry)),
-						()			-> __.failure(__.fault().of(ParseFailed(NoFileOnPath(raw))))
+						(entry) -> __.accept(Archive.make(drive,tp.snd(),entry)),
+						()			-> __.reject(__.fault().of(E_Path_PathParse(E_PathParse_NoFileOnPath(raw))))
 					),
-					__.failure
+					__.reject
 				);
 			default : 
-					__.failure(__.fault().of(ParseFailed(NoHeadNode)));
+					__.reject(__.fault().of(E_Path_PathParse(E_PathParse_NoHeadNode)));
 		});
 	}
 	static public function kind(arr:Raw){
@@ -202,7 +202,20 @@ class RawLift {
       has_trailing_slash    : has_trailing_slash,
       file                  : false
     }
-  }
+	}
+	static public function toTrack(raw:Raw):Res<Track,PathFailure>{
+		return raw.lfold(
+			(next:Token,memo:Res<Track,PathFailure>) -> memo.fold(
+				(arr) -> switch(next){
+					case FPTDown(str) : __.accept(arr.snoc(str));
+					case FPTSep  			: __.accept(arr);
+					default 					: __.reject(__.fault().of(E_Path_PathParse(E_PathParse_UnexpectedToken(next,raw))));
+				},
+				__.reject
+			),
+			__.accept([])
+		);
+	}
 }
 
 @:forward abstract MaybeAttachment(Couple<Option<Entry>,Route>){

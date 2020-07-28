@@ -1,7 +1,7 @@
 package stx.fs.path.parse.body;
 
 class Raws extends Clazz{
-  public function toAddress(arr:Raw):Outcome<Address,AddressFailure>{
+  public function toAddress(arr:Raw):Outcome<Address,PathFailure>{
 		var head = arr.head();
 		var rest = arr.tail();
 		return switch(head){
@@ -34,15 +34,15 @@ class Raws extends Clazz{
 					case FPTRel:
 					default : 
 						trace(v);
-						error = __.fault().of(ParseFailed(NoHeadNode));
+						error = __.fault().of(E_Path_Parse(NoHeadNode));
 				}
 				for(node in rest){
 					switch (node){
 						case FPTSep : 
 						case FPTDrive(name):
-							error = __.fault().of(ParseFailed(MisplacedHeadNode));
+							error = __.fault().of(E_Path_Parse(MisplacedHeadNode));
 						case FPTRel:
-							error = __.fault().of(ParseFailed(MisplacedHeadNode));
+							error = __.fault().of(E_Path_Parse(MisplacedHeadNode));
 						case FPTUp:
 							body.prj().push(From);
 						case FPTDown(str):
@@ -80,19 +80,19 @@ class Raws extends Clazz{
 				}
 		}
 	}
-	public function toDirectory(raw:Raw):Proceed<Directory,AddressFailure>{
+	public function toDirectory(raw:Raw):Proceed<Directory,PathFailure>{
 		return (switch(raw.head()){
 			case Some(FPTDrive(head)) : 
 				var drive : Drive = head;
 				var track = raw.tail().lfold(
-					(next:Token,memo:Outcome<Array<String>,AddressFailure>) -> memo.fold(
+					(next:Token,memo:Outcome<Array<String>,PathFailure>) -> memo.fold(
 						(arr) -> switch(next){
-							case FPTDrive(_) 	: __.failure(__.fault().of(ParseFailed(MisplacedHeadNode)));
-							case FPTRel				: __.failure(__.fault().of(ParseFailed(MisplacedHeadNode)));
-							case FPTUp				: __.failure(__.fault().of(ParseFailed(UnexpectedDenormalisedAddress(raw))));
+							case FPTDrive(_) 	: __.failure(__.fault().of(E_Path_Parse(MisplacedHeadNode)));
+							case FPTRel				: __.failure(__.fault().of(E_Path_Parse(MisplacedHeadNode)));
+							case FPTUp				: __.failure(__.fault().of(E_Path_Parse(UnexpectedDenormalisedAddress(raw))));
 							case FPTSep				: __.success(arr);
 							case FPTDown(str) : __.success(arr.snoc(str));
-							case FPTFile(_,_) : __.failure(__.fault().of(ParseFailed(UnexpectedFileInDirectory(raw))));
+							case FPTFile(_,_) : __.failure(__.fault().of(E_Path_Parse(UnexpectedFileInDirectory(raw))));
 						},
 						(err) -> __.failure(err)
 					),
@@ -102,21 +102,21 @@ class Raws extends Clazz{
 					(track:Track) -> Directory.make(drive,track)
 				);
 			default : 
-					__.failure(__.fault().of(ParseFailed(NoHeadNode)));
+					__.failure(__.fault().of(E_Path_Parse(NoHeadNode)));
 		}).broker(
 			F -> F.then(Proceed.fromOutcome).then(
 				(io) -> io.map(__.tracer())
 			)
 		);
 	}
-	public function toAttachment(raw:Raw):Res<Attachment,AddressFailure>{
+	public function toAttachment(raw:Raw):Res<Attachment,PathFailure>{
 		return switch(raw.head()){
 			case Some(FPTRel)				: 
 				Res.lift(raw.tail().lfold(
-					(next:Token,memo:Res<MaybeAttachment,AddressFailure>) -> memo.fold(
+					(next:Token,memo:Res<MaybeAttachment,PathFailure>) -> memo.fold(
 						(v) -> switch(next){
-							case FPTDrive(_) 	: __.failure(__.fault().of(ParseFailed(MisplacedHeadNode)));
-							case FPTRel				: __.failure(__.fault().of(ParseFailed(MisplacedHeadNode)));
+							case FPTDrive(_) 	: __.failure(__.fault().of(E_Path_Parse(MisplacedHeadNode)));
+							case FPTRel				: __.failure(__.fault().of(E_Path_Parse(MisplacedHeadNode)));
 							case FPTUp				: __.success(v.snoc(From));
 							case FPTDown(str) : __.success(v.snoc(Into(str)));
 							case FPTFile(n,e) : __.success(v.name({ name : n, ext : e }));
@@ -128,22 +128,22 @@ class Raws extends Clazz{
 				)).flat_map(
 					(x) -> x.brand.fold(
 						(brand) -> __.success(Attachment.lift(Clause.make(brand,x.media))),
-						() 			-> __.failure(__.fault().of(ParseFailed(NoFileFoundOnAttachment(raw))))
+						() 			-> __.failure(__.fault().of(E_Path_Parse(NoFileFoundOnAttachment(raw))))
 					)
 				);
-			default : __.failure(__.fault().of(ParseFailed(MalformedRaw(raw))));
+			default : __.failure(__.fault().of(E_Path_Parse(MalformedRaw(raw))));
 		}
 	}
-	public function toArchive(raw:Raw):Outcome<Archive,AddressFailure>{
+	public function toArchive(raw:Raw):Outcome<Archive,PathFailure>{
 		return (switch(raw.head()){
 			case Some(FPTDrive(head)) : 
 				var drive : Drive = head;
 				var track = raw.tail().lfold(
-					(next:Token,memo:Outcome<Couple<Option<Entry>,Array<String>>,AddressFailure>) -> memo.fold(
+					(next:Token,memo:Outcome<Couple<Option<Entry>,Array<String>>,PathFailure>) -> memo.fold(
 						(tp) -> switch(next){
-							case FPTDrive(_) 				: __.failure(__.fault().of(ParseFailed(MisplacedHeadNode)));
-							case FPTRel							: __.failure(__.fault().of(ParseFailed(MisplacedHeadNode)));
-							case FPTUp							: __.failure(__.fault().of(ParseFailed(UnexpectedDenormalisedAddress(raw))));
+							case FPTDrive(_) 				: __.failure(__.fault().of(E_Path_Parse(MisplacedHeadNode)));
+							case FPTRel							: __.failure(__.fault().of(E_Path_Parse(MisplacedHeadNode)));
+							case FPTUp							: __.failure(__.fault().of(E_Path_Parse(UnexpectedDenormalisedAddress(raw))));
 							case FPTSep							: __.success(tp);
 							case FPTDown(str) 			: __.success(tp.map(arr->arr.snoc(str)));
 							case FPTFile(nm,null) 	: __.success(tp.map(arr->arr.snoc(nm)));
@@ -156,12 +156,12 @@ class Raws extends Clazz{
 				track.fold(
 					(tp) -> tp.fst().fold(
 						(entry) -> __.success(Archive.make(drive,tp.snd(),entry)),
-						()			-> __.failure(__.fault().of(ParseFailed(NoFileOnAddress(raw))))
+						()			-> __.failure(__.fault().of(E_Path_Parse(NoFileOnAddress(raw))))
 					),
 					__.failure
 				);
 			default : 
-					__.failure(__.fault().of(ParseFailed(NoHeadNode)));
+					__.failure(__.fault().of(E_Path_Parse(NoHeadNode)));
 		});
 	}
 	public function kind(arr:Raw){

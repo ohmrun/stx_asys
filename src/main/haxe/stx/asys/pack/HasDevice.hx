@@ -1,3 +1,5 @@
 package stx.asys.pack;
 
-typedef HasDevice = { device : Device };
+typedef HasDevice = { 
+  public var device(default,null):Device;
+};

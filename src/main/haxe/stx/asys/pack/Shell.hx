@@ -1,27 +1,48 @@
 package stx.asys.pack;
 
-class Shell implements stx.asys.type.Shell extends Clazz{
+interface ShellApi{
+  public function print(v:Dynamic):Future<Noise>;
+  public function println(v:Dynamic):Future<Noise>;
+
+  public function stdin():Input;
+  public function stderr():Output;
+  public function stdout():Output;
+
+  
+  public var cwd(default,null):Cwd;
+  
+  //public function command
+  //public var env(default,null)        : Env;
+}
+
+class Shell implements ShellApi extends Clazz{
+  static public function unit(){
+    return new Shell();
+  }
   public function new(){
     super();
     cwd = new Cwd();
   }
   public var cwd(default,null):Cwd;
 
-  public function print(v:Dynamic):Bang{
-    return Bang.pure(Sys.print.bind(v));
+  public function print(v:Dynamic):Future<Noise>{
+    return Future.irreversible(cb -> {Sys.print(v);cb(Noise);});
   }  
-  public function println(v:Dynamic):Bang{
-    return Bang.pure(Sys.println.bind(v));
+  public function println(v:Dynamic):Future<Noise>{
+    return Future.irreversible(cb -> {Sys.println(v);cb(Noise);});
   }  
   public function stdin(){
-    return new StdIn(Sys.stdin());
+    return new Input(new StdIn(Sys.stdin()));
   }
   public function stdout(){
-    return new StdOut(Sys.stdout());
+    return new Output(new StdOut(Sys.stdout()));
   }
   public function stderr(){
-    return new StdOut(Sys.stderr());
+    return new Output(new StdOut(Sys.stderr()));
   }
+  // public function char():Proceed<Int>{
+  //   return () -> Sys.getChar(false);
+  // }
 
   public function byte():Proceed<Int,ASysFailure>{
     return Proceed.fromFunXR(Sys.getChar.bind(false));

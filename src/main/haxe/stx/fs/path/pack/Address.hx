@@ -38,8 +38,8 @@ typedef AddressDef = {
     );
     return '${head}${body}${tail}';
   }
-  public function exists<T:HasDevice>():Attempt<T,Bool,FSFailure>{
-    return (env:T) -> __.success(FileSystem.exists(canonical(env.device.sep)));
+  public function exists<T:HasDevice>():Attempt<T,Bool,FsFailure>{
+    return (env:T) -> __.accept(FileSystem.exists(canonical(env.device.sep)));
   }
   public function prj():AddressDef return this;
   private var self(get,never):Address;

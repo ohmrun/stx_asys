@@ -17,4 +17,4 @@ enum TokenSum{
 }
 
 typedef Token             = TokenSum;
-typedef PathParseFailure  = stx.parse.path.PathParseFailure;
+typedef PathParseFailure  = stx.fail.PathParseFailure;

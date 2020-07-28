@@ -1,16 +1,17 @@
 package stx.parse.path;
 
-class Base{
+class Base extends ParserBase<String,Array<Token>>{
 	var is_windows : Bool;
-	public function new(is_windows){
+	public function new(is_windows,?id:Pos){
 		this.is_windows = is_windows;
+		super(Some('asys.fs.Path'),id);
 	}
 	private function separator(){
 		return is_windows ? Separator.WinSeparator : Separator.PosixSeparator;
 	}
 	public function p_sep(): Parser<String,Token>{
 		var sep = separator(); 
-		return Parser.Anon(function(ipt:Input<String>):ParseResult<String,Token>{
+		return Parser.SyncAnon(function(ipt:Input<String>):ParseResult<String,Token>{
 				return 
 					if( ipt.take(1) == sep ){ 
 						ipt.drop(1).ok(FPTSep);
@@ -157,8 +158,8 @@ class Base{
 				)
 			).and_(Parse.eof().lookahead());
 	}               
-	public function parse(i:Input<String>):ParseResult<String,Array<Token>>{
-		return p_path().parse(i);
+	override public function doApplyII(i:Input<String>,cont:Terminal<ParseResult<String,Array<Token>>,Noise>):Work{
+		return p_path().applyII(i,cont);
 	}
 	public function format(arr:Array<Token>){
 		var o = arr.lfold(
@@ -189,5 +190,8 @@ class Base{
 	}
 	public function asBase():Base{
 		return this;
+	}
+	public function forward(input){
+		return this.asParser().forward(input);
 	}
 }

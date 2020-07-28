@@ -1,28 +1,40 @@
 package stx;
 
+import stx.fail.FsFailure;
+import stx.fail.PathFailure;
+import stx.fail.PathParseFailure;
+import stx.fail.ASysFailure;
 
+#if test
+  import utest.Assert in Rig;
+#end
 import haxe.io.Eof;
 
-import sys.FileSystem;
+#if sys
+  import sys.FileSystem;
+  import sys.io.FileInput;
+  import sys.io.FileOutput;
 
-import sys.io.FileInput;
-import sys.io.FileOutput;
+  using stx.Fs;
+  using stx.Net;
+  using stx.Io;
+#end
 
 using tink.CoreApi;
 
 using stx.Pico;
 using stx.Nano;
-using stx.Run;
-using stx.Arrowlet;
+using stx.Arw;
 using stx.Log;
 using stx.Fn;
-using stx.Std;
+using stx.Ext;
+using stx.Async;
 
-using stx.asys.Pack;
-using stx.Fs;
+using stx.proxy.Pack;
+
+using stx.ASys;
 
 using stx.proxy.Pack;
 
 using stx.parse.Pack;
 using stx.parse.term.Path;
-using jali.Pack;
