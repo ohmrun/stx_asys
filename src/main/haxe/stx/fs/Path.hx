@@ -3,12 +3,7 @@ package stx.fs;
 typedef LiftString = stx.fs.path.lift.LiftString;
 
 class PathApi extends Clazz{
-  public function archive(str:String):Archive{
-    return Path.parse(str)
-        .attempt(Raw._.toArchive)
-        .forward(__.asys().local())//HMMMM
-        .fudge();
-  }
+  
 }
 class Path{
   static public function path(wildcard:Wildcard){
@@ -155,3 +150,5 @@ class LiftDrive{
     }
   }
 }
+
+typedef LiftAttemptHasDeviceRaw       = stx.fs.path.lift.LiftAttemptHasDeviceRaw;

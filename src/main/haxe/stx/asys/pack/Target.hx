@@ -45,7 +45,9 @@ abstract Target(TargetSum) from TargetSum to TargetSum{
       case "lua"    : Lua;
       case "hl"     : Hl;
       case "interp" : Interp;
-      default       : throw __.fault().err(E_ResourceNotFound);
+      default       : 
+        trace(str);
+        throw __.fault().err(E_ResourceNotFound);
     }
   }
 }
@@ -55,17 +57,17 @@ class TargetLift{
   }
   static public function toBuildDirective(target:Target):Option<String>{
     return switch (target) {
-      case Swf            : Some("-swf");
-      case Js             : Some("-js");
-      case Php            : Some("-php");
-      case Neko           : Some("-neko");
-      case Cpp            : Some("-cpp");
-      case Cs             : Some("-cs");
-      case Java           : Some("-java");
-      case Python         : Some("-python");
-      case Lua            : Some("-lua");
-      case Hl             : Some("-hl");
-      case Interp         : Some("--interp");
+      case Swf            : Some("swf");
+      case Js             : Some("js");
+      case Php            : Some("php");
+      case Neko           : Some("neko");
+      case Cpp            : Some("cpp");
+      case Cs             : Some("cs");
+      case Java           : Some("java");
+      case Python         : Some("python");
+      case Lua            : Some("lua");
+      case Hl             : Some("hl");
+      case Interp         : Some("interp");
       default             : None;
     }
   }
