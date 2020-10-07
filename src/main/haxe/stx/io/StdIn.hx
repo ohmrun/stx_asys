@@ -1,11 +1,26 @@
-package stx.io.body;
+package stx.io;
 
-
-class StdIns{
-  static public inline function pull(ip:StdInput,un:InputRequest):Proceed<InputResponse,IOFailure>{
+@:using(stx.io.StdIn.StdInLift)
+abstract StdIn(StdInput) from StdInput{
+  static public var _(default,never) = StdInLift;
+  public function new(self){
+    this = self;
+  }
+  public function apply(type:InputRequest):Proceed<InputResponse,IoFailure>{
+    return StdInLift.pull(this,type);
+  }
+  public function prj():StdInput{
+    return this;
+  }
+  public function pull(un:InputRequest):Proceed<InputResponse,IoFailure>{
+    return _.pull(this,un);
+  }
+}
+class StdInLift{
+  static public inline function pull(ip:StdInput,un:InputRequest):Proceed<InputResponse,IoFailure>{
     return () -> {
       var prim : InputResponse       = null;
-      var err  : Err<IOFailure>      = null;
+      var err  : Err<IoFailure>      = null;
       try{
         prim = apply(ip,un);
       }catch(e:Eof){
@@ -15,14 +30,15 @@ class StdIns{
       }catch(e:Dynamic){
         err  = __.fault().of(Subsystem(Custom(e)));
       }
-      var out : Res<InputResponse,IOFailure> = __.option(err).map(__.failure).def(
-        ()-> __.success(prim)
+      var out : Res<InputResponse,IoFailure> = __.option(err).map(__.reject).def(
+        ()-> __.accept(prim)
       );
       return out;
     };
   }
   static function apply(ip:StdInput,un:InputRequest):InputResponse{
     return switch(un){
+      //case IReqStart    : 
       case IReqValue(x) :
         var prim = 
           switch(x){
@@ -51,6 +67,9 @@ class StdIns{
         var bytes = Bytes.alloc(len);
         ip.readBytes(bytes,pos,len);
         IResBytes(bytes);
+      case IReqClose:     
+        IResSpent;
+
     }
   }
 }

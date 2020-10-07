@@ -1,6 +1,6 @@
-package stx.io.pack;
+package stx.io;
 
-enum IOFailure{
+enum IoFailure{
   Subsystem(e:haxe.io.Error);
   TypeError;
   SourceNotFound;

@@ -1,4 +1,4 @@
-package stx.io.pack;
+package stx.io;
 
 enum InputRequest{
   //IReqStart;

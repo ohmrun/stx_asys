@@ -102,6 +102,14 @@ class DirectoryLift{
       }
     };
   }
+  static public function ensure(self:Directory):Command<HasDevice,FsFailure>{
+    return exists(self).reframe().commandeer(
+      (bool:Bool) -> bool.if_else(
+        () -> Command.unit(),
+        () -> inject(self)
+      )
+    );
+  }
   static public function inject(self:Directory):Command<HasDevice,FsFailure>{
     return (env:HasDevice) -> {
       return Execute.bind_fold(
@@ -111,7 +119,7 @@ class DirectoryLift{
             (v:Err<FsFailure>) -> Execute.pure(v),
             ()  -> exists(path).forward(env).point(
               (b) -> b.if_else(
-                () -> cast Execute.unit(),//TODO wtf
+                () -> Execute.unit(),//TODO wtf
                 () -> attach(path).forward(env)
               )
             )

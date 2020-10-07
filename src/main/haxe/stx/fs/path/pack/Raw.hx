@@ -163,7 +163,7 @@ class RawLift {
 							case FPTSep							: __.accept(tp);
 							case FPTDown(str) 			: __.accept(tp.map(arr->arr.snoc(str)));
 							case FPTFile(nm,null) 	: __.accept(tp.map(arr->arr.snoc(nm)));
-							case FPTFile(nm,ext) 	  : __.accept(tp.lmap(_ -> __.option(Entry.make(nm,ext))));
+							case FPTFile(nm,ext) 	  : __.accept(tp.mapl(_ -> __.option(stx.fs.path.pack.Entry.make(nm,ext))));
 						},
 						__.reject
 					),
@@ -232,9 +232,9 @@ class RawLift {
 			)
 		);
 	}
-	public function name(entry:Entry){
+	public function name(entry:stx.fs.path.pack.Entry){
 		return lift(
-			this.lmap(
+			this.mapl(
 				(_) -> Some(entry)
 			)
 		);

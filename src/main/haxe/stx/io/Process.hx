@@ -1,9 +1,9 @@
-package stx.io.pack;
+package stx.io;
 
-import stx.io.pack.StdIn  in AsysStdIn;
-import stx.io.pack.StdOut in AsysStdOut;
+import stx.io.StdIn  in AsysStdIn;
+import stx.io.StdOut in AsysStdOut;
 
-typedef ProcessDef = Server<InputRequest,InputResponse,Noise,IOFailure>;
+typedef ProcessDef = Server<InputRequest,InputResponse,Noise,IoFailure>;
 
 abstract Process(ProcessDef) from ProcessDef{
   public function new(self){

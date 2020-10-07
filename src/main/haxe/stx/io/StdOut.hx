@@ -1,21 +1,21 @@
-package stx.io.pack;
+package stx.io;
 
 
-@:using(stx.io.pack.StdOut.StdOutLift)
+@:using(stx.io.StdOut.StdOutLift)
 abstract StdOut(StdOutput) from StdOutput{
   static public var _(default,never) = StdOutLift;
   public function new(self){
     this = self;
   }
-  public function apply(type:OutputRequest):Execute<IOFailure>{
+  public function apply(type:OutputRequest):Execute<IoFailure>{
     return StdOutLift.push(this,type);
   }
-  public inline function push(value:OutputRequest):Execute<IOFailure>{
+  public inline function push(value:OutputRequest):Execute<IoFailure>{
     return _.push(this,value);
   }
 }
 class StdOutLift{
-  static public inline function push(op:StdOutput,value:OutputRequest):Execute<IOFailure>{
+  static public inline function push(op:StdOutput,value:OutputRequest):Execute<IoFailure>{
     function fn(){
       var output      = Option.unit();
       var valAsInt    = Option.unit();

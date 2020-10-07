@@ -3,7 +3,7 @@ package stx.io.test;
 import haxe.io.*;
 
 import sys.io.Process;
-import stx.io.pack.Process;
+import stx.io.Process;
 
 class ProcessTest extends utest.Test{
   var log : Log = __.log();

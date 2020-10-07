@@ -8,7 +8,7 @@ class FsTest extends utest.Test{
             (dir:Directory) -> dir.entry('missing_file').val()
           ).environment(
             env,
-            __.log().sink(),
+            __.log().printer(),
             __.crack
           ).crunch();
     }catch(e:Err<Dynamic>){

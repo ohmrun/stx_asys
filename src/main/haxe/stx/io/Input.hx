@@ -1,12 +1,12 @@
-package stx.io.pack;
+package stx.io;
 
-typedef InputDef  = ProxyCat<InputRequest,Closed,Noise,InputRequest,InputResponse,Noise,IOFailure>;
+typedef InputDef  = ProxyCat<InputRequest,Closed,Noise,InputRequest,InputResponse,Noise,IoFailure>;
 
 @:callable @:forward abstract Input(InputDef) from InputDef{
   public function new(ipt:StdIn){
-    var rec : ProxyCat<InputRequest,Closed,Noise,InputRequest,InputResponse,Noise,IOFailure> = null;
+    var rec : ProxyCat<InputRequest,Closed,Noise,InputRequest,InputResponse,Noise,IoFailure> = null;
         rec = new ProxyCat(
-          function rec(req):Proxy<Closed,Noise,InputRequest,InputResponse,Noise,IOFailure>{
+          function rec(req):Proxy<Closed,Noise,InputRequest,InputResponse,Noise,IoFailure>{
             var effect = 
               ipt.apply(req)
                .process((res) -> switch(res){
@@ -14,7 +14,7 @@ typedef InputDef  = ProxyCat<InputRequest,Closed,Noise,InputRequest,InputRespons
                  default        : __.yield(res,rec);
                }
               ).control(
-                (e:Err<IOFailure>) -> Ended(End(e))
+                (e:Err<IoFailure>) -> Ended(End(e))
               );
             return __.belay(effect);
           }

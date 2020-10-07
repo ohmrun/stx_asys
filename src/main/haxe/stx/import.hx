@@ -5,7 +5,7 @@ import stx.fail.PathFailure;
 import stx.fail.PathParseFailure;
 import stx.fail.ASysFailure;
 
-#if test
+#if (test=="stx_asys")
   import utest.Assert in Rig;
 #end
 import haxe.io.Eof;
@@ -30,11 +30,9 @@ using stx.Fn;
 using stx.Ext;
 using stx.Async;
 
-using stx.proxy.Pack;
+using stx.Proxy;
 
 using stx.ASys;
-
-using stx.proxy.Pack;
 
 using stx.parse.Pack;
 using stx.parse.term.Path;

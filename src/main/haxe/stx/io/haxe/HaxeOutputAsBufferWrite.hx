@@ -1,4 +1,4 @@
-package stx.io.pack.haxe;
+package stx.io.haxe;
 
 import stx.io.type.node.BufferEdit;
 

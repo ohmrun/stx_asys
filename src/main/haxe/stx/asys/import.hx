@@ -1,6 +1,6 @@
 package stx.asys;
 
-#if test
+#if (test=="stx_asys")
   import utest.Assert;
 #end
 

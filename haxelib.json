@@ -18,10 +18,10 @@
         "stx_pico": "",
         "stx_nano": "",
 
-        "stx_fn": "",
+        "stx_fn": "1.0.0",
         "stx_assert": "",
         "stx_async": "",
-        "stx_arrowlet": "",
+        "stx_arw": "",
         "stx_proxy" : "",
         "stx_parse" : "",
         "pml"       : ""

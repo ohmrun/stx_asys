@@ -24,8 +24,8 @@ class EnvTest extends utest.Test{
     var env    = __.asys().local().device.env;
     var path   = env.get("UNKNOWN");
         path.environment(
-          __.log().sink(),
-          __.log().sink()
+          __.log().printer(),
+          __.log().printer()
         ).crunch();
   }
 }
@@ -44,7 +44,7 @@ class ArchiveTest extends utest.Test{
     };
     arc.val().environment(
       __.asys().local(),
-      __.log().sink(),
+      __.log().printer(),
       __.crack
     ).crunch();
   }
