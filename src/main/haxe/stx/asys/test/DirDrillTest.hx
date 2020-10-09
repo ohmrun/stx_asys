@@ -38,7 +38,7 @@ class DirDrillTest extends utest.Test{
     var cwd 	= new Cwd();
 		var host 	= LocalHost.unit().toHasDevice();
     cwd.pop()
-      .process((dir:Directory) -> dir.into(['src', 'main', 'haxe', 'stx', 'fs']))
+      .convert((dir:Directory) -> dir.into(['src', 'main', 'haxe', 'stx', 'fs']))
       .reframe()
       .arrange(
         Directory._.tree

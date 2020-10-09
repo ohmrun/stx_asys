@@ -1,7 +1,8 @@
 package stx.io;
+ 
+using stx.Coroutine;
 
-
-typedef OutputDef = ProxyCat<OutputRequest,Noise,OutputRequest,Noise,Closed,Noise,IoFailure>;
+typedef OutputDef = Coroutine<OutputRequest,Report<IoFailure>,Noise,IoFailure>;
 
 @:using(stx.io.Output.OutputLift)
 @:callable @:forward abstract Output(OutputDef) from OutputDef to OutputDef{
@@ -9,26 +10,16 @@ typedef OutputDef = ProxyCat<OutputRequest,Noise,OutputRequest,Noise,Closed,Nois
     return new Output(self);
   }
   public function new(opt:StdOut){
-    var rec = null;
-        rec = 
-          function(pkt:OutputRequest):Proxy<Noise,OutputRequest,Noise,Closed,Noise,IoFailure>{ 
-            return __.belay(
-              opt.apply(pkt)
-                .then(
-                  (report:Report<IoFailure>) -> report.fold(
-                    (err:Err<IoFailure>) -> Ended(End(err)),
-                    ()                          -> switch(pkt){
-                      case OReqValue(_) : Await(Noise,rec);
-                      case OReqClose    : __.ended(Tap);
-                    }
-                  )
-                )
-            );
-          }
-    this = (rec:OutputDef);
-  }
-  public function next<A,B,X,Y,R>(that:ProxyCat<Noise,A,B,X,Y,R,IoFailure>):ProxyCat<OutputRequest,A,B,X,Y,R,IoFailure>{
-    return ProxyCat._.next(this,that);
+    this = __.wait(
+      Transmission.fromFun1R(function rec(req:OutputRequest) {
+        return __.hold(opt.apply(req).toProvide().convert(
+          (report:Report<IoFailure>) -> report.fold(
+            (e:Err<IoFailure>) -> __.exit(e.map(E_Coroutine_Subsystem)),
+            () -> __.wait(Transmission.fromFun1R(rec))
+          )
+        ));
+      })
+    );
   }
 }
 class OutputLift{

@@ -4,7 +4,7 @@ class AsysTest extends utest.Test{
   var local = Device.local();
   @Ignored
   public function testA(async:utest.Async){
-    Proceed.pure(Sys.getCwd());
+    Produce.pure(Sys.getCwd());
     
     // __.channel().io(__.into2(Paths._.toDirectory)).toChannel().prepare(
     //   __.accept(Devices.local()),
@@ -37,7 +37,7 @@ class AsysTest extends utest.Test{
   
   public function testDir(){
     var path = __.asys().local().device.shell.cwd.pop();
-    var next = path.process(
+    var next = path.convert(
       (dir:Directory) -> dir.into(['testing'])
     ).reframe()
      .commandment(Directory._.inject);

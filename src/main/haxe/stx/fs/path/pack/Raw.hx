@@ -96,7 +96,7 @@ class RawLift {
 				}
 		}
 	}
-	static public function toDirectory(raw:Raw):Proceed<Directory,PathFailure>{
+	static public function toDirectory(raw:Raw):Produce<Directory,PathFailure>{
 		return (switch(raw.head()){
 			case Some(FPTDrive(head)) : 
 				var drive : Drive = head;
@@ -120,7 +120,7 @@ class RawLift {
 			default : 
 					__.reject(__.fault().of(E_Path_PathParse(E_PathParse_NoHeadNode)));
 		}).broker(
-			F -> F.then(Proceed.fromRes).then(
+			F -> F.then(Produce.fromRes).then(
 				(io) -> io
 			)
 		);

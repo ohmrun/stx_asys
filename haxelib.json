@@ -13,18 +13,18 @@
     "version": "0.1.0",
     "url": "http://www.example.com",
     "dependencies": {
-        "tink_core": "",
+        "tink_core": "2.0.0-rc.1",
         
-        "stx_pico": "",
-        "stx_nano": "",
+        "stx_pico": "1.0.0",
+        "stx_nano": "0.1.5",
 
         "stx_fn": "1.0.0",
-        "stx_assert": "",
-        "stx_async": "",
-        "stx_arw": "",
-        "stx_proxy" : "",
-        "stx_parse" : "",
-        "pml"       : ""
+        "stx_assert": "0.1.0",
+        "stx_async": "1.0.1",
+        "stx_arw": "1.0.0",
+        "stx_proxy" : "0.1.0",
+        "stx_parse" : "0.2.0",
+        "pml"       : "0.2.0"
     },
     "classPath": "src/main/haxe"
 }

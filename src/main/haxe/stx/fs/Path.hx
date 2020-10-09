@@ -10,21 +10,21 @@ class Path{
     return new PathApi();
   }
   static public function parse(str:String):Attempt<HasDevice,Raw,PathFailure>{
-    return Attempt.fromFun1Proceed(
+    return Attempt.fromFun1Produce(
       (env:HasDevice) -> {
-        return Proceed.fromForward(__.option(str).map(
+        return Produce.fromProvide(__.option(str).map(
           (s:String) -> env.device.distro.is_windows().if_else(
             () -> new Windows().asBase(),
             () -> new Posix().asBase()
           ).asParser()
            .forward(s.reader())
-           .process(
+           .convert(
              (res:ParseResult<String,Array<Token>>) -> res.fold(
               (a)     -> __.accept((a.with.defv([]):Raw)),
               (e)     -> e.toRes().errate( (e) -> e.toPathParseFailure().toPathFailure() ) 
            )
           )
-        ).defv(Forward.pure(__.reject(__.fault().of(E_Path_PathParse(E_PathParse_EmptyInput)))))
+        ).defv(Provide.pure(__.reject(__.fault().of(E_Path_PathParse(E_PathParse_EmptyInput)))))
         );
       }
     );

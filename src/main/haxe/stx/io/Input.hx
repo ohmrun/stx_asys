@@ -9,7 +9,7 @@ typedef InputDef  = ProxyCat<InputRequest,Closed,Noise,InputRequest,InputRespons
           function rec(req):Proxy<Closed,Noise,InputRequest,InputResponse,Noise,IoFailure>{
             var effect = 
               ipt.apply(req)
-               .process((res) -> switch(res){
+               .convert((res) -> switch(res){
                  case IResSpent : __.ended(Tap);
                  default        : __.yield(res,rec);
                }

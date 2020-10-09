@@ -117,10 +117,10 @@ class DirectoryLift{
           var path = Directory.fromArray(next);
           return memo.fold(
             (v:Err<FsFailure>) -> Execute.pure(v),
-            ()  -> exists(path).forward(env).point(
+            ()  -> exists(path).provide(env).point(
               (b) -> b.if_else(
                 () -> Execute.unit(),//TODO wtf
-                () -> attach(path).forward(env)
+                () -> attach(path).provide(env)
               )
             )
           );
@@ -146,7 +146,7 @@ class DirectoryLift{
       __.reject(__.fault().of(UnknownFSError(e)));
     }  
   }
-  static public function parent(self:Directory):Proceed<Directory,FsFailure>{
+  static public function parent(self:Directory):Produce<Directory,FsFailure>{
     var fn = () -> {
       var track = self.track.snapshot();
           track.pop();
@@ -156,7 +156,7 @@ class DirectoryLift{
         track
       );
     };
-    return Proceed.fromFunXR(fn).errata(
+    return Produce.fromFunXR(fn).errata(
       (e) -> e.fault().of(UnknownFSError(e.data))
     );
   }
@@ -174,7 +174,7 @@ class DirectoryLift{
           var next = tree(into);
           __.log().close()(next);
           
-          next.process(
+          next.convert(
             function(t1){
               return t.conflate(Group(Cons(Label(string),Cons(t1,Nil))));
             }

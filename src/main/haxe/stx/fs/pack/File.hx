@@ -4,7 +4,7 @@ import sys.io.FileInput;
 import sys.io.FileOutput;
 
 class File extends Clazz{
-  public function read(path:String,?binary = false):Proceed<FileInput,FsFailure>{
+  public function read(path:String,?binary = false):Produce<FileInput,FsFailure>{
     return () -> {
       var out = null;
       try{
@@ -15,7 +15,7 @@ class File extends Clazz{
       return out;
     }
   }
-  public function exists(str:String):Proceed<Bool,FsFailure>{
+  public function exists(str:String):Produce<Bool,FsFailure>{
     return () -> {
       var out = null;
       try{
@@ -26,7 +26,7 @@ class File extends Clazz{
       return out;
     };
   }
-  public function is_dir(str:String):Proceed<Bool,FsFailure>{
+  public function is_dir(str:String):Produce<Bool,FsFailure>{
     return () -> {
       var out = null;
       try{

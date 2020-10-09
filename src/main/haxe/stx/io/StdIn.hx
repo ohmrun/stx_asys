@@ -6,18 +6,18 @@ abstract StdIn(StdInput) from StdInput{
   public function new(self){
     this = self;
   }
-  public function apply(type:InputRequest):Proceed<InputResponse,IoFailure>{
+  public function apply(type:InputRequest):Produce<InputResponse,IoFailure>{
     return StdInLift.pull(this,type);
   }
   public function prj():StdInput{
     return this;
   }
-  public function pull(un:InputRequest):Proceed<InputResponse,IoFailure>{
+  public function pull(un:InputRequest):Produce<InputResponse,IoFailure>{
     return _.pull(this,un);
   }
 }
 class StdInLift{
-  static public inline function pull(ip:StdInput,un:InputRequest):Proceed<InputResponse,IoFailure>{
+  static public inline function pull(ip:StdInput,un:InputRequest):Produce<InputResponse,IoFailure>{
     return () -> {
       var prim : InputResponse       = null;
       var err  : Err<IoFailure>      = null;

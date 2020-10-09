@@ -1,10 +1,10 @@
 package stx.fs.pack;
 
 interface VolumeApi{
-  public function index(dir:Directory):Proceed<Array<String>,FsFailure>;
+  public function index(dir:Directory):Produce<Array<String>,FsFailure>;
   public function parent(dir:Directory):Res<Directory,PathFailure>;
 
-  public function read(archive:Archive,?binary : Bool = false):Proceed<FileInput,FsFailure>;
+  public function read(archive:Archive,?binary : Bool = false):Produce<FileInput,FsFailure>;
 }
 
 class Volume implements VolumeApi extends Clazz{
@@ -13,8 +13,8 @@ class Volume implements VolumeApi extends Clazz{
     super();
     this.sep = sep;
   }
-  public function index(dir:Directory):Proceed<Array<String>,FsFailure>{
-    return Proceed.fromFunXR(
+  public function index(dir:Directory):Produce<Array<String>,FsFailure>{
+    return Produce.fromFunXR(
       FileSystem.readDirectory.bind(dir.canonical(sep))
     ).errata(
       e -> e.fault().of(CannotReadDirectory)
@@ -27,14 +27,14 @@ class Volume implements VolumeApi extends Clazz{
     );
   }
 
-  public function read(archive:Archive,?binary = false):Proceed<FileInput,FsFailure>{
+  public function read(archive:Archive,?binary = false):Produce<FileInput,FsFailure>{
     return () -> try{
       __.accept(StdFile.read(archive.canonical(sep),binary));
     }catch(e:Dynamic){
       __.reject(__.fault().of(FileUnreadable(e)));
     }
   }
-  public function write(archive:Archive,?binary = false):Proceed<FileOutput,FsFailure>{
+  public function write(archive:Archive,?binary = false):Produce<FileOutput,FsFailure>{
     return () -> try{
       __.accept(StdFile.write(archive.canonical(sep),binary));
     }catch(e:Dynamic){

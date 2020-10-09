@@ -80,7 +80,7 @@ class Raws extends Clazz{
 				}
 		}
 	}
-	public function toDirectory(raw:Raw):Proceed<Directory,PathFailure>{
+	public function toDirectory(raw:Raw):Produce<Directory,PathFailure>{
 		return (switch(raw.head()){
 			case Some(FPTDrive(head)) : 
 				var drive : Drive = head;
@@ -104,7 +104,7 @@ class Raws extends Clazz{
 			default : 
 					__.failure(__.fault().of(E_Path_Parse(NoHeadNode)));
 		}).broker(
-			F -> F.then(Proceed.fromOutcome).then(
+			F -> F.then(Produce.fromOutcome).then(
 				(io) -> io.map(__.tracer())
 			)
 		);

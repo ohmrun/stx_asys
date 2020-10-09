@@ -5,7 +5,7 @@ abstract WorkingDirectory(Directory) from Directory to Directory{
     this = self;
   }
   /*
-  public function navigate(path:FilePath):Proceed<FilePath,PathFailure>{
+  public function navigate(path:FilePath):Produce<FilePath,PathFailure>{
     return () -> {
       return switch(path.head){
         case FPRoot(_):

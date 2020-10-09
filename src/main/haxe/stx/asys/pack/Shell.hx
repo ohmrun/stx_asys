@@ -40,11 +40,11 @@ class Shell implements ShellApi extends Clazz{
   public function stderr(){
     return new Output(new StdOut(Sys.stderr()));
   }
-  // public function char():Proceed<Int>{
+  // public function char():Produce<Int>{
   //   return () -> Sys.getChar(false);
   // }
 
-  public function byte():Proceed<Int,ASysFailure>{
-    return Proceed.fromFunXR(Sys.getChar.bind(false));
+  public function byte():Produce<Int,ASysFailure>{
+    return Produce.fromFunXR(Sys.getChar.bind(false));
   }
 }

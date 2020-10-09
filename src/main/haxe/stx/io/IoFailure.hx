@@ -9,10 +9,10 @@ enum IoFailure{
 }
 
 /**
-	The possible Proceed errors that can occur
+	The possible Produce errors that can occur
 **/
 // enum Error {
-// 	/** The Proceed is set into nonblocking mode and some data cannot be read or written **/
+// 	/** The Produce is set into nonblocking mode and some data cannot be read or written **/
 // 	Blocked;
 
 // 	/** An integer value is outside its allowed range **/
