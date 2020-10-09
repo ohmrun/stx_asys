@@ -1,3 +1,4 @@
+-D no-deprecation-warnings
 src/main/hxml/extra.hxml
 src/main/hxml/libs.hxml
 src/main/hxml/hxnodejs.hxml

@@ -21,7 +21,7 @@
         "stx_fn": "1.0.0",
         "stx_assert": "0.1.0",
         "stx_async": "1.0.1",
-        "stx_arw": "1.0.0",
+        "stx_arw": "1.1.0",
         "stx_proxy" : "0.1.0",
         "stx_parse" : "0.2.0",
         "pml"       : "0.2.0"

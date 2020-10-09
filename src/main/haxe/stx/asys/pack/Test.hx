@@ -32,7 +32,7 @@ class EnvTest extends utest.Test{
 class SocketTest extends utest.Test{
   public function test(){
     var input = Shell.unit().stdin();
-    var proxy = input(IReqValue(ByteSize.LINE));
+    //var proxy = input(IReqValue(ByteSize.LINE));
   }
 }
 class ArchiveTest extends utest.Test{
