@@ -1,6 +1,6 @@
 package stx.asys.test;
 
-class WhereYourGrilsAtTest extends utest.Test{
+class WhereYourGrilsAtTest extends TestCase{
   static var env = __.asys().local();
   //@Ignored
   public function testPushBackBecauseThatsTheCoolestThingObviously(){

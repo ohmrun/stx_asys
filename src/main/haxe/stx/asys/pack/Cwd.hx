@@ -11,9 +11,7 @@ class Cwd implements CwdApi extends Clazz{
     return 
       Path.parse(Sys.getCwd())
       .attempt(Raw._.toDirectory)
-      .errata(
-        e -> e.map(E_Fs_Path)
-      );
+      .errate(E_Fs_Path);
   }
   public function put(dir:Directory):Command<HasDevice,FsFailure>{
     return Command.fromFun1Report(

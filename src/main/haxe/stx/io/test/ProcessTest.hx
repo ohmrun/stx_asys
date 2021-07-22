@@ -5,7 +5,7 @@ import haxe.io.*;
 import sys.io.Process;
 import stx.io.Process;
 
-class ProcessTest extends utest.Test{
+class ProcessTest extends TestCase{
   var log : Log = __.log();
   public function test(){
     var p   = new StdProcess("",[]);

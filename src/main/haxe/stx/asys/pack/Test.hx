@@ -1,51 +1,51 @@
 package stx.asys.pack;
 
-import stx.asys.test.*;
+import utest.Assert.*;
 
-class Test extends Clazz{
-  public function deliver():Array<Dynamic>{
-    trace(
-      "test"
-    );
-    return [
+import stx.asys.test.*;
+using stx.Test;
+
+class Test{
+  static public function main(){
+    var f = __.log().global;
+        f.includes.push('stx.fs.path.pack.Directory');
+        //f.includes.push('stx.parse.path');
+        f.includes.push('stx.asys.test');
+        f.includes.push('stx.fs.Path');
+        //f.includes.push('stx.async');
+        f.includes.push('stx.async');
+        //f.includes.push('stx.parse');
+        //f.includes.push('stx.parse.With');
+        f.reinstate  = true;
+
+        f.level = DEBUG;
+    __.test([
       new FsParseTest(),
       new AsysTest(),
       new SocketTest(),
       new DirDrillTest(),
       new ArchiveTest(),
       new EnvTest(),
-      new FsTest()
-    ];//.last().toArray();
+      new FsTest(),
+      new EmptyTest(),
+    ],[DirDrillTest]);
   }
 }
-
-class EnvTest extends utest.Test{
+class EmptyTest extends TestCase{
+  public function test(){
+    pass();
+  }
+}
+class EnvTest extends TestCase{
   public function test_get(){
     var env    = __.asys().local().device.env;
     var path   = env.get("UNKNOWN");
-        path.environment(
-          __.log().printer(),
-          __.log().printer()
-        ).crunch();
+        __.ctx(Noise).load(path).crunch();
   }
 }
-class SocketTest extends utest.Test{
+class SocketTest extends TestCase{
   public function test(){
-    var input = Shell.unit().stdin();
+    var input   = Shell.unit().stdin();
     //var proxy = input(IReqValue(ByteSize.LINE));
-  }
-}
-class ArchiveTest extends utest.Test{
-  public function test_non_existent_get(){
-    var arc : Archive = {
-      drive : None,
-      track : ["nope"],
-      entry : "not.here"
-    };
-    arc.val().environment(
-      __.asys().local(),
-      __.log().printer(),
-      __.crack
-    ).crunch();
   }
 }

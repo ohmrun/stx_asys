@@ -13,18 +13,25 @@
     "version": "0.1.0",
     "url": "http://www.example.com",
     "dependencies": {
-        "tink_core": "2.0.0-rc.1",
-        
-        "stx_pico": "1.0.0",
-        "stx_nano": "0.1.5",
+      "tink_core"       : "git:https://github.com/haxetink/tink_core.git",
 
-        "stx_fn": "1.0.0",
-        "stx_assert": "0.1.0",
-        "stx_async": "1.0.1",
-        "stx_arw": "1.1.0",
-        "stx_proxy" : "0.1.0",
-        "stx_parse" : "0.2.0",
-        "pml"       : "0.2.0"
+
+      "stx_pico"        : "git:https://github.com/ohmrun/stx_pico.git",
+      "stx_nano"        : "git:https://github.com/ohmrun/stx_nano.git",
+      "stx_fn"          : "git:https://github.com/ohmrun/stx_fn.git",
+
+      "stx_log"         : "git:https://github.com/ohmrun/stx_log.git",
+      "stx_assert"      : "git:https://github.com/ohmrun/stx_assert.git",
+
+      "stx_fp"          : "git:https://github.com/ohmrun/stx_fp.git",
+      "stx_async"       : "git:https://github.com/ohmrun/stx_async.git",
+      "stx_arw"         : "git:https://github.com/ohmrun/stx_arw.git",
+
+
+      "stx_proxy"       : "git:https://github.com/ohmrun/stx_proxy.git",
+        
+      "stx_parse"       : "git:https://github.com/ohmrun/stx_parse.git",
+      "pml"             : "git:https://github.com/ohmrun/pml.git"
     },
     "classPath": "src/main/haxe"
 }

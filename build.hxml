@@ -1,4 +1,12 @@
 -D no-deprecation-warnings
 src/main/hxml/extra.hxml
 src/main/hxml/libs.hxml
-src/main/hxml/hxnodejs.hxml
+#src/main/hxml/hl.hxml
+--main Main
+--interp
+--macro haxe.macro.Compiler.allowPackage("sys")
+#-lib hxnodejs
+#--js bin/main.js
+#--cpp bin/cpp
+#--jvm bin/main.jar
+#--hl bin/main.hl

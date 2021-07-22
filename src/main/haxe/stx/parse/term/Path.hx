@@ -1,7 +1,7 @@
 package stx.parse.term;
 
 interface ParseApi{
-	public function parse(i:Input<String>):ParseResult<String, Array<Token>>;
+	public function parse(i:ParseInput<String>):ParseResult<String, Array<Token>>;
 }
 typedef Base    = stx.parse.path.Base;
 typedef Posix   = stx.parse.path.Posix;

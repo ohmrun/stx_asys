@@ -97,6 +97,7 @@ class RawLift {
 		}
 	}
 	static public function toDirectory(raw:Raw):Produce<Directory,PathFailure>{
+		__.log().debug(_ -> _.pure(raw));
 		return (switch(raw.head()){
 			case Some(FPTDrive(head)) : 
 				var drive : Drive = head;

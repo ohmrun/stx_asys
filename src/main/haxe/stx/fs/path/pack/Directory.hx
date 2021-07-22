@@ -2,6 +2,11 @@ package stx.fs.path.pack;
 
 using eu.ohmrun.Pml;
 
+using stx.fs.path.pack.Directory;
+
+function log(wildcard:Wildcard){
+  return stx.Log.ZERO.tag(__.here().toPosition().identifier());
+}
 /**
   Represents an absolute path between the root of a file system
   to a known directory.
@@ -84,8 +89,8 @@ class DirectoryLift{
       return out  = __.accept(
         FileSystem.readDirectory(path).map(
           (str:String) ->  FileSystem.isDirectory(self.into([str]).canonical(sep)).if_else(
-            () -> __.left(str),
-            () -> __.right(Entry.parse(str))
+            () -> stx.pico.Either.left(str),
+            () -> stx.pico.Either.right(Entry.parse(str))
           )
         )
       );
@@ -161,18 +166,18 @@ class DirectoryLift{
     );
   }
   static public function tree(dir:Directory):Cascade<HasDevice,Expr<Entry>,FsFailure>{
-    __.log().close()('tree: $dir');
+    __.log().debug('tree: $dir');
     var init  = Arrange.fromFun1Attempt(entries);
     var c     = Cascade.pure(dir).reframe().arrange(entries);
     
     function fn(either:Either<String,Entry>,t:Expr<Entry>):Cascade<HasDevice,Expr<Entry>,FsFailure>{
-      __.log().close().trace(either);
+      __.log().debug(_ -> _.pure(either));
       return switch(either){
         case Left(string) : 
           var into = dir.into([string]);
-          __.log().close()(into);
+          __.log().debug(_ -> _.pure(into));
           var next = tree(into);
-          __.log().close()(next);
+          __.log().debug(_ -> _.pure(next));
           
           next.convert(
             function(t1){
@@ -187,7 +192,7 @@ class DirectoryLift{
     var ut  = Arrange.pure(Empty);
     var d   = Arrange.bind_fold.bind(fn).fn().then( _ -> _.defv(ut));
     var e   = c.arrangement(d).toCascade();
-    var f = e.prefix(
+    var f = e.mapi(
       (env) -> __.couple(Empty,env)
     );
     //$type(a);

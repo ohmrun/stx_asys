@@ -1,5 +1,7 @@
 package stx;
 
+import stx.alias.StdThread;
+
 import stx.fail.FsFailure;
 import stx.fail.PathFailure;
 import stx.fail.PathParseFailure;
@@ -10,7 +12,7 @@ import stx.fail.ASysFailure;
 #end
 import haxe.io.Eof;
 
-#if sys
+#if (sys || hxnodejs)
   import sys.FileSystem;
   import sys.io.FileInput;
   import sys.io.FileOutput;
@@ -22,17 +24,18 @@ import haxe.io.Eof;
 
 using tink.CoreApi;
 
+using stx.Coroutine;
 using stx.Pico;
 using stx.Nano;
-using stx.Arw;
 using stx.Log;
 using stx.Fn;
-using stx.Ext;
-using stx.Async;
 
 using stx.Proxy;
+using stx.Stream;
 
 using stx.ASys;
 
-using stx.parse.Pack;
+using stx.Parse;
 using stx.parse.term.Path;
+
+using eu.ohmrun.Fletcher;

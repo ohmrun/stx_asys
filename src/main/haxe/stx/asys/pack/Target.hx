@@ -47,7 +47,7 @@ abstract Target(TargetSum) from TargetSum to TargetSum{
       case "interp" : Interp;
       default       : 
         trace(str);
-        throw __.fault().err(E_ResourceNotFound);
+        throw __.fault().err(E_Undefined);
     }
   }
 }
@@ -73,6 +73,6 @@ class TargetLift{
   }
   
   static public function canonical(target:Target):String{
-    return new EnumValue(target.prj()).constructor();
+    return new EnumValue(target.prj()).ctr();
   }
 }

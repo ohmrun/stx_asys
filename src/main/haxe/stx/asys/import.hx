@@ -27,11 +27,6 @@ using stx.Pico;
 using stx.Nano;
 using stx.Fn;
 using stx.Assert;
-using stx.Ext;
-
-
-using stx.Async;
-using stx.Arw;
 
 using stx.Fs;
 using stx.Io;
@@ -42,3 +37,4 @@ using stx.ASys;
 
 using stx.asys.Blot;
 
+using eu.ohmrun.Fletcher;

@@ -17,6 +17,11 @@ typedef StdOut              = stx.io.StdOut;
 typedef StdIn               = stx.io.StdIn;
 
 typedef InputResponse       = stx.io.InputResponse;
+
+typedef InputRequestSum     = stx.io.InputRequest.InputRequestSum;
 typedef InputRequest        = stx.io.InputRequest;
+
+typedef OutputRequestSum    = stx.io.OutputRequest.OutputRequestSum;
 typedef OutputRequest       = stx.io.OutputRequest;
+
 typedef IoFailure           = stx.io.IoFailure;

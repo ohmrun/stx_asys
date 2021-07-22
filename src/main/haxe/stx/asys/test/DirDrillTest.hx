@@ -1,10 +1,10 @@
 package stx.asys.test;
 
-class DirDrillTest extends utest.Test{
+class DirDrillTest extends TestCase{
   var dev = LocalHost.unit().toHasDevice();
   
-  @Ignored
-  public function test_cwd_crunch(async:utest.Async){
+  @:timeout(100000)
+  public function _test_cwd_crunch(async:Async){
     var cwd = new Cwd();
         cwd.pop()
            .environment(dev,
@@ -17,29 +17,33 @@ class DirDrillTest extends utest.Test{
           ).submit();
 
   }
-  @Ignored
-  public function test_cwd_submit(async:utest.Async){
-
+  @:timeout(100000)
+  public function _test_cwd_submit(async:Async){
+    __.log()('test_cwd_submit');
     var cwd = new Cwd();
         cwd.pop()
            .environment(
              dev,
              (x) -> {
+              trace(x);
               Rig.pass();
               async.done();
-              trace(x);
             },
             __.crack
            ).submit();
   }
-  //@Ignored
-  @:timeout(30000)
-  public function test(async:utest.Async){
+  @:timeout(100000)
+  public function test(async:Async){
+    __.log()('tedst');
     var cwd 	= new Cwd();
 		var host 	= LocalHost.unit().toHasDevice();
     cwd.pop()
-      .convert((dir:Directory) -> dir.into(['src', 'main', 'haxe', 'stx', 'fs']))
-      .reframe()
+      .convert(
+        (dir:Directory) -> {
+          trace(dir);
+          return dir.into(['src', 'main', 'haxe', 'stx', 'fs']);
+        }
+      ).reframe()
       .arrange(
         Directory._.tree
       ).evaluation()
@@ -54,7 +58,7 @@ class DirDrillTest extends utest.Test{
         (e) -> {
           trace(e);
         }
-     ).crunch();
+     ).submit();
      //crunch
   }
 }

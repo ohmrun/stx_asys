@@ -3,7 +3,7 @@ package stx.asys.test;
 using utest.Assert;
 import utest.Assert;
 
-class FilePathTest extends utest.Test{
+class FilePathTest extends TestCase{
   function wins(){
     return { device : new Device(Windows) };
   }

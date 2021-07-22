@@ -4,6 +4,9 @@ package stx.io;
 @:using(stx.io.StdOut.StdOutLift)
 abstract StdOut(StdOutput) from StdOutput{
   static public var _(default,never) = StdOutLift;
+  @:noUsing static public function lift(self:StdOutput){
+    return new StdOut(self);
+  }
   public function new(self){
     this = self;
   }
@@ -16,8 +19,10 @@ abstract StdOut(StdOutput) from StdOutput{
 }
 class StdOutLift{
   static public inline function push(op:StdOutput,value:OutputRequest):Execute<IoFailure>{
+    __.log()('push');
     function fn(){
-      var output      = Option.unit();
+      __.log()('pushing');
+      var output      = Happened;
       var valAsInt    = Option.unit();
       var valAsString = Option.unit();
       var valAsFloat  = Option.unit();
@@ -87,6 +92,7 @@ class StdOutLift{
           output = Report.pure(__.fault().of(Subsystem(e)));
         }
       }
+      __.log()('pushed $output');
       return output;
     }
     return Execute.fromFunXR(fn);

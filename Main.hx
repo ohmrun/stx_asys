@@ -10,11 +10,13 @@ using stx.fs.Path;
 
 using eu.ohmrun.Jali;
 
+//import stx.proc.Thread;
+
 class Main {
 	static function main() {
 		trace('stx_asys');		
 		#if (test=="stx_asys")
-			utest.UTest.run(cast new stx.asys.pack.Test().deliver());
+			stx.asys.pack.Test.main();			
 		#end
 	}
 }

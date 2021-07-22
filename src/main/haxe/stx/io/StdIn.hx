@@ -1,8 +1,11 @@
 package stx.io;
-
+ 
 @:using(stx.io.StdIn.StdInLift)
 abstract StdIn(StdInput) from StdInput{
   static public var _(default,never) = StdInLift;
+  @:noUsing static public function lift(self:StdInput){
+    return new StdIn(self);
+  }
   public function new(self){
     this = self;
   }
@@ -18,18 +21,25 @@ abstract StdIn(StdInput) from StdInput{
 }
 class StdInLift{
   static public inline function pull(ip:StdInput,un:InputRequest):Produce<InputResponse,IoFailure>{
+    __.log().debug("pull");
     return () -> {
+      __.log().debug("pulling");
       var prim : InputResponse       = null;
       var err  : Err<IoFailure>      = null;
       try{
         prim = apply(ip,un);
+        __.log().debug('pull ok');
       }catch(e:Eof){
+        __.log().debug('pull fail $e');
         err = __.fault().of(EndOfFile);
       }catch(e:haxe.io.Error){
+        __.log().debug('pull fail $e');
         err  = __.fault().of(Subsystem(e));
       }catch(e:Dynamic){
+        __.log().debug('pull fail $e');
         err  = __.fault().of(Subsystem(Custom(e)));
       }
+      __.log().debug('pulled: $prim');
       var out : Res<InputResponse,IoFailure> = __.option(err).map(__.reject).def(
         ()-> __.accept(prim)
       );

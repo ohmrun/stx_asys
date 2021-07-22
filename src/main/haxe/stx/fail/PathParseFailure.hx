@@ -7,7 +7,7 @@ enum PathParseFailure{
   //E_Path_Parse_Parse
   E_PathParse_UnexpectedToken(token:Token,raw:Raw);
   //MalformedSource
-  E_PathParse_ParseErrorInfo(v:ParseErrorInfo);
+  E_PathParse_ParseErrorInfo(v:stx.parse.core.ParseError.ParseErrorInfo);
   E_PathParse_EmptyInput;
   E_PathParse_MalformedRaw(raw:Raw);
 

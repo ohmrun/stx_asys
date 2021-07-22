@@ -1,6 +1,6 @@
 package stx.asys.test;
 
-class FolderTest extends utest.Test{
+class FolderTest extends TestCase{
   public function testCwd(){
     var a = __.asys().local().device.shell.cwd;
 

@@ -1,6 +1,6 @@
 package stx.asys.test;
 
-class FsTest extends utest.Test{
+class FsTest extends TestCase{
   public function test_file_contents_error(){
     try{
       var env = __.asys().local();

@@ -10,7 +10,7 @@ package stx;
   
 
 class LiftParseErrorInfoToPathParseFailure{
-  static public function toPathParseFailure(e:ParseErrorInfo):PathParseFailure{
+  static public function toPathParseFailure(e:stx.parse.core.ParseError.ParseErrorInfo):PathParseFailure{
     return E_PathParse_ParseErrorInfo(e);
   } 
 }

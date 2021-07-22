@@ -1,6 +1,13 @@
 package stx.parse.path;
 
-class Base extends ParserBase<String,Array<Token>>{
+using stx.parse.path.Base;
+
+function id(str) return __.parse().id(str);
+function reg(str) return __.parse().reg(str);
+function log(wildcard){
+	return stx.Log.ZERO.tag('stx.parse.path');
+}
+class Base extends ParserCls<String,Array<Token>>{
 	var is_windows : Bool;
 	public function new(is_windows,?id:Pos){
 		this.is_windows = is_windows;
@@ -10,19 +17,18 @@ class Base extends ParserBase<String,Array<Token>>{
 		return is_windows ? Separator.WinSeparator : Separator.PosixSeparator;
 	}
 	public function p_sep(): Parser<String,Token>{
-		var sep = separator(); 
-		return Parser.SyncAnon(function(ipt:Input<String>):ParseResult<String,Token>{
-				return 
-					if( ipt.take(1) == sep ){ 
-						ipt.drop(1).ok(FPTSep);
-					}else{
-						ipt.fail('not a separator');
-					}
-			}).asParser();
+		return Parser.When(
+			string -> {
+				return string == separator();	
+			},
+			Some('p_sep')
+		).asParser().then(
+			_ -> FPTSep
+		).with_tag('p_sep');
 	}
 	public function p_root():Parser<String,Array<Token>>{
 		return if(is_windows) {
-				"[A-Za-z]:".regex()
+				"[A-Za-z]:".reg()
 				.then( Some.fn().then(FPTDrive) )
 				.and(p_sep().option()).then(
 					(tp) -> switch(tp.snd()){
@@ -36,38 +42,46 @@ class Base extends ParserBase<String,Array<Token>>{
 	}
 
 	public var p_up  			= 
-		'..'.identifier().then ( function(x) return FPTUp );
+		'..'.id().then ( function(x) return FPTUp ).with_tag('p_up');
 
 
 	public var char_and_space
-		= Parse.alphanum.or(Parse.whitespace);
+		= Parse.alphanum.or(Parse.whitespace).with_tag('char_and_space');
 
 	public var p_special_chars 
-		= "[^<>:\"\\\\|?*\\/A-Za-z0-9]".regex();
+		= "[^<>:\"\\\\|?*\\/A-Za-z0-9]".reg().with_tag('p_special_chars');
 
 
 	public function p_path_chars(){
-		return p_sep().not()._and(char_and_space.or( p_special_chars )).one_many().token(); 
+		return inspect(p_sep().not().tag_error('p_path_chars.p_sep')._and(char_and_space.or(p_special_chars))).one_many().tokenize().with_tag('p_path_chars'); 
 	}		
 	public function p_file_chars(){
-		return char_and_space.or(p_special_chars).one_many().token();
+		return char_and_space.or(p_special_chars).one_many().tokenize().with_tag('p_file_chars');
+	}
+	static function spect<I,O>(parser:Parser<I,O>,?pos:Pos){
+		return parser;
+	}
+	static function inspect<I,O>(parser:Parser<I,O>,?pos:Pos){
+		return Parser.Inspect(
+			parser,
+			__.log().printer(pos),((x:ParseResult<I,O>) -> x.toString()).fn().then(__.log().printer(pos)));
 	}
 	public function p_term(){
+		//__.log().debug('pterm');
 		return p_path_chars().and_(
-			p_sep().not()
-			.and(':'.id().not())
+			':'.id().not()
 		).and_then(
 			(str:String) -> {
-				//trace(' ###$str###');
+				__.log()(' ###$str###');
 				return switch(str){
 					case '.' 		: Parser.Failed('not a term');
 					case '..' 	: Parser.Failed('not a term');
 					default  		: 
-					var all = str.split(".");
-					var ext = null;
-					if(all.length>1 && all[1] != null && str!='.'){
-						ext = all.pop();
-					}
+						var all = str.split(".");
+						var ext = null;
+						if(all.length>1 && all[1] != null && str!='.'){
+							ext = all.pop();
+						}
 					return if(ext==null){
 						Parser.Succeed(FPTDown(str));
 					}else{
@@ -75,53 +89,51 @@ class Base extends ParserBase<String,Array<Token>>{
 					}
 				}
 			}
-		);
+		).with_tag('p_term');
 	}
 	public function p_junction(){
-		return p_term().or(p_up).or(p_down());
+		return inspect(p_term().or(p_up).or(p_down()));
 	}
 	public function p_down(){
 		return p_path_chars().and_(
 			':'.id().not()
 		).then( function(str) { return FPTDown(str); } );
 	}
+	public function p_body(){
+		return inspect(p_junction().rep1sep0(p_sep()));
+	}
 	public function p_abs(){ 
 		return p_root()
-		.and( p_junction().repsep0(p_sep()).option() )
+		.and( p_body() )
 		.then( 
-				function(t) {
-					return switch(t.cat()){
-						case [Left(tk),Right(b2_opt_arr)] :
-							var out = [];
-							for(v in tk){
-								out.push(v);
-							}
-							//out.push(tk.b);
-							switch(b2_opt_arr){
-								case Some(v) : 
-									for(v0 in v){
-										out.push(v0);
-									}
-								default : null;
-							}
-							out;
-						default : [];
-					}
+			function(t) {
+				return switch(t.tup()){
+					case tuple2(tk,b2_opt_arr) :
+						var out = [];
+						for(v in tk){ 
+							out.push(v); 
+						}
+						for(v0 in b2_opt_arr){ 
+							out.push(v0); 
+						}
+						out;
+					default : [];
 				}
+			}
 		);
 	}
 	public function p_rel_root(){
-		return '.'.id().and_('.'.id().not()).and(p_sep().not()).then( (_) -> FPTRel);
+		return '.'.id().and_('.'.id().not().and(p_sep().option())).then( (_) -> FPTRel);
 	}
 	public function p_rel():Parser<String,Array<Token>>{ 
 		return p_rel_root().or(p_junction())
-		.and(p_sep().option())
+		.and(p_sep().option().with_tag("HSDF"))
 		.and(
-				p_up.repsep0(p_sep()).and_(p_sep()).and_with( p_junction().repsep0(p_sep()) 
-				,	function(a,b){
-						//trace('$a $b');
-						return a.concat(b);
-					}
+				p_up.repsep0(p_sep()).and_(p_sep()).and_with(p_junction().repsep0(p_sep()) 
+				,function(a,b){
+					trace('$a $b');
+					return a.concat(b);
+				}
 			).or(
 				p_junction().repsep0(p_sep())
 			).option()
@@ -156,10 +168,10 @@ class Base extends ParserBase<String,Array<Token>>{
 				p_term().then(
 					(x) -> [x]
 				)
-			).and_(Parse.eof().lookahead());
+			).and_(Parser.Eof().lookahead());
 	}               
-	override public function doApplyII(i:Input<String>,cont:Terminal<ParseResult<String,Array<Token>>,Noise>):Work{
-		return p_path().applyII(i,cont);
+	public function defer(i:ParseInput<String>,cont:Terminal<ParseResult<String,Array<Token>>,Noise>):Work{
+		return p_path().defer(i,cont);
 	}
 	public function format(arr:Array<Token>){
 		var o = arr.lfold(
@@ -176,7 +188,7 @@ class Base extends ParserBase<String,Array<Token>>{
 		);
 		return o;
 	}
-	public function toString(n:Token){
+	public function stringify(n:Token){
 		return switch (n){
 			case FPTUp 										:	'..';
 			case FPTDown(str) 						:	str;
@@ -191,7 +203,7 @@ class Base extends ParserBase<String,Array<Token>>{
 	public function asBase():Base{
 		return this;
 	}
-	public function forward(input){
-		return this.asParser().forward(input);
+	public function provide(input){
+		return this.asParser().provide(input);
 	}
 }

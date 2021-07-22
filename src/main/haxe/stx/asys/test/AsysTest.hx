@@ -1,9 +1,9 @@
 package stx.asys.test;
 
-class AsysTest extends utest.Test{
+class AsysTest extends TestCase{
   var local = Device.local();
   @Ignored
-  public function testA(async:utest.Async){
+  public function testA(async:Async){
     Produce.pure(Sys.getCwd());
     
     // __.channel().io(__.into2(Paths._.toDirectory)).toChannel().prepare(
@@ -14,7 +14,7 @@ class AsysTest extends utest.Test{
     //trace(get_path);
   }
   @Ignored
-  public function testB(async:utest.Async){
+  public function testB(async:Async){
     Path.parse(Sys.getCwd())
         .reframe();
         //.forward(local)
