@@ -1,5 +1,0 @@
-package stx.io.head.data;
-
-import stx.proxy.core.head.data.Client in ClientT;
-
-typedef Output = Arrowlet<Packet,ClientT<Noise,Packet,Noise,IoFailure>>;

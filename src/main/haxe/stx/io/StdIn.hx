@@ -9,29 +9,56 @@ abstract StdIn(StdInput) from StdInput{
   public function new(self){
     this = self;
   }
-  public function apply(type:InputRequest):Produce<InputResponse,IoFailure>{
-    return StdInLift.pull(this,type);
-  }
-  public function prj():StdInput{
-    return this;
-  }
-  public function pull(un:InputRequest):Produce<InputResponse,IoFailure>{
-    return _.pull(this,un);
-  }
-}
-class StdInLift{
-  static public inline function pull(ip:StdInput,un:InputRequest):Produce<InputResponse,IoFailure>{
-    __.log().debug("pull");
-    return () -> {
+  public function reply():Tunnel<InputRequest,InputResponse,IoFailure>{
+    var closed = false;
+    function apply(ip:StdInput,un:InputRequest):InputResponse{
+      return switch(un){
+        case IReqState    : IResState(({ closed : closed }:InputState));
+        case IReqValue(x) :
+          var prim = 
+            switch(x){
+                case I8      : PInt(ip.readInt8());
+                case I16BE   : ip.bigEndian = true;   PInt(ip.readInt16());
+                case I16LE   : ip.bigEndian = false;  PInt(ip.readInt16());
+                case UI16BE  : ip.bigEndian = true;   PInt(ip.readUInt16());
+                case UI16LE  : ip.bigEndian = false;  PInt(ip.readUInt16());
+                case I24BE   : ip.bigEndian = true;   PInt(ip.readInt24());
+                case I24LE   : ip.bigEndian = false;  PInt(ip.readInt24());
+                case UI24BE  : ip.bigEndian = true;   PInt(ip.readUInt24());
+                case UI24LE  : ip.bigEndian = false;  PInt(ip.readUInt24());
+                case I32BE   : ip.bigEndian = true;   PInt(ip.readInt32());
+                case I32LE   : ip.bigEndian = false;  PInt(ip.readInt32());
+                case FBE     : ip.bigEndian = true;   PFloat(ip.readFloat());
+                case FLE     : ip.bigEndian = false;  PFloat(ip.readFloat());
+                case DBE     : ip.bigEndian = true;   PFloat(ip.readDouble());
+                case DLE     : ip.bigEndian = false;  PFloat(ip.readDouble());
+                case LINE    :                        PString(ip.readLine());
+              }
+          IResValue(({
+            data : prim,
+            type : x
+          }:Packet));
+        case IReqBytes(pos,len) :
+          var bytes = Bytes.alloc(len);
+          ip.readBytes(bytes,pos,len);
+          IResBytes(bytes);
+        case IReqClose:    
+          if(!closed){
+            ip.close(); 
+          }
+          IResSpent;
+      }
+    }
+    final pull = (un:InputRequest) -> {
       __.log().debug("pulling");
       var prim : InputResponse       = null;
       var err  : Err<IoFailure>      = null;
       try{
-        prim = apply(ip,un);
+        prim = apply(this,un);
         __.log().debug('pull ok');
       }catch(e:Eof){
         __.log().debug('pull fail $e');
-        err = __.fault().of(EndOfFile);
+        prim = IResSpent;
       }catch(e:haxe.io.Error){
         __.log().debug('pull fail $e');
         err  = __.fault().of(Subsystem(e));
@@ -45,41 +72,33 @@ class StdInLift{
       );
       return out;
     };
-  }
-  static function apply(ip:StdInput,un:InputRequest):InputResponse{
-    return switch(un){
-      //case IReqStart    : 
-      case IReqValue(x) :
-        var prim = 
-          switch(x){
-              case I8      : PInt(ip.readInt8());
-              case I16BE   : ip.bigEndian = true;   PInt(ip.readInt16());
-              case I16LE   : ip.bigEndian = false;  PInt(ip.readInt16());
-              case UI16BE  : ip.bigEndian = true;   PInt(ip.readUInt16());
-              case UI16LE  : ip.bigEndian = false;  PInt(ip.readUInt16());
-              case I24BE   : ip.bigEndian = true;   PInt(ip.readInt24());
-              case I24LE   : ip.bigEndian = false;  PInt(ip.readInt24());
-              case UI24BE  : ip.bigEndian = true;   PInt(ip.readUInt24());
-              case UI24LE  : ip.bigEndian = false;  PInt(ip.readUInt24());
-              case I32BE   : ip.bigEndian = true;   PInt(ip.readInt32());
-              case I32LE   : ip.bigEndian = false;  PInt(ip.readInt32());
-              case FBE     : ip.bigEndian = true;   PFloat(ip.readFloat());
-              case FLE     : ip.bigEndian = false;  PFloat(ip.readFloat());
-              case DBE     : ip.bigEndian = true;   PFloat(ip.readDouble());
-              case DLE     : ip.bigEndian = false;  PFloat(ip.readDouble());
-              case LINE    :                        PString(ip.readLine());
+    return Tunnel.lift(__.tran(
+      function rec(ipt:InputRequest):Coroutine<InputRequest,InputResponse,Noise,IoFailure>{
+        return switch([closed,ipt]){
+          case [_,IReqState]          : __.emit(IResState(({ closed : closed }:InputState)),__.tran(rec));
+          case [true,IReqValue(_)]    : __.quit(__.fault().of(EndOfFile));
+          case [true,IReqBytes(_,_)]  : __.quit(__.fault().of(EndOfFile));
+          case [true,IReqClose]       : __.stop();
+          case [false,IReqClose]      :
+            if(!closed){
+              this.close(); 
             }
-        IResValue(({
-          data : prim,
-          type : x
-        }:Packet));
-      case IReqBytes(pos,len) :
-        var bytes = Bytes.alloc(len);
-        ip.readBytes(bytes,pos,len);
-        IResBytes(bytes);
-      case IReqClose:     
-        IResSpent;
-
-    }
+            closed = true; 
+            __.stop();
+          case [false,x]              :
+              pull(x)
+               .fold(
+                  ok -> __.emit(ok,__.tran(rec)),
+                  no -> __.quit(no) 
+                );
+        }
+      }
+    ));
   }
+  public function prj():StdInput{
+    return this;
+  }
+}
+class StdInLift{
+
 }

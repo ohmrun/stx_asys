@@ -3,7 +3,7 @@ package stx.io;
 import stx.io.StdIn  in AsysStdIn;
 import stx.io.StdOut in AsysStdOut;
 
-typedef ProcessDef = Server<InputRequest,InputResponse,Noise,IoFailure>;
+typedef ProcessDef = Server<InputRequest,Either<InputResponse,InputRespon,Noise,IoFailure>;
 
 abstract Process(ProcessDef) from ProcessDef{
   public function new(self){
@@ -19,16 +19,20 @@ abstract Process(ProcessDef) from ProcessDef{
       var errs_buffer                 = new BytesBuffer().getBytes();
       var ins_buffer                  = new BytesBuffer().getBytes();
 
-      var is_error_condition          = false;
-      try{
-        errs.prj().readBytes(errs_buffer,0,1);
-      }catch(e:Eof){
-        is_error_condition            = true;
-      }
-
-      var outs_in = new Input(outs);
-          
-      return null;
+      var outs_in                     = new Input(outs);
+      var return_value                = None;
+      
+      return Yield(
+        IResReady,
+        function rec(req:InputRequest){
+          return switch (req){
+            case IReqState            : 
+            case IReqValue(bs)        :
+            case IReqBytes(pos,len)   : 
+            case IReqClose            : 
+          }
+        }        
+      );
     }; 
   }
 }

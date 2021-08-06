@@ -1,9 +1,3 @@
-package stx.proxy.io.test;
+package stx.io.test;
 
-import utest.Assert.*;
-import utest.*;
-
-import stx.log.Package;
-
-using stx.core.Lift;
-using stx.log.Lift;
+using stx.Test;

@@ -4,4 +4,5 @@ enum InputResponse{
   IResValue(p:Packet);
   IResBytes(b:Bytes);
   IResSpent;
+  IResState(state:InputState);
 }
