@@ -1,0 +1,13 @@
+{
+  "build" : { 
+    "-lib" : [
+      "stx_pico","stx_nano","stx_parse","stx_show","stx_pkg","stx_proxy","stx_coroutine","stx_test",
+      "fletcher","pml","jali"
+    ],
+    "-cp" : "src/main/haxe",
+    "asys.io.test" : {
+      "-main"     : "stx.io.Test",
+      "--interp"  : "true"
+    }
+  } 
+}
