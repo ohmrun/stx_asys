@@ -1,4 +1,4 @@
-package stx.asys.pack;
+package stx.asys;
 
 import utest.Assert.*;
 
@@ -10,24 +10,23 @@ class Test{
     var f = __.log().global;
         f.includes.push('stx.fs.path.pack.Directory');
         //f.includes.push('stx.parse.path');
-        f.includes.push('stx.asys.test');
+        f.includes.push('stx/asys/test');
         f.includes.push('stx.fs.Path');
         //f.includes.push('stx.async');
-        f.includes.push('stx.async');
         //f.includes.push('stx.parse');
         //f.includes.push('stx.parse.With');
         f.reinstate  = true;
 
-        f.level = DEBUG;
+        f.level = TRACE;
     __.test([
       new FsParseTest(),
-      new AsysTest(),
-      new SocketTest(),
-      new DirDrillTest(),
-      new ArchiveTest(),
-      new EnvTest(),
-      new FsTest(),
-      new EmptyTest(),
+      // new AsysTest(),
+      // new SocketTest(),
+      // new DirDrillTest(),
+      // new ArchiveTest(),
+      // new EnvTest(),
+      // new FsTest(),
+      // new EmptyTest(),
     ],[DirDrillTest]);
   }
 }

@@ -1,4 +1,4 @@
-package stx.asys.pack;
+package stx.asys;
 
 @:forward abstract LocalHost(Device) from Device to Device{
   private function new(){

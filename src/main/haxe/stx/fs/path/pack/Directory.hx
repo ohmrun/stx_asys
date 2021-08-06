@@ -4,9 +4,6 @@ using eu.ohmrun.Pml;
 
 using stx.fs.path.pack.Directory;
 
-function log(wildcard:Wildcard){
-  return stx.Log.ZERO.tag(__.here().toPosition().identifier());
-}
 /**
   Represents an absolute path between the root of a file system
   to a known directory.

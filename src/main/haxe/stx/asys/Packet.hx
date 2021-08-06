@@ -1,4 +1,4 @@
-package stx.asys.pack;
+package stx.asys;
 
 typedef PacketDef = {
   var data : Primitive;

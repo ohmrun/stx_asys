@@ -1,4 +1,4 @@
-package stx.asys.pack;
+package stx.asys;
 
 interface DeviceApi{
   public var distro(default,null)     : Distro;

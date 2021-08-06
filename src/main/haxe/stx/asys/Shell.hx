@@ -1,4 +1,4 @@
-package stx.asys.pack;
+package stx.asys;
 
 interface ShellApi{
   public function print(v:Dynamic):Future<Noise>;

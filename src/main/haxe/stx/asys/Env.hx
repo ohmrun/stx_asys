@@ -1,4 +1,4 @@
-package stx.asys.pack;
+package stx.asys;
 
 interface EnvApi{ 
   public function get(string:String): Produce<String,ASysFailure>;

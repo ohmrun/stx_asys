@@ -1,4 +1,4 @@
-package stx.asys.pack;
+package stx.asys;
 
 abstract WorkingDirectory(Directory) from Directory to Directory{
   public function new(self){

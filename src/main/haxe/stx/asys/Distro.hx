@@ -1,4 +1,4 @@
-package stx.asys.pack;
+package stx.asys;
 
 enum abstract Distro(String){
   static public function unit():Distro{

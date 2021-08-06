@@ -1,4 +1,4 @@
-package stx.asys.pack;
+package stx.asys;
 
 @:enum abstract ByteSize(StdString) from StdString to StdString{
   var I8      = 'i8';

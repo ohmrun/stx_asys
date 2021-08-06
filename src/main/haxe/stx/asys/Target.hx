@@ -1,4 +1,4 @@
-package stx.asys.pack;
+package stx.asys;
 
 enum TargetSum{
   Js;
@@ -20,7 +20,7 @@ enum TargetSum{
   Interp;
 }
 
-@:using(stx.asys.pack.Target.TargetLift)
+@:using(stx.asys.Target.TargetLift)
 abstract Target(TargetSum) from TargetSum to TargetSum{
   static public var _(default,never) = TargetLift;
 
