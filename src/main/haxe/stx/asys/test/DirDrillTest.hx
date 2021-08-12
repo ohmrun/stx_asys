@@ -10,7 +10,7 @@ class DirDrillTest extends TestCase{
            .environment(dev,
              (x) -> {
                trace(x);
-               Rig.pass();
+               pass();
                async.done();
              },
              __.crack
@@ -26,7 +26,7 @@ class DirDrillTest extends TestCase{
              dev,
              (x) -> {
               trace(x);
-              Rig.pass();
+              pass();
               async.done();
             },
             __.crack

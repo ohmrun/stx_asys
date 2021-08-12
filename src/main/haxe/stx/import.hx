@@ -7,9 +7,6 @@ import stx.fail.PathFailure;
 import stx.fail.PathParseFailure;
 import stx.fail.ASysFailure;
 
-#if (test=="stx_asys")
-  import utest.Assert in Rig;
-#end
 import haxe.io.Eof;
 
 #if (sys || hxnodejs)

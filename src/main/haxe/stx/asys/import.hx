@@ -1,9 +1,5 @@
 package stx.asys;
 
-#if (test=="stx_asys")
-  import utest.Assert;
-#end
-
 using Lambda;
 
 import tink.CoreApi;
@@ -33,7 +29,7 @@ using stx.Io;
 using stx.fs.Path;
 
 using stx.ASys;
-
+using stx.Test;
 
 using stx.asys.Blot;
 

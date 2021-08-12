@@ -3,6 +3,7 @@ package stx.io;
 enum InputRequestSum{
   //IReqStart;
   IReqState;
+  IReqTotal(?buffer_size:Int);
   IReqValue(bs:ByteSize);
   IReqBytes(pos:Int,len:Int);
   IReqClose;

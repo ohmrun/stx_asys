@@ -1,6 +1,5 @@
 package stx.io;
 
-
 @:using(stx.io.StdOut.StdOutLift)
 abstract StdOut(StdOutput) from StdOutput{
   static public var _(default,never) = StdOutLift;
@@ -10,18 +9,9 @@ abstract StdOut(StdOutput) from StdOutput{
   public function new(self){
     this = self;
   }
-  public function apply(type:OutputRequest):Execute<IoFailure>{
-    return StdOutLift.push(this,type);
-  }
-  public inline function push(value:OutputRequest):Execute<IoFailure>{
-    return _.push(this,value);
-  }
-}
-class StdOutLift{
-  static public inline function push(op:StdOutput,value:OutputRequest):Execute<IoFailure>{
-    __.log()('push');
-    function fn(){
-      __.log()('pushing');
+  public function reply():Coroutine<OutputRequest,Report<IoFailure>,Noise,IoFailure>{
+    function fn(value:OutputRequest){
+      __.log().debug('pushing');
       var output      = Happened;
       var valAsInt    = Option.unit();
       var valAsString = Option.unit();
@@ -29,7 +19,7 @@ class StdOutLift{
 
       switch(value){
         case OReqClose:
-          op.close();
+          this.close();
           output = Report.unit();
         case OReqValue(packet):
           switch(packet.data){
@@ -42,51 +32,51 @@ class StdOutLift{
           try{
             switch(packet.type){
               case I8      :
-                for (val in valAsInt){ op.writeInt8(val); }
+                for (val in valAsInt){ this.writeInt8(val); }
               case I16BE   :
-                op.bigEndian = true;
-                for (val in valAsInt){ op.writeInt16(val); }
+                this.bigEndian = true;
+                for (val in valAsInt){ this.writeInt16(val); }
               case I16LE   :
-                op.bigEndian = false;
-                for (val in valAsInt){ op.writeInt16(val); }
+                this.bigEndian = false;
+                for (val in valAsInt){ this.writeInt16(val); }
               case UI16BE  :
-                op.bigEndian = true;
-                for (val in valAsInt){ op.writeInt16(val); }
+                this.bigEndian = true;
+                for (val in valAsInt){ this.writeInt16(val); }
               case UI16LE  :
-                op.bigEndian = false;
-                for (val in valAsInt){ op.writeUInt16(val); }
+                this.bigEndian = false;
+                for (val in valAsInt){ this.writeUInt16(val); }
               case I24BE   :
-                op.bigEndian = true;
-                for (val in valAsInt){ op.writeInt24(val); }
+                this.bigEndian = true;
+                for (val in valAsInt){ this.writeInt24(val); }
               case I24LE   :
-                op.bigEndian = false;
-                for (val in valAsInt){ op.writeInt24(val); }
+                this.bigEndian = false;
+                for (val in valAsInt){ this.writeInt24(val); }
               case UI24BE  :
-                op.bigEndian = true;
-                for (val in valAsInt){ op.writeUInt24(val); }
+                this.bigEndian = true;
+                for (val in valAsInt){ this.writeUInt24(val); }
               case UI24LE  :
-                op.bigEndian = false;
-                for (val in valAsInt){ op.writeUInt24(val); }
+                this.bigEndian = false;
+                for (val in valAsInt){ this.writeUInt24(val); }
               case I32BE   :
-                op.bigEndian = true;
-                for (val in valAsInt){ op.writeInt32(val); }
+                this.bigEndian = true;
+                for (val in valAsInt){ this.writeInt32(val); }
               case I32LE   :
-                op.bigEndian = false;
-                for (val in valAsInt){ op.writeInt32(val);  }
+                this.bigEndian = false;
+                for (val in valAsInt){ this.writeInt32(val);  }
               case FBE     :
-                op.bigEndian = true;
-                for (val in valAsFloat){ op.writeFloat(val); }
+                this.bigEndian = true;
+                for (val in valAsFloat){ this.writeFloat(val); }
               case FLE     :
-                op.bigEndian = false;
-                for (val in valAsFloat){ op.writeFloat(val);}
+                this.bigEndian = false;
+                for (val in valAsFloat){ this.writeFloat(val);}
               case DBE     :
-                op.bigEndian = true;
-                for (val in valAsFloat){ op.writeDouble(val); }
+                this.bigEndian = true;
+                for (val in valAsFloat){ this.writeDouble(val); }
               case DLE     :
-                op.bigEndian = false;
-                for (val in valAsFloat){ op.writeDouble(val); }
+                this.bigEndian = false;
+                for (val in valAsFloat){ this.writeDouble(val); }
               case LINE    :
-                for (val in valAsString){ op.writeString(val); }
+                for (val in valAsString){ this.writeString(val); }
             }
         }catch(e:Dynamic){
           output = Report.pure(__.fault().of(Subsystem(e)));
@@ -95,6 +85,24 @@ class StdOutLift{
       __.log()('pushed $output');
       return output;
     }
-    return Execute.fromFunXR(fn);
+    return __.hold(
+      stx.coroutine.core.Held.Guard(Future.irreversible(
+        function(cb){
+          cb(
+            __.tran(
+              function rec(value){
+                return fn(value).fold(
+                  err -> __.emit(err.report(),__.tran(rec)),
+                  ()  -> __.tran(rec)
+                );
+              }
+            )
+          );
+        }
+      ))
+    );
   }
+}
+class StdOutLift{
+
 }

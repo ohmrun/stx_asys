@@ -16,7 +16,7 @@ class Main {
 	static function main() {
 		trace('stx_asys');		
 		#if (test=="stx_asys")
-			stx.asys.pack.Test.main();			
+			stx.asys.Test.main();			
 		#end
 	}
 }

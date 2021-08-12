@@ -47,6 +47,11 @@ abstract StdIn(StdInput) from StdInput{
             ip.close(); 
           }
           IResSpent;
+        case IReqTotal(buffer_size) :
+          var bytes = ip.readAll(buffer_size);
+          IResBytes(bytes);
+
+          
       }
     }
     final pull = (un:InputRequest) -> {
@@ -72,6 +77,7 @@ abstract StdIn(StdInput) from StdInput{
       );
       return out;
     };
+    //TODO implement Control4
     return Tunnel.lift(__.tran(
       function rec(ipt:InputRequest):Coroutine<InputRequest,InputResponse,Noise,IoFailure>{
         return switch([closed,ipt]){

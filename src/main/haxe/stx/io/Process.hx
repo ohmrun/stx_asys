@@ -1,38 +1,93 @@
 package stx.io;
 
+using stx.coroutine.Core;
+
 import stx.io.StdIn  in AsysStdIn;
 import stx.io.StdOut in AsysStdOut;
 
-typedef ProcessDef = Server<InputRequest,Either<InputResponse,InputRespon,Noise,IoFailure>;
+typedef ProcessDef = ServerDef<ProcessRequest,ProcessResponse,Noise,IoFailure>;
 
+@:using(stx.io.Process.ProcessLift);
 abstract Process(ProcessDef) from ProcessDef{
-  public function new(self){
-    this = self;
-  }
-  static public function grow(command:Command){
-    var fn = () ->  {
-      final proc : StdProcess         = new StdProcess(command.name,command.args.prj());
-      final errs : AsysStdIn          = proc.stderr;
-      final outs : AsysStdIn          = proc.stdout;
-      final ins  : AsysStdOut         = proc.stdin;
-
-      var errs_buffer                 = new BytesBuffer().getBytes();
-      var ins_buffer                  = new BytesBuffer().getBytes();
-
-      var outs_in                     = new Input(outs);
-      var return_value                = None;
-      
-      return Yield(
-        IResReady,
-        function rec(req:InputRequest){
+  static public var _(default,never) = ProcessLift;
+  public function new(self){this = self;}
+  static public function grow(command:Cluster<String>,?detached:Bool){
+    var exit_code                   = None;
+    function step(ins:OutputDef,outs:InputDef,errs:InputDef,req:ProcessRequest):ProcessDef{
+      return __.yield(
+        PResReady,
+        function rec(req:ProcessRequest):ProcessDef{
           return switch (req){
-            case IReqState            : 
-            case IReqValue(bs)        :
-            case IReqBytes(pos,len)   : 
-            case IReqClose            : 
+            case PReqState(block)            :
+              exit_code = __.option(this.exitCode(__.option(block).defv(true))); 
+              __.yield(PResState(({ exit_code : exit_code }:ProcessState)),rec);
+            case PReqInput(req,false)      : 
+              switch(outs.provide(req)){
+                case Emit(x,next)       : __.yield(PResValue(Success(x)),step.bind(ins,next,errs));
+                case Wait(arw)          : __.yield(PResReady,step.bind(ins,__.wait(arw),errs));
+                case Hold(held)         : 
+                  __.belay(
+                    stx.proxy.core.Belay.lift(
+                      held.map(
+                        next -> __.yield(PResReady,step.bind(ins,next,errs)) 
+                      )
+                    )
+                  );
+                case Halt(ret)          : __.yield(PResValue(Success(IResSpent)),step.bind(ins,Halt(ret),errs));
+              }
+              case PReqInput(req,true)      : 
+                switch(errs.provide(req)){
+                  case Emit(x,next)       : __.yield(PResValue(Success(x)),step.bind(ins,outs,next));
+                  case Wait(arw)          : __.yield(PResReady,step.bind(ins,outs,__.wait(arw)));
+                  case Hold(held)         : 
+                    __.belay(
+                      stx.proxy.core.Belay.lift(held.map(
+                        next -> __.yield(PResReady,step.bind(ins,outs,next)) 
+                      ))
+                    );
+                  case Halt(ret)          : __.yield(PResValue(Success(IResSpent)),step.bind(ins,outs,Halt(ret)));
+                }
+              case PReqOutput(req)  :   
+                __.yield(PResReady,step.bind(ins.provide(req),outs,errs));
           }
-        }        
+        }
       );
+    }
+    function init():ProcessDef{
+      final proc                      = new sys.io.Process(command.head().fudge(), Std.downcast(command.tail(),Array),detached);
+      final ins                       = AsysStdOut.lift(proc.stdin).reply();
+      final outs                      = AsysStdIn.lift(proc.stdout).reply();
+      final errs                      = AsysStdIn.lift(proc.stderr).reply();    
+      return __.yield(PResReady,step.bind(ins,outs,errs));        
     }; 
+  
+    return __.belay(Belay.fromThunk(init));
+  }
+}
+class ProcessLift{
+  static inline public function lift(self:ProcessDef):Process{
+    return Process.lift(self);
+  }
+  static public function provide(self:Process,req:ProcessRequest):Process{
+    return lift(Server._.provide(self,req));
+  }
+  static public function drain(self:ProcessDef,?buffer):Process{
+    var that  = self.provide(PReqInput(PReqTotal(buffer),false));
+    return that;
+  }
+  static public function outlet<Z>(self:ProcessDef,driver:Void->InputRequest,fn:InputResponse -> Z -> Res<Z,IoFailure>,init:Z):Process{
+    function rec(self:ProcessDef,init:Z):OutletDef<Z,IoFailure> {
+      return switch(self){
+        case Await(_,next) : rec(next(Noise),init);
+        case Yield(y,next) : 
+          fn(y,init).fold(
+            ok -> rec(next(driver()),ok),
+            er -> Outlet.make(End(er))
+          );
+        case Ended(e)      : __.ended(e);
+        case Defer(d)      : __.defer(d.map(rec.bind(_,init)));
+      }`
+    };
+    return lift(rec(self,init));
   }
 }
