@@ -97,6 +97,7 @@ abstract StdIn(StdInput) from StdInput{
                   ok -> __.emit(ok,__.tran(rec)),
                   no -> __.quit(no) 
                 );
+          case [true,IReqTotal(_)] : __.quit(__.fault().of(EndOfFile));
         }
       }
     ));

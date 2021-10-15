@@ -1,5 +1,6 @@
 package stx.asys;
 
+using stx.Sys;
 
 interface CwdApi{
   public function pop():Attempt<HasDevice,Directory,FsFailure>;
@@ -8,8 +9,9 @@ interface CwdApi{
 
 class Cwd implements CwdApi extends Clazz{
   public function pop():Attempt<HasDevice,Directory,FsFailure>{
+    trace(__.sys().cwd().get());
     return 
-      Path.parse(Sys.getCwd())
+      Path.parse(__.sys().cwd().get())
       .attempt(Raw._.toDirectory)
       .errate(E_Fs_Path);
   }
@@ -18,7 +20,7 @@ class Cwd implements CwdApi extends Clazz{
       (env:HasDevice) -> {
         var val = Report.unit();
         try{
-          Sys.setCwd(dir.canonical(env.device.sep));
+          __.sys().cwd().put(dir.canonical(env.device.sep));
         }catch(e:Dynamic){
           val = Report.pure(__.fault().of(CannotSetWorkingDirectory(dir.canonical(env.device.sep),e)));
         }

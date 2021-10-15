@@ -10,7 +10,7 @@ enum abstract Distro(String){
   var Mac;
 
   public function new(){
-    this = switch(Sys.systemName()){
+    this = switch(std.Sys.systemName()){
       case "Windows"  : "Windows"; 
       case "Linux"    : "Linux";
       case "BSD"      : "BSD";

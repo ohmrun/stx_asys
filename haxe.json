@@ -5,8 +5,13 @@
       "fletcher","pml","jali"
     ],
     "-cp" : "src/main/haxe",
-    "asys.io.test" : {
+    "interp" : {
       "-main"     : "stx.io.Test",
+      "io" : {
+        "test" : {
+          "-main"     : "stx.io.Test"
+        }
+      },
       "--interp"  : "true"
     }
   } 

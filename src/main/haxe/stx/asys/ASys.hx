@@ -11,7 +11,7 @@ class ASys implements ASysApi{
   public function sleep(t):Future<Noise>{
     return Future.irreversible(
       (cb) -> {
-        Sys.sleep(t);
+        std.Sys.sleep(t);
         cb(Noise);
       }
     );
