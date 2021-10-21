@@ -1,11 +1,9 @@
 package stx.fs;
 
+using stx.fs.path.Logging;
+
 typedef LiftString = stx.fs.path.lift.LiftString;
 
-
-function log(wildcard:Wildcard){
-  return stx.Log.ZERO.tag(__.here().toPosition().identifier());
-}
 
 class PathApi extends Clazz{
   
@@ -25,9 +23,9 @@ class Path{
             ).asParser()
             .provide(s.reader())
             .convert(
-              (res:ParseResult<String,Array<Token>>) -> __.log().through()(res).fold(
-                (a)     -> __.accept((a.with.defv([]):Raw)),
-                (e)     -> e.toRes().errate( (e) -> e.toPathParseFailure().toPathFailure() ) 
+              (res:ParseResult<String,Array<Token>>) -> __.log().through()(res).is_ok().if_else(
+                ()      -> __.option(res.value).flat_map((x:Option<Array<Token>>) -> x).resolve(f -> f.err(E_Undefined)),
+                ()      -> res.fails().toRes().map(x -> x.defv([])).errate( (e) -> e.toPathParseFailure().toPathFailure() ) 
             )
             )
           ).defv(Provide.pure(__.reject(__.fault().of(E_Path_PathParse(E_PathParse_EmptyInput)))))

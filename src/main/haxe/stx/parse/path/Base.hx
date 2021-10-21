@@ -5,7 +5,7 @@ using stx.parse.path.Base;
 function id(str) return __.parse().id(str);
 function reg(str) return __.parse().reg(str);
 function log(wildcard){
-	return stx.Log.ZERO.tag('stx.parse.path');
+	return stx.Log.ZERO.tag('stx/parse/path');
 }
 class Base extends ParserCls<String,Array<Token>>{
 	var is_windows : Bool;
@@ -27,6 +27,7 @@ class Base extends ParserCls<String,Array<Token>>{
 		).with_tag('p_sep');
 	}
 	public function p_root():Parser<String,Array<Token>>{
+		__.log().trace(is_windows);
 		return if(is_windows) {
 				"[A-Za-z]:".reg()
 				.then( Some.fn().then(FPTDrive) )
@@ -37,7 +38,7 @@ class Base extends ParserCls<String,Array<Token>>{
 					}
 				);
 			}else{
-				p_sep().then( function(x) return [FPTDrive(None)] );
+				inspect(p_sep().then( function(x) return [FPTDrive(None)] ));
 			}
 	}
 
@@ -104,9 +105,10 @@ class Base extends ParserCls<String,Array<Token>>{
 	}
 	public function p_abs(){ 
 		return p_root()
-		.and( p_body() )
+		.and( p_body().option() )
 		.then( 
 			function(t) {
+				__.log().trace('${t.tup()}');
 				return switch(t.tup()){
 					case tuple2(tk,b2_opt_arr) :
 						var out = [];
@@ -114,7 +116,9 @@ class Base extends ParserCls<String,Array<Token>>{
 							out.push(v); 
 						}
 						for(v0 in b2_opt_arr){ 
-							out.push(v0); 
+							for(v1 in v0){
+								out.push(v1); 
+							}
 						}
 						out;
 					default : [];
@@ -158,7 +162,7 @@ class Base extends ParserCls<String,Array<Token>>{
 			.and(p_sep().option())
 			.then(
 				(tp) -> {
-					//trace(tp);
+					__.log().debug('${tp.tup()}');
 					return ((l:Array<Token>,r:Option<Token>) -> switch(r){
 						case Some(v): l.concat([v]);
 						case None 	: l;

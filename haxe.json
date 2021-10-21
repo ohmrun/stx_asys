@@ -12,7 +12,23 @@
           "-main"     : "stx.io.Test"
         }
       },
-      "--interp"  : "true"
+      "--interp"  : true
+    },
+    "stx.fs.path" : {
+      "interp" : {
+        "test" : {
+          "-main" : "stx.fs.path.Test"
+        },
+        "--interp" : true
+      }
+    },
+    "stx.parse.path" : {
+      "interp" : {
+        "test" : {
+          "-main" : "stx.parse.path.Test"
+        },
+        "--interp" : true
+      }
     }
   } 
 }
