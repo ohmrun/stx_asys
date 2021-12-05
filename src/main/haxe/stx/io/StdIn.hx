@@ -56,8 +56,8 @@ abstract StdIn(StdInput) from StdInput{
     }
     final pull = (un:InputRequest) -> {
       __.log().debug("pulling");
-      var prim : InputResponse       = null;
-      var err  : Err<IoFailure>      = null;
+      var prim : InputResponse              = null;
+      var err  : Rejection<IoFailure>       = null;
       try{
         prim = apply(this,un);
         __.log().debug('pull ok');

@@ -24,7 +24,7 @@ class Path{
             .provide(s.reader())
             .convert(
               (res:ParseResult<String,Array<Token>>) -> __.log().through()(res).is_ok().if_else(
-                ()      -> __.option(res.value).flat_map((x:Option<Array<Token>>) -> x).resolve(f -> f.err(E_Undefined)),
+                ()      -> __.option(res.value).flat_map((x:Option<Array<Token>>) -> x).resolve(f -> f.internal(E_Undefined)),
                 ()      -> res.fails().toRes().map(x -> x.defv([])).errate( (e) -> e.toPathParseFailure().toPathFailure() ) 
             )
             )

@@ -15,7 +15,7 @@ enum abstract Distro(String){
       case "Linux"    : "Linux";
       case "BSD"      : "BSD";
       case "Mac"      : "Mac";
-      case _          :  throw __.fault().of(UnknownDistroName);
+      case x          :  throw __.fault().external('E_UnknownDistroName($x)');
     }
   }
   public function is_windows(){

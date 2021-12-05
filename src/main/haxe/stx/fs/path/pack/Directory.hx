@@ -118,7 +118,7 @@ class DirectoryLift{
         (next:Array<String>,memo:Report<FsFailure>) -> {
           var path = Directory.fromArray(next);
           return memo.fold(
-            (v:Err<FsFailure>) -> Execute.pure(v),
+            (v:Rejection<FsFailure>) -> Execute.pure(v),
             ()  -> exists(path).provide(env).point(
               (b) -> b.if_else(
                 () -> Execute.unit(),//TODO wtf

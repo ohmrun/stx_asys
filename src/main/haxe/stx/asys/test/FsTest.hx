@@ -11,7 +11,7 @@ class FsTest extends TestCase{
             __.log().printer(),
             __.crack
           ).crunch();
-    }catch(e:Err<Dynamic>){
+    }catch(e:Rejection<Dynamic>){
       switch(e.data){
         case Some(ERR_OF(E_FileNotFound(arch))) : Rig.pass();
         default                                 : throw(e);
