@@ -159,7 +159,7 @@ class DirectoryLift{
       );
     };
     return Produce.fromFunXR(fn).errata(
-      (e) -> e.fault().of(UnknownFSError(e.data))
+      (e) -> e.fault().of(UnknownFSError(e.val))
     );
   }
   static public function tree(dir:Directory):Cascade<HasDevice,Expr<Entry>,FsFailure>{
