@@ -4,6 +4,7 @@
       "stx_pico","stx_nano","stx_parse","stx_show","stx_pkg","stx_proxy","stx_coroutine","stx_test",
       "fletcher","pml","jali"
     ],
+    "-D" : ["STX_TEST__VERBOSE"],
     "-cp" : "src/main/haxe",
     "interp" : {
       "-main"     : "stx.io.Test",
