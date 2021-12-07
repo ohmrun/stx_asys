@@ -73,7 +73,7 @@ class Base extends ParserCls<String,Array<Token>>{
 			':'.id().not()
 		).and_then(
 			(str:String) -> {
-				__.log()(' ###$str###');
+				__.log().trace(' ###$str###');
 				return switch(str){
 					case '.' 		: Parser.Failed('not a term');
 					case '..' 	: Parser.Failed('not a term');

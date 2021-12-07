@@ -1,6 +1,7 @@
 package stx.parse.path;
 
 import stx.parse.path.test.*;
+import stx.parse.path.test.issues.*;
 
 using stx.Test;
 using stx.Log;
@@ -13,7 +14,10 @@ class Test{
           log.includes.push("stx/parse/path");
           log.includes.push("stx/parse/parser/With");
     __.test(
-      [new PosixTest()],
+      [
+        new PosixTest(),
+        //new Issue1(),
+      ],
       []
     );
   }

@@ -24,11 +24,11 @@
       }
     },
     "stx.parse.path" : {
-      "interp" : {
-        "test" : {
-          "-main" : "stx.parse.path.Test"
-        },
-        "--interp" : true
+      "test" : {
+        "-main" : "stx.parse.path.Test",
+        "interp" : {
+          "--interp" : true
+        }
       }
     }
   } 
