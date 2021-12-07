@@ -3,7 +3,7 @@ package stx.parse.path.test;
 class PosixTest extends TestCase{
   private var parser = new Posix();
   private function on_done<T,S>(x:ParseResult<T,S>,?fn:Void->Void){
-    trace('$x');
+    trace('${x.toString()}');
     if(fn!=null){
       fn();
     }
