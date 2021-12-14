@@ -1,11 +1,11 @@
 package stx.io;
 
 enum IoFailure{
-  Subsystem(e:haxe.io.Error);
-  TypeError;
-  SourceNotFound;
-  EndOfFile;
-  UnsupportedValue;
+  E_Subsystem(e:haxe.io.Error);
+  E_TypeError;
+  E_SourceNotFound;
+  E_EndOfFile;
+  E_UnsupportedValue;
 }
 
 /**

@@ -1,4 +1,4 @@
-package stx.asys.type;
+package stx.asys;
 
 interface UserApi{
   

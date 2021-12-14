@@ -54,7 +54,7 @@ class Base extends ParserCls<String,Array<Token>>{
 
 
 	public function p_path_chars(){
-		return inspect(p_sep().not().tag_error('p_path_chars.p_sep')._and(char_and_space.or(p_special_chars))).one_many().tokenize().with_tag('p_path_chars'); 
+		return p_sep().not().tag_error('p_path_chars.p_sep')._and(char_and_space.or(p_special_chars)).one_many().tokenize().with_tag('p_path_chars'); 
 	}		
 	public function p_file_chars(){
 		return char_and_space.or(p_special_chars).one_many().tokenize().with_tag('p_file_chars');

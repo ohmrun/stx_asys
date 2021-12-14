@@ -29,7 +29,10 @@ typedef OutputRequest       = stx.io.OutputRequest;
 typedef IoFailure           = stx.io.IoFailure;
 
 typedef Process             = stx.io.Process;
+typedef ProcessDef          = stx.io.Process.ProcessDef;
 typedef ProcessRequest      = stx.io.process.ProcessRequest;
 typedef ProcessResponse     = stx.io.process.ProcessResponse;
 typedef ProcessState        = stx.io.process.ProcessState;
 typedef ProcessFailure      = stx.fail.ProcessFailure;
+
+typedef LiftInputResponse   = stx.io.lift.LiftInputResponse;

@@ -1,8 +1,5 @@
 package stx.asys;
 
-import utest.Assert.*;
-
-import stx.asys.test.*;
 using stx.Test;
 
 class Test{
@@ -19,7 +16,7 @@ class Test{
 
         f.level = TRACE;
     __.test([
-      new FsParseTest(),
+      // new FsParseTest(),
       // new AsysTest(),
       // new SocketTest(),
       // new DirDrillTest(),
@@ -27,7 +24,7 @@ class Test{
       // new EnvTest(),
       // new FsTest(),
       // new EmptyTest(),
-    ],[DirDrillTest]);
+    ],[]);
   }
 }
 class EmptyTest extends TestCase{

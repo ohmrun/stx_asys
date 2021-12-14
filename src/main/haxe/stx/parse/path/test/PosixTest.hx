@@ -25,12 +25,12 @@ class PosixTest extends TestCase{
     final parse = parser.char_and_space;
     __.ctx(input,on_done.bind(_,()->{})).load(parse).crunch();
   }
-  public function test__one_many_char_and_space(){
+  public function _test__one_many_char_and_space(){
     final input = "aaa".reader();
-    final parse = parser.char_and_space.one_many().tokenize();
+    final parse = parser.char_and_space.or(parser.p_special_chars).one_many().tokenize();
     __.ctx(input,on_done.bind(_,()->{})).load(parse).crunch();
   }
-  public function _test__p_down(){           
+  public function test__p_path_chars(){           
     final input = "abc".reader();
     final parse = parser.p_path_chars();
     __.ctx(input,on_done.bind(_,()->{})).load(parse).crunch();

@@ -2,6 +2,7 @@ package stx.io;
 
 enum OutputRequestSum{
   OReqValue(packet:Packet);
+  OReqBytes(bytes:Bytes);
   OReqClose;
 }
 abstract OutputRequest(OutputRequestSum) from OutputRequestSum to OutputRequestSum{

@@ -6,6 +6,16 @@
     ],
     "-D" : ["STX_TEST__VERBOSE"],
     "-cp" : "src/main/haxe",
+    "unit" : {
+      "--macro" : [
+        "include('stx.io',true)",
+        "include('stx.fs',true)",
+        "include('stx.asys',true)"
+      ],
+      "interp" : {
+        "--interp" : true
+      }
+    },
     "interp" : {
       "-main"     : "stx.io.Test",
       "io" : {
@@ -26,6 +36,14 @@
     "stx.parse.path" : {
       "test" : {
         "-main" : "stx.parse.path.Test",
+        "interp" : {
+          "--interp" : true
+        }
+      }
+    },
+    "stx.io" : {
+      "test" : {
+        "-main" : "stx.io.Test",
         "interp" : {
           "--interp" : true
         }

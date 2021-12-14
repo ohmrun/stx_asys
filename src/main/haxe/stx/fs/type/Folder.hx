@@ -1,4 +1,4 @@
-package stx.fs.head.data;
+package stx.fs.type;
 
 interface Folder{
   //public function index():Produce<Array<St>>;

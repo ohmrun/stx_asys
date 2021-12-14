@@ -2,7 +2,11 @@ package stx.asys;
 
 
 interface ASysApi{
+  public function local():HasDevice;
   public function sleep(float:Float):Future<Noise>;
+  public function stderr():stx.io.Output;
+  public function stdout():stx.io.Output;
+  public function stdin():stx.io.Input;
 }
 
 class ASys implements ASysApi{
@@ -16,5 +20,16 @@ class ASys implements ASysApi{
       }
     );
   }
-  
+  public function stderr():stx.io.Output{
+    return new stx.io.Output(std.Sys.stderr());
+  }
+  public function stdout():stx.io.Output{
+    return new stx.io.Output(std.Sys.stdout());
+  }
+  public function stdin():stx.io.Input{
+    return new stx.io.Input(std.Sys.stdin());
+  }
+  public function local():HasDevice{
+    return { device : new Device(new Distro()) };
+  }
 }

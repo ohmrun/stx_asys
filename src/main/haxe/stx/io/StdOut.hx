@@ -21,13 +21,16 @@ abstract StdOut(StdOutput) from StdOutput{
         case OReqClose:
           this.close();
           output = Report.unit();
+        case OReqBytes(bytes) : 
+          this.write(bytes);
+          output = Report.unit();
         case OReqValue(packet):
           switch(packet.data){
             case PString(str):          valAsString = Some(str);
             case PFloat(fl):            valAsFloat  = Some(fl);
             case PInt(int):             valAsInt    = Some(int);
             default:
-              __.fault().of(UnsupportedValue);
+              __.fault().of(E_UnsupportedValue);
           }
           try{
             switch(packet.type){
@@ -79,7 +82,7 @@ abstract StdOut(StdOutput) from StdOutput{
                 for (val in valAsString){ this.writeString(val); }
             }
         }catch(e:Dynamic){
-          output = Report.pure(__.fault().of(Subsystem(e)));
+          output = Report.pure(__.fault().of(E_Subsystem(e)));
         }
       }
       __.log()('pushed $output');

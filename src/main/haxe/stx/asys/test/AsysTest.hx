@@ -4,7 +4,7 @@ class AsysTest extends TestCase{
   var local = Device.local();
   @Ignored
   public function testA(async:Async){
-    Produce.pure(Sys.getCwd());
+    Produce.pure(std.Sys.getCwd());
     
     // __.channel().io(__.into2(Paths._.toDirectory)).toChannel().prepare(
     //   __.accept(Devices.local()),
@@ -15,14 +15,14 @@ class AsysTest extends TestCase{
   }
   @Ignored
   public function testB(async:Async){
-    Path.parse(Sys.getCwd())
+    Path.parse(std.Sys.getCwd())
         .reframe();
         //.forward(local)
         //.submit();
   }
   @Ignored
   public function test(){
-    trace(Sys.getCwd());
+    trace(std.Sys.getCwd());
     var path        = __.asys().local().device.shell.cwd.pop();
     //var next        = path.receive(Devices.local());   
      //     path.deliver(

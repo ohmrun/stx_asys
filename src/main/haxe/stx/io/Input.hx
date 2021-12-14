@@ -8,4 +8,5 @@ typedef InputDef  = Coroutine<InputRequest,InputResponse,Noise,IoFailure>;
   public function new(ipt:StdIn){
     this = ipt.reply();
   }
+  //@:noUsing static public 
 }

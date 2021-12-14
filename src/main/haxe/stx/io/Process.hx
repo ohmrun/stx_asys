@@ -14,9 +14,9 @@ abstract Process(ProcessDef) from ProcessDef{
     return new Process(self);
   }
   public function new(self){this = self;}
-  static public function grow(command:Cluster<String>,?detached:Bool){
+  @:noUsing static public function make0(self:sys.io.Process,ins:OutputDef,outs:InputDef,errs:InputDef,req:ProcessRequest):Process{
     var exit_code                   = None;
-    function step(self,ins:OutputDef,outs:InputDef,errs:InputDef,req:ProcessRequest):ProcessDef{
+    function step(self:sys.io.Process,ins:OutputDef,outs:InputDef,errs:InputDef,req:ProcessRequest):ProcessDef{
       return __.yield(
         PResReady,
         function rec(req:ProcessRequest):ProcessDef{
@@ -56,12 +56,17 @@ abstract Process(ProcessDef) from ProcessDef{
         }
       );
     }
+    return step(self,ins,outs,errs,req);
+  }
+  static public function grow(command:Cluster<String>,?detached:Bool){
+    var exit_code                   = None;
+    
     function init():ProcessDef{
       final self                      = new sys.io.Process(command.head().fudge(), Std.downcast(command.tail(),Array),detached);
       final ins                       = AsysStdOut.lift(self.stdin).reply();
       final outs                      = AsysStdIn.lift(self.stdout).reply();
       final errs                      = AsysStdIn.lift(self.stderr).reply();    
-      return __.yield(PResReady,step.bind(self,ins,outs,errs));        
+      return __.yield(PResReady,make0.bind(self,ins,outs,errs).fn().then(x -> x.prj()));        
     }; 
   
     return __.belay(Belay.fromThunk(init));

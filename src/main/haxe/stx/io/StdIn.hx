@@ -66,10 +66,10 @@ abstract StdIn(StdInput) from StdInput{
         prim = IResSpent;
       }catch(e:haxe.io.Error){
         __.log().debug('pull fail $e');
-        err  = __.fault().of(Subsystem(e));
+        err  = __.fault().of(E_Subsystem(e));
       }catch(e:Dynamic){
         __.log().debug('pull fail $e');
-        err  = __.fault().of(Subsystem(Custom(e)));
+        err  = __.fault().of(E_Subsystem(Custom(e)));
       }
       __.log().debug('pulled: $prim');
       var out : Res<InputResponse,IoFailure> = __.option(err).map(__.reject).def(
@@ -82,8 +82,8 @@ abstract StdIn(StdInput) from StdInput{
       function rec(ipt:InputRequest):Coroutine<InputRequest,InputResponse,Noise,IoFailure>{
         return switch([closed,ipt]){
           case [_,IReqState]          : __.emit(IResState(({ closed : closed }:InputState)),__.tran(rec));
-          case [true,IReqValue(_)]    : __.quit(__.fault().of(EndOfFile));
-          case [true,IReqBytes(_,_)]  : __.quit(__.fault().of(EndOfFile));
+          case [true,IReqValue(_)]    : __.quit(__.fault().of(E_EndOfFile));
+          case [true,IReqBytes(_,_)]  : __.quit(__.fault().of(E_EndOfFile));
           case [true,IReqClose]       : __.stop();
           case [false,IReqClose]      :
             if(!closed){
@@ -97,7 +97,7 @@ abstract StdIn(StdInput) from StdInput{
                   ok -> __.emit(ok,__.tran(rec)),
                   no -> __.quit(no) 
                 );
-          case [true,IReqTotal(_)] : __.quit(__.fault().of(EndOfFile));
+          case [true,IReqTotal(_)] : __.quit(__.fault().of(E_EndOfFile));
         }
       }
     ));
