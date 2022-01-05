@@ -10,10 +10,10 @@ abstract StdIn(StdInput) from StdInput{
     this = self;
   }
   public function reply():Tunnel<InputRequest,InputResponse,IoFailure>{
-    var closed = false;
+    var state = Io_Input_Unknown;
     function apply(ip:StdInput,un:InputRequest):InputResponse{
       return switch(un){
-        case IReqState    : IResState(({ closed : closed }:InputState));
+        case IReqState    : IResState(state);
         case IReqValue(x) :
           var prim = 
             switch(x){
@@ -43,15 +43,16 @@ abstract StdIn(StdInput) from StdInput{
           ip.readBytes(bytes,pos,len);
           IResBytes(bytes);
         case IReqClose:    
-          if(!closed){
-            ip.close(); 
+          switch(state){
+            case Io_Input_Closed(_) : 
+            default : 
+              state = Io_Input_Closed(true);
+              ip.close(); 
           }
           IResSpent;
         case IReqTotal(buffer_size) :
           var bytes = ip.readAll(buffer_size);
           IResBytes(bytes);
-
-          
       }
     }
     final pull = (un:InputRequest) -> {
@@ -63,11 +64,14 @@ abstract StdIn(StdInput) from StdInput{
         __.log().debug('pull ok');
       }catch(e:Eof){
         __.log().debug('pull fail $e');
-        prim = IResSpent;
+        state = Io_Input_Closed(false);
+        prim  = IResSpent;
       }catch(e:haxe.io.Error){
         __.log().debug('pull fail $e');
+        state = Io_Input_Error(Error.make(Some(Std.string(e))));
         err  = __.fault().of(E_Subsystem(e));
       }catch(e:Dynamic){
+        state = Io_Input_Error(Error.make(Some(Std.string(e))));
         __.log().debug('pull fail $e');
         err  = __.fault().of(E_Subsystem(Custom(e)));
       }
@@ -80,24 +84,26 @@ abstract StdIn(StdInput) from StdInput{
     //TODO implement Control4
     return Tunnel.lift(__.tran(
       function rec(ipt:InputRequest):Coroutine<InputRequest,InputResponse,Noise,IoFailure>{
-        return switch([closed,ipt]){
-          case [_,IReqState]          : __.emit(IResState(({ closed : closed }:InputState)),__.tran(rec));
-          case [true,IReqValue(_)]    : __.quit(__.fault().of(E_EndOfFile));
-          case [true,IReqBytes(_,_)]  : __.quit(__.fault().of(E_EndOfFile));
-          case [true,IReqClose]       : __.stop();
-          case [false,IReqClose]      :
-            if(!closed){
-              this.close(); 
+        return switch([state,ipt]){
+          case [_,IReqState]                        : __.emit(IResState(state),__.tran(rec));
+          case [Io_Input_Closed(_),IReqValue(_)]    : __.quit(__.fault().of(E_EndOfFile));
+          case [Io_Input_Closed(_),IReqBytes(_,_)]  : __.quit(__.fault().of(E_EndOfFile));
+          case [Io_Input_Closed(_),IReqClose]       : __.stop();
+          case [Io_Input_Closed(_),IReqTotal(_)]    : __.quit(__.fault().of(E_EndOfFile));
+          case [_,IReqClose]      :
+            switch(state){
+              case Io_Input_Closed(_) : 
+              default                 : 
+                this.close(); 
+                state = Io_Input_Closed(true);
             }
-            closed = true; 
             __.stop();
-          case [false,x]              :
+          case [_,x]              :
               pull(x)
                .fold(
                   ok -> __.emit(ok,__.tran(rec)),
                   no -> __.quit(no) 
                 );
-          case [true,IReqTotal(_)] : __.quit(__.fault().of(E_EndOfFile));
         }
       }
     ));

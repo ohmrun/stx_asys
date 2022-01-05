@@ -14,9 +14,6 @@ using eu.ohmrun.Jali;
 
 class Main {
 	static function main() {
-		trace('stx_asys');		
-		#if (test=="stx_asys")
-			stx.asys.Test.main();			
-		#end
+		stx.asys.Test.main();			
 	}
 }

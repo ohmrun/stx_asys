@@ -16,15 +16,6 @@
         "--interp" : true
       }
     },
-    "interp" : {
-      "-main"     : "stx.io.Test",
-      "io" : {
-        "test" : {
-          "-main"     : "stx.io.Test"
-        }
-      },
-      "--interp"  : true
-    },
     "stx.fs.path" : {
       "interp" : {
         "test" : {

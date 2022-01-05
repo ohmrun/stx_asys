@@ -32,7 +32,15 @@ typedef Process             = stx.io.Process;
 typedef ProcessDef          = stx.io.Process.ProcessDef;
 typedef ProcessRequest      = stx.io.process.ProcessRequest;
 typedef ProcessResponse     = stx.io.process.ProcessResponse;
+
+typedef ProcessStateDef     = stx.io.process.ProcessState.ProcessStateDef;
 typedef ProcessState        = stx.io.process.ProcessState;
+
+typedef ProcessStatusSum    = stx.io.process.ProcessStatus.ProcessStatusSum;
+typedef ProcessStatus       = stx.io.process.ProcessStatus;
 typedef ProcessFailure      = stx.fail.ProcessFailure;
 
 typedef LiftInputResponse   = stx.io.lift.LiftInputResponse;
+
+typedef InputState         = stx.io.InputState;
+typedef InputStateSum      = stx.io.InputState.InputStateSum;

@@ -7,6 +7,7 @@ import stx.io.StdOut in AsysStdOut;
 
 typedef ProcessDef = ServerDef<ProcessRequest,ProcessResponse,Noise,IoFailure>;
 
+@:using(stx.Proxy.ProxyLift)
 @:using(stx.io.Process.ProcessLift)
 abstract Process(ProcessDef) from ProcessDef{
   static public var _(default,never) = ProcessLift;
@@ -14,25 +15,96 @@ abstract Process(ProcessDef) from ProcessDef{
     return new Process(self);
   }
   public function new(self){this = self;}
+  //TODO fetch state from io
   @:noUsing static public function make0(self:sys.io.Process,ins:OutputDef,outs:InputDef,errs:InputDef,req:ProcessRequest):Process{
-    var exit_code                   = None;
+    var exit_code                               = None;
+    var found_errors                            = false;
+    var errors_state                            = None;
+    var output_state                            = None; 
+    var process_status :  ProcessStatus         = Io_Process_Init;
+
+    function get_process_state(){
+      return ProcessState.make(process_status,exit_code,errors_state,output_state);
+    }
     function step(self:sys.io.Process,ins:OutputDef,outs:InputDef,errs:InputDef,req:ProcessRequest):ProcessDef{
       return __.yield(
-        PResReady,
+        PResState(ProcessState.make(process_status)),
         function rec(req:ProcessRequest):ProcessDef{
+          __.log().debug(_ -> _.pure(req));
           return switch (req){
+            case PReqTouch                   : __.yield(PResState(get_process_state()),rec);
             case PReqState(block)            :
-              exit_code = __.option(self.exitCode(__.option(block).defv(true))); 
-              __.yield(PResState(({ exit_code : exit_code }:ProcessState)),rec);
+              exit_code       = __.option(self.exitCode(__.option(block).defv(true))); 
+              function get_state(x) return switch(x){
+                case IResState(state)     : __.option(x);
+                default                   : None;
+              }
+              function choose_first_state_response(x,y){
+                return switch(y){
+                  case Some(IResState(x)) : y;
+                  default                 : x;
+                };
+              }
+              final out_state = Emiter._.derive(
+                Tunnel._.emiter(outs,Emiter.pure(IReqState)),
+                get_state,
+                choose_first_state_response,
+                None
+              ).map(
+                res -> switch(res){
+                  case Some(IResState(state)) : __.option(state);
+                  default                     : __.option(null);
+                }
+              );
+              final err_state = Emiter._.derive(
+                Tunnel._.emiter(errs,Emiter.pure(IReqState)),
+                get_state,
+                choose_first_state_response,
+                None
+              ).map(
+                res -> switch(res){
+                  case Some(IResState(state)) : __.option(state);
+                  default                     : __.option(null);
+                }
+              );
+              //$type(out_state);
+              //$type(err_state);
+              final either = err_state.zip(out_state);
+              $type(either);
+              final apply  = Action.fromEffect(
+                either.secure(
+                  Secure.handler(
+                  (x:Couple<Option<InputState>,Option<InputState>>) -> {
+                    x.decouple(
+                      (out,err) -> {
+                          output_state  = out;
+                          errors_state  = err;
+                      }
+                    );
+                  }
+                  )
+                )
+              );
+              //$type(apply);
+              // RespondCat._.next(
+              //   apply,
+              //   (_)  ->  __.yield(PResState(get_process_state()),rec)
+              // );
+              //TODO call this;
+              __.yield(PResState(get_process_state()),rec);
             case PReqInput(req,false)      : 
               switch(outs.provide(req)){
                 case Emit(x,next)       : __.yield(PResValue(Success(x)),step.bind(self,ins,next,errs));
-                case Wait(arw)          : __.yield(PResReady,step.bind(self,ins,__.wait(arw),errs));
+                case Wait(arw)          : 
+                    process_status = Io_Process_Open;
+                  __.yield(PResState(get_process_state()),step.bind(self,ins,__.wait(arw),errs));
                 case Hold(held)         : 
+                  process_status = process_status.hang();
+                  //TODO The state report is *behind the asynchronous gap
                   __.belay(
                     stx.proxy.core.Belay.lift(
                       held.map(
-                        next -> __.yield(PResReady,step.bind(self,ins,next,errs)) 
+                        next -> __.yield(PResState(get_process_state()),step.bind(self,ins,next,errs)) 
                       )
                     )
                   );
@@ -41,24 +113,27 @@ abstract Process(ProcessDef) from ProcessDef{
               case PReqInput(req,true)      : 
                 switch(errs.provide(req)){
                   case Emit(x,next)       : __.yield(PResValue(Success(x)),step.bind(self,ins,outs,next));
-                  case Wait(arw)          : __.yield(PResReady,step.bind(self,ins,outs,__.wait(arw)));
+                  case Wait(arw)          : 
+                    process_status = Io_Process_Open;
+                    __.yield(PResState(get_process_state()),step.bind(self,ins,outs,__.wait(arw)));
                   case Hold(held)         : 
+                    process_status = process_status.hang();
                     __.belay(
                       stx.proxy.core.Belay.lift(held.map(
-                        next -> __.yield(PResReady,step.bind(self,ins,outs,next)) 
+                        next -> __.yield(PResState(get_process_state()),step.bind(self,ins,outs,next))
                       ))
                     );
                   case Halt(ret)          : __.yield(PResValue(Success(IResSpent)),step.bind(self,ins,outs,Halt(ret)));
                 }
               case PReqOutput(req)  :   
-                __.yield(PResReady,step.bind(self,ins.provide(req),outs,errs));
+                __.yield(PResState(get_process_state()),step.bind(self,ins.provide(req),outs,errs));
           }
         }
       );
     }
     return step(self,ins,outs,errs,req);
   }
-  static public function grow(command:Cluster<String>,?detached:Bool){
+  static public function grow(command:Cluster<String>,?detached:Bool):Process{
     var exit_code                   = None;
     
     function init():ProcessDef{
@@ -66,10 +141,10 @@ abstract Process(ProcessDef) from ProcessDef{
       final ins                       = AsysStdOut.lift(self.stdin).reply();
       final outs                      = AsysStdIn.lift(self.stdout).reply();
       final errs                      = AsysStdIn.lift(self.stderr).reply();    
-      return __.yield(PResReady,make0.bind(self,ins,outs,errs).fn().then(x -> x.prj()));        
+      return __.yield(PResState(ProcessState.make(Io_Process_Init)),make0.bind(self,ins,outs,errs).fn().then(x -> x.prj()));        
     }; 
   
-    return __.belay(Belay.fromThunk(init));
+    return lift(__.belay(Belay.fromThunk(init)));
   }
   public function prj():ProcessDef{
     return this;
@@ -86,19 +161,4 @@ class ProcessLift{
     var that  = provide(self,PReqInput(IReqTotal(buffer),false));
     return that;
   }
-  // static public function outlet<Z>(self:ProcessDef,driver:Void->InputRequest,fn:InputResponse -> Z -> Res<Z,IoFailure>,init:Z):Outlet<Z,IoFailure>{
-  //   function rec(self:ProcessDef,init:Z):OutletDef<Z,IoFailure> {
-  //     return switch(self){
-  //       case Await(_,next) : rec(next(Noise),init);
-  //       case Yield(y,next) : 
-  //         fn(y,init).fold(
-  //           ok -> rec(PReqInput(next(driver())),ok),
-  //           er -> Outlet.make(End(er))
-  //         );
-  //       case Ended(e)      : __.ended(e);
-  //       case Defer(d)      : __.belay(d.map(rec.bind(_,init)));
-  //     }
-  //   };
-  //   return lift(rec(self,init));
-  // }
 }

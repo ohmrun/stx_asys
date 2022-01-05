@@ -162,12 +162,12 @@ class DirectoryLift{
       (e) -> e.fault().of(UnknownFSError(e.val))
     );
   }
-  static public function tree(dir:Directory):Cascade<HasDevice,Expr<Entry>,FsFailure>{
+  static public function tree(dir:Directory):Modulate<HasDevice,Expr<Entry>,FsFailure>{
     __.log().debug('tree: $dir');
     var init  = Arrange.fromFun1Attempt(entries);
-    var c     = Cascade.pure(dir).reframe().arrange(entries);
+    var c     = Modulate.pure(dir).reframe().arrange(entries);
     
-    function fn(either:Either<String,Entry>,t:Expr<Entry>):Cascade<HasDevice,Expr<Entry>,FsFailure>{
+    function fn(either:Either<String,Entry>,t:Expr<Entry>):Modulate<HasDevice,Expr<Entry>,FsFailure>{
       __.log().debug(_ -> _.pure(either));
       return switch(either){
         case Left(string) : 
@@ -181,14 +181,14 @@ class DirectoryLift{
               return t.conflate(Group(Cons(Label(string),Cons(t1,Nil))));
             }
           );
-        case Right(entry) : Cascade.pure(
+        case Right(entry) : Modulate.pure(
             t.conflate(Value(entry))
           );
       }
     }
     var ut  = Arrange.pure(Empty);
     var d   = Arrange.bind_fold.bind(fn).fn().then( _ -> _.defv(ut));
-    var e   = c.arrangement(d).toCascade();
+    var e   = c.arrangement(d).toModulate();
     var f = e.mapi(
       (env) -> __.couple(Empty,env)
     );
@@ -200,6 +200,6 @@ class DirectoryLift{
     //$type(e);
     //$type(f);
 
-    return Cascade.lift(f);
+    return Modulate.lift(f);
   }
 }
