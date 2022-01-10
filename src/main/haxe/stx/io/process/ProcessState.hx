@@ -18,7 +18,19 @@ typedef ProcessStateDef = {
       stdout          : stdout 
     });
   }
+  public function copy(?status,?exit_code,?stderr,?stdout){
+    return lift({
+      status    : __.option(status).defv(this.status),
+      exit_code : __.option(exit_code).defv(this.exit_code),
+      stderr    : __.option(stderr).defv(this.stderr),
+      stdout    : __.option(stdout).defv(this.stdout)
+    });
+  }
   public function prj():ProcessStateDef return this;
   private var self(get,never):ProcessState;
   private function get_self():ProcessState return lift(this);
+
+  public function with_status(status:ProcessStatus){
+    return copy(status);
+  }
 }

@@ -17,7 +17,7 @@ class Base extends ParserCls<String,Array<Token>>{
 		return is_windows ? Separator.WinSeparator : Separator.PosixSeparator;
 	}
 	public function p_sep(): Parser<String,Token>{
-		return Parser.When(
+		return Parsers.When(
 			string -> {
 				return string == separator();	
 			},
@@ -63,7 +63,7 @@ class Base extends ParserCls<String,Array<Token>>{
 		return parser;
 	}
 	static function inspect<I,O>(parser:Parser<I,O>,?pos:Pos){
-		return Parser.Inspect(
+		return Parsers.Inspect(
 			parser,
 			__.log().printer(pos),((x:ParseResult<I,O>) -> x.toString()).fn().then(__.log().printer(pos)));
 	}
@@ -75,8 +75,8 @@ class Base extends ParserCls<String,Array<Token>>{
 			(str:String) -> {
 				__.log().trace(' ###$str###');
 				return switch(str){
-					case '.' 		: Parser.Failed('not a term');
-					case '..' 	: Parser.Failed('not a term');
+					case '.' 		: Parsers.Failed('not a term');
+					case '..' 	: Parsers.Failed('not a term');
 					default  		: 
 						var all = str.split(".");
 						var ext = null;
@@ -84,9 +84,9 @@ class Base extends ParserCls<String,Array<Token>>{
 							ext = all.pop();
 						}
 					return if(ext==null){
-						Parser.Succeed(FPTDown(str));
+						Parsers.Succeed(FPTDown(str));
 					}else{
-						Parser.Succeed(FPTFile(all.join('.'),ext));
+						Parsers.Succeed(FPTFile(all.join('.'),ext));
 					}
 				}
 			}
@@ -172,7 +172,7 @@ class Base extends ParserCls<String,Array<Token>>{
 				p_term().then(
 					(x) -> [x]
 				)
-			).and_(Parser.Eof().lookahead());
+			).and_(Parsers.Eof().lookahead());
 	}               
 	public function defer(i:ParseInput<String>,cont:Terminal<ParseResult<String,Array<Token>>,Noise>):Work{
 		return p_path().defer(i,cont);

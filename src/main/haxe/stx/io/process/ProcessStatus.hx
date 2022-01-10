@@ -3,7 +3,7 @@ package stx.io.process;
 enum ProcessStatusSum{
   Io_Process_Init;
   Io_Process_Open;
-  Io_Process_Hung(calls:Int,?last:Float);
+  Io_Process_Hung(num_calls:Int,?last_timestamp:Float);
 }
 abstract ProcessStatus(ProcessStatusSum) from ProcessStatusSum to ProcessStatusSum{
   public function new(self) this = self;

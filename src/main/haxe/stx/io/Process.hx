@@ -5,7 +5,7 @@ using stx.coroutine.Core;
 import stx.io.StdIn  in AsysStdIn;
 import stx.io.StdOut in AsysStdOut;
 
-typedef ProcessDef = ServerDef<ProcessRequest,ProcessResponse,Noise,IoFailure>;
+typedef ProcessDef = ServerDef<ProcessRequest,ProcessResponse,Noise,ProcessFailure>;
 
 @:using(stx.Proxy.ProxyLift)
 @:using(stx.io.Process.ProcessLift)
@@ -70,7 +70,7 @@ abstract Process(ProcessDef) from ProcessDef{
               //$type(out_state);
               //$type(err_state);
               final either = err_state.zip(out_state);
-              $type(either);
+              //$type(either);
               final apply  = Action.fromEffect(
                 either.secure(
                   Secure.handler(
