@@ -14,91 +14,98 @@ class Processor{
     var ok_parser = ok_parser;
     var no_parser = no_parser;
     function f(self:ProcessDef):OutletDef<R,ProcessFailure>{
-       return switch(self){
+      function no_step(arw){
+        return switch(no_parser){
+          case Emit(o,next) : 
+            final next_process_step = arw(PReqInput(o,true));
+            no_parser  = next;
+            f(next_process_step);
+          case Wait(tran)   :
+            __.ended(End(__.fault().explain(_ -> _.e_input_parser_waiting_on_an_unitialized_process())));
+          case Hold(held)   :
+            __.belay(held.convert(
+              (next_no_parser) -> {
+                no_parser = next_no_parser;
+                return f(self);
+              }
+            ));
+          case Halt(Production(r))  :
+            __.ended(End(Rejection.fromError(r.error.toError()).errate(E_Process_Parse)));
+          case Halt(Terminated(Stop))  :
+            __.ended(Tap);
+          case Halt(Terminated(Exit(rejection))) :
+            __.ended(End(rejection.errate(E_Process_Parse)));  
+        }
+      }
+      function ok_step(arw){
+        return switch(ok_parser){
+          case Wait(fn)             : 
+            __.ended(End(__.fault().explain(_ -> _.e_input_parser_waiting_on_an_unitialized_process())));
+          case Emit(e,rest)         : 
+            //Pass input request from Output to Process
+            final next_proxy                = arw(PReqInput(e,false));
+            ok_parser                       = rest;
+            f(next_proxy);
+          case Hold(ft)             :
+            final status = Io_Process_Hung(1,haxe.Timer.stamp());
+            __.belay(
+              ft.convert(
+                ok_parserI -> {
+                  ok_parser = ok_parserI;
+                  //try again with the new parser state.
+                  return f(self);
+                }
+              )
+            );
+          case Halt(Production(r))  :
+            r.toRes().fold(
+              opt -> opt.fold(
+                ok -> __.ended(Val(ok)),
+                () -> __.ended(Tap)
+              ),
+              e -> __.ended(e.errate(E_Process_Parse))
+            );
+            //TODO close process
+          case Halt(Terminated(Stop))  :
+            __.ended(Tap);
+          case Halt(Terminated(Exit(rejection)))  :
+             __.ended(End(rejection.errate(E_Process_Parse)));
+        }
+      }
+      return switch(self){
         case Await(_,arw) : f(arw(Noise));
         case Yield(y,arw) : switch(y){
           case PResState(state) : 
             switch(state.status){
               case Io_Process_Init                            :
                 switch(state.exit_code){
-                  case Some(0) | None      : switch(ok_parser){
-                    case Wait(fn)             : 
-                      //If Wait then request input from Process
-                      final next_proxy                = arw(PReqInput(config.default_input_request,false));
-                      f(next_proxy);
-                    case Emit(e,rest)         : 
-                      //Pass input request from Output to Process
-                      final next_proxy                = arw(PReqInput(e,false));
-                      ok_parser                       = rest;
-                      f(next_proxy);
-                    case Hold(ft)             :
-                      //final next_proxy                = __.yield(,arw);
-                      //f(next_proxy,__.hold(ft),no_parser);
-                      final status = Io_Process_Hung(1,haxe.Timer.stamp());
-                      // f(
-                      //   __.yield(state.with_status(status),arw),
-                      //   __.hold(ft),
-                      //   no_parser
-                      // );
-                      __.belay(
-                        ft.convert(
-                          ok_parserI -> {
-                            ok_parser = ok_parserI;
-                            return f(arw(PReqInput(config.default_input_request,false)));
-                          }
-                        )
-                      );
-                    case Halt(Production(r))  :
-                      __.ended(Val(r));
-                      //TODO close process
-                    case Halt(Terminated(Stop))  :
-                      __.ended(Tap);
-                    case Halt(Terminated(Exit(rejection)))  :
-                       __.ended(End(rejection));
-                  }
+                  case Some(0) | None      : 
+                    ok_step(arw);
                   case Some(x)  : 
                     errored = true;
-                    return switch(no_parser){
-                      case Emit(o,next) : 
-                        final next_process_step = arw(PReqInput(o,true));
-                        no_parser  = next;
-                        f(next_process_step);
-                        null;
-                      case Wait(tran)   :
-                        final next_proxy                = arw(PReqInput(config.default_input_request,true));
-                        f(next_proxy);
-                      case Hold(held)   :
-                        __.belay(held.convert(
-                          (next_no_parser) -> {
-                            no_parser = next_no_parser;
-                            return f(arw(PReqInput(config.default_input_request,true)));
-                          }
-                        ));
-                      case Halt(Production(r))  :
-                        __.ended(End(Rejection.fromError(r.error.toError()).errate(E_Process_Parse)));
-                      case Halt(Terminated(Stop))  :
-                        __.ended(Tap);
-                      case Halt(Terminated(Exit(rejection))) :
-                        __.ended(End(rejection.errate(E_Process_Parse)));  
-                    }
+                    no_step(arw);
                 }
               case Io_Process_Open                            :
                 switch(errored){
-                  case true   : f(arw(PReqInput(config.default_input_request,true)));
-                  case false  : f(arw(PReqInput(config.default_input_request,false)));
+                  case true   : return no_step(arw);
+                  case false  : 
+                    switch(state.exit_code){
+                      case Some(0) | None      : 
+                        ok_step(arw);
+                      case Some(x)  : 
+                        errored = true;
+                        no_step(arw);
+                    }
                 }
               case Io_Process_Hung(num_calls,last_timestamp) :
                 switch(hung(num_calls,last_timestamp)){
-                  case None             : f(arw(PReqTouch));
+                  case None             : __.belay(Belay.fromThunk(f.bind(arw(PReqTouch))));
                   case Some(rejection)  : __.ended(End(rejection));
                 } 
             }
-            //:ProcessState
-            null;
           case PResValue(res)   :
             //Outcome<InputResponse,InputResponse>
             var is_error = null;
-            $type(res);
             switch(res){
               case Success(ok) : 
                 is_error  = false;
@@ -109,10 +116,7 @@ class Processor{
             }
             f(arw(PReqInput(config.default_input_request,is_error)));
           case PResError(raw)   :
-            $type(raw);
-            //__.end
-            //Rejection<ProcessFailure>
-            null;
+            __.ended(End(raw));
         } 
         case Defer(ft)    : __.belay(ft.mod(f));
         case Ended(res)   : __.ended(

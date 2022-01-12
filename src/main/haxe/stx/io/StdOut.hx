@@ -1,5 +1,6 @@
 package stx.io;
 
+//TODO support INT64
 @:using(stx.io.StdOut.StdOutLift)
 abstract StdOut(StdOutput) from StdOutput{
   static public var _(default,never) = StdOutLift;
@@ -26,9 +27,10 @@ abstract StdOut(StdOutput) from StdOutput{
           output = Report.unit();
         case OReqValue(packet):
           switch(packet.data){
-            case PString(str):          valAsString = Some(str);
-            case PFloat(fl):            valAsFloat  = Some(fl);
-            case PInt(int):             valAsInt    = Some(int);
+            case Textal(str)        :          valAsString  = Some(str);
+            case Byteal(NFloat(fl)) :          valAsFloat   = Some(fl);
+            case Byteal(NInt(fl))   :          valAsInt     = Some(fl);
+            //case PInt(int):             valAsInt    = Some(int);
             default:
               __.fault().of(E_UnsupportedValue);
           }

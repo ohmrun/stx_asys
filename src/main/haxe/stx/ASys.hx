@@ -11,7 +11,6 @@ class LiftASys{
 typedef ASysApi           = stx.asys.ASys.ASysApi; 
 typedef ASys              = stx.asys.ASys; 
 
-typedef ByteSize          = stx.asys.ByteSize;
 typedef Packet            = stx.asys.Packet;
 typedef Distro            = stx.asys.Distro;
 typedef EnvApi            = stx.asys.Env.EnvApi;
@@ -19,6 +18,7 @@ typedef Env               = stx.asys.Env;
 typedef Cwd               = stx.asys.Cwd;
 typedef Device            = stx.asys.Device;
 typedef LocalHost         = stx.asys.LocalHost;
+typedef CharKind          = stx.asys.CharKind;
 
 typedef WorkingDirectory  = stx.asys.WorkingDirectory;
 typedef HasDevice         = stx.asys.HasDevice;

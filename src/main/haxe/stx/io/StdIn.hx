@@ -12,32 +12,29 @@ abstract StdIn(StdInput) from StdInput{
   public function reply():Tunnel<InputRequest,InputResponse,IoFailure>{
     var state = Io_Input_Unknown;
     function apply(ip:StdInput,un:InputRequest):InputResponse{
-      return switch(un){
-        case IReqState    : IResState(state);
-        case IReqValue(x) :
+      return switch(un){ 
+        case IReqState      : IResState(state);
+        case IReqValue(x)   : 
           var prim = 
             switch(x){
-                case I8      : PInt(ip.readInt8());
-                case I16BE   : ip.bigEndian = true;   PInt(ip.readInt16());
-                case I16LE   : ip.bigEndian = false;  PInt(ip.readInt16());
-                case UI16BE  : ip.bigEndian = true;   PInt(ip.readUInt16());
-                case UI16LE  : ip.bigEndian = false;  PInt(ip.readUInt16());
-                case I24BE   : ip.bigEndian = true;   PInt(ip.readInt24());
-                case I24LE   : ip.bigEndian = false;  PInt(ip.readInt24());
-                case UI24BE  : ip.bigEndian = true;   PInt(ip.readUInt24());
-                case UI24LE  : ip.bigEndian = false;  PInt(ip.readUInt24());
-                case I32BE   : ip.bigEndian = true;   PInt(ip.readInt32());
-                case I32LE   : ip.bigEndian = false;  PInt(ip.readInt32());
-                case FBE     : ip.bigEndian = true;   PFloat(ip.readFloat());
-                case FLE     : ip.bigEndian = false;  PFloat(ip.readFloat());
-                case DBE     : ip.bigEndian = true;   PFloat(ip.readDouble());
-                case DLE     : ip.bigEndian = false;  PFloat(ip.readDouble());
-                case LINE    :                        PString(ip.readLine());
+                case I8      : Byteal(NInt(ip.readInt8()));
+                case I16BE   : ip.bigEndian = true;   Byteal(NInt(ip.readInt16()));
+                case I16LE   : ip.bigEndian = false;  Byteal(NInt(ip.readInt16()));
+                case UI16BE  : ip.bigEndian = true;   Byteal(NInt(ip.readUInt16()));
+                case UI16LE  : ip.bigEndian = false;  Byteal(NInt(ip.readUInt16()));
+                case I24BE   : ip.bigEndian = true;   Byteal(NInt(ip.readInt24()));
+                case I24LE   : ip.bigEndian = false;  Byteal(NInt(ip.readInt24()));
+                case UI24BE  : ip.bigEndian = true;   Byteal(NInt(ip.readUInt24()));
+                case UI24LE  : ip.bigEndian = false;  Byteal(NInt(ip.readUInt24()));
+                case I32BE   : ip.bigEndian = true;   Byteal(NInt(ip.readInt32()));
+                case I32LE   : ip.bigEndian = false;  Byteal(NInt(ip.readInt32()));
+                case FBE     : ip.bigEndian = true;   Byteal(NFloat(ip.readFloat()));
+                case FLE     : ip.bigEndian = false;  Byteal(NFloat(ip.readFloat()));
+                case DBE     : ip.bigEndian = true;   Byteal(NFloat(ip.readDouble()));
+                case DLE     : ip.bigEndian = false;  Byteal(NFloat(ip.readDouble()));
+                case LINE    :                        Textal(ip.readLine());
               }
-          IResValue(({
-            data : prim,
-            type : x
-          }:Packet));
+          IResValue({ data : prim, type : x});
         case IReqBytes(pos,len) :
           var bytes = Bytes.alloc(len);
           ip.readBytes(bytes,pos,len);
