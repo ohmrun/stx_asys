@@ -4,12 +4,8 @@ import stx.coroutine.Core;
 
 
 // Process = <Closed,Noise,ProcessRequest,ProcessResponse,Noise,IoFailure>
-
-typedef ProcessorConfigDef = {
-  final default_input_request : InputRequest; 
-}
 class Processor{
-  static public function apply<R>(self:ProcessDef,ok_parser:InputParser<R>,no_parser:InputParser<ProcessFailure>,hung : (num_calls:Int, ?last_timestamp:Float) -> Option<Rejection<ProcessFailure>>,config:ProcessorConfigDef) : Outlet<R,ProcessFailure> {
+  static public function apply<R>(self:ProcessDef,ok_parser:InputParser<R>,no_parser:InputParser<ProcessFailure>,hung : (num_calls:Int, ?last_timestamp:Float) -> Option<Rejection<ProcessFailure>>) : Outlet<R,ProcessFailure> {
     var errored   = false;
     var ok_parser = ok_parser;
     var no_parser = no_parser;
@@ -38,12 +34,14 @@ class Processor{
         }
       }
       function ok_step(arw){
+        __.log().debug(_ -> _.pure(ok_parser));
         return switch(ok_parser){
           case Wait(fn)             : 
             __.ended(End(__.fault().explain(_ -> _.e_input_parser_waiting_on_an_unitialized_process())));
           case Emit(e,rest)         : 
             //Pass input request from Output to Process
             final next_proxy                = arw(PReqInput(e,false));
+            __.log().debug(_ -> _.pure(next_proxy));
             ok_parser                       = rest;
             f(next_proxy);
           case Hold(ft)             :
@@ -57,7 +55,7 @@ class Processor{
                 }
               )
             );
-          case Halt(Production(r))  :
+          case Halt(Production(r))  : 
             r.toRes().fold(
               opt -> opt.fold(
                 ok -> __.ended(Val(ok)),
@@ -72,6 +70,7 @@ class Processor{
              __.ended(End(rejection.errate(E_Process_Parse)));
         }
       }
+      __.log().debug(_ -> _.pure(self));
       return switch(self){
         case Await(_,arw) : f(arw(Noise));
         case Yield(y,arw) : switch(y){
@@ -110,11 +109,56 @@ class Processor{
               case Success(ok) : 
                 is_error  = false;
                 ok_parser = ok_parser.provide(ok);
+                switch(ok_parser){
+                  case Emit(emit,next) : 
+                    ok_parser = next;
+                    f(arw(PReqInput(emit,false)));
+                  case Wait(wait) :
+                    f(arw(PReqTouch));
+                  case Hold(held) : 
+                    __.belay(held.convert(x -> {
+                        ok_parser = x;
+                        return f(self);
+                      })
+                    );
+                  case Halt(Production(r)) :
+                    r.toRes().fold(
+                      opt -> opt.fold(
+                        ok -> __.ended(Val(ok)),
+                        () -> __.ended(Tap)
+                      ),
+                      e -> __.ended(e.errate(E_Process_Parse))
+                    );
+                  case Halt(Terminated(Stop))  :
+                    __.ended(Tap);
+                  case Halt(Terminated(Exit(rejection)))  :
+                      __.ended(End(rejection.errate(E_Process_Parse)));
+                }
               case Failure(no) :
                 is_error  = true;
                 no_parser = no_parser.provide(no);
+                return switch(no_parser){
+                  case Emit(o,next) : 
+                    final next_process_step = arw(PReqInput(o,true));
+                    no_parser  = next;
+                    f(next_process_step);
+                  case Wait(tran)   :
+                    f(arw(PReqTouch));
+                  case Hold(held)   :
+                    __.belay(held.convert(
+                      (next_no_parser) -> {
+                        no_parser = next_no_parser;
+                        return f(self);
+                      }
+                    ));
+                  case Halt(Production(r))  :
+                    __.ended(End(Rejection.fromError(r.error.toError()).errate(E_Process_Parse)));
+                  case Halt(Terminated(Stop))  :
+                    __.ended(Tap);
+                  case Halt(Terminated(Exit(rejection))) :
+                    __.ended(End(rejection.errate(E_Process_Parse)));  
+                }
             }
-            f(arw(PReqInput(config.default_input_request,is_error)));
           case PResError(raw)   :
             __.ended(End(raw));
         } 
@@ -128,7 +172,7 @@ class Processor{
         );
        }
     }
-    return null;
+    return f(self);
   }
   // static public function init(next){
 

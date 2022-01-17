@@ -11,6 +11,23 @@ typedef PacketDef = {
       type : LINE
     };
   }
+  public function toBytes(){
+    var bytes = Bytes.alloc(
+      this.type.get_width().def(
+        () -> this.data.fold(
+          s -> s.length,
+          n -> n.get_width()
+        )
+      )
+    );
+    switch(this.data){
+      case Byteal(NInt(int))    : bytes.setInt32(0,int);
+      case Byteal(NInt64(int))  : bytes.setInt64(0,int);
+      case Byteal(NFloat(f))    : bytes.setDouble(0,f);
+      case Textal(t)            : bytes = Bytes.ofString(t);
+    }
+    return bytes;
+  }
   // public function toString(){
   //   return switch(this.data){
 

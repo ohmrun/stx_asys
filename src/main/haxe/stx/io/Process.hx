@@ -9,19 +9,20 @@ typedef ProcessDef = ServerDef<ProcessRequest,ProcessResponse,Noise,ProcessFailu
 
 @:using(stx.Proxy.ProxyLift)
 @:using(stx.io.Process.ProcessLift)
-abstract Process(ProcessDef) from ProcessDef{
+abstract Process(ProcessDef) from ProcessDef to ProcessDef{
   static public var _(default,never) = ProcessLift;
   @:noUsing static public function lift(self:ProcessDef):Process{
     return new Process(self);
   }
   public function new(self){this = self;}
   //TODO fetch state from io
-  @:noUsing static public function make0(self:sys.io.Process,ins:OutputDef,outs:InputDef,errs:InputDef,req:ProcessRequest):Process{
+  @:noUsing static public function make0(self:sys.io.Process,ins:OutputDef,outs:InputDef,errs:InputDef):Process{
+    __.log().debug('Process.make0');
     var exit_code                               = None;
     var found_errors                            = false;
     var errors_state                            = None;
     var output_state                            = None; 
-    var process_status :  ProcessStatus         = Io_Process_Init;
+    var process_status :  ProcessStatus         = Io_Process_Open;
 
     function get_process_state(){
       return ProcessState.make(process_status,exit_code,errors_state,output_state);
@@ -67,10 +68,7 @@ abstract Process(ProcessDef) from ProcessDef{
                   default                     : __.option(null);
                 }
               );
-              //$type(out_state);
-              //$type(err_state);
               final either = err_state.zip(out_state);
-              //$type(either);
               final apply  = Action.fromEffect(
                 either.secure(
                   Secure.handler(
@@ -131,9 +129,9 @@ abstract Process(ProcessDef) from ProcessDef{
         }
       );
     }
-    return step(self,ins,outs,errs,req);
+    return step(self,ins,outs,errs,PReqState(false));
   }
-  static public function grow(command:Cluster<String>,?detached:Bool):Process{
+  static public function make(command:Cluster<String>,?detached:Bool):Process{
     var exit_code                   = None;
     
     function init():ProcessDef{
@@ -141,7 +139,7 @@ abstract Process(ProcessDef) from ProcessDef{
       final ins                       = AsysStdOut.lift(self.stdin).reply();
       final outs                      = AsysStdIn.lift(self.stdout).reply();
       final errs                      = AsysStdIn.lift(self.stderr).reply();    
-      return __.yield(PResState(ProcessState.make(Io_Process_Init)),make0.bind(self,ins,outs,errs).fn().then(x -> x.prj()));        
+      return make0(self,ins,outs,errs);
     }; 
   
     return lift(__.belay(Belay.fromThunk(init)));

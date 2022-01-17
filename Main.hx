@@ -14,6 +14,6 @@ using eu.ohmrun.Jali;
 
 class Main {
 	static function main() {
-		stx.asys.Test.main();			
+		//stx.asys.Test.main();			
 	}
 }

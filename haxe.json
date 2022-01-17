@@ -1,10 +1,21 @@
 {
   "build" : { 
     "-lib" : [
-      "stx_pico","stx_nano","stx_parse","stx_show","stx_pkg","stx_proxy","stx_coroutine","stx_test",
-      "fletcher","pml","jali"
+      "tink_core",
+      "stx_pico",
+      "stx_nano",
+      "stx_log",
+      "stx_fn",
+      "stx_proxy",
+      "stx_coroutine",
+      "stx_parse",
+      "fletcher",
+      "pml"
     ],
-    "-D" : ["STX_TEST__VERBOSE"],
+    "-D"    : [
+      "stx.log.filter.show=false",
+      "haxe.issue_9359"
+    ],
     "-cp" : "src/main/haxe",
     "unit" : {
       "--macro" : [
