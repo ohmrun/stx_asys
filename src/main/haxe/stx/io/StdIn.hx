@@ -53,26 +53,26 @@ abstract StdIn(StdInput) from StdInput{
       }
     }
     final pull = (un:InputRequest) -> {
-      __.log().debug("pulling");
+      __.log().trace("pulling");
       var prim : InputResponse              = null;
       var err  : Rejection<IoFailure>       = null;
       try{
         prim = apply(this,un);
-        __.log().debug('pull ok');
+        __.log().trace('pull ok');
       }catch(e:Eof){
-        __.log().debug('pull fail $e');
+        __.log().trace('pull fail $e');
         state = Io_Input_Closed(false);
         prim  = IResSpent;
       }catch(e:haxe.io.Error){
-        __.log().debug('pull fail $e');
+        __.log().trace('pull fail $e');
         state = Io_Input_Error(Error.make(Some(Std.string(e))));
         err  = __.fault().of(E_Subsystem(e));
       }catch(e:Dynamic){
         state = Io_Input_Error(Error.make(Some(Std.string(e))));
-        __.log().debug('pull fail $e');
+        __.log().trace('pull fail $e');
         err  = __.fault().of(E_Subsystem(Custom(e)));
       }
-      __.log().debug('pulled: $prim');
+      __.log().trace('pulled: $prim');
       var out : Res<InputResponse,IoFailure> = __.option(err).map(__.reject).def(
         ()-> __.accept(prim)
       );
