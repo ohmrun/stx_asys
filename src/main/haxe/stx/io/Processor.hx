@@ -2,26 +2,34 @@ package stx.io;
 
 import stx.coroutine.Core;
 
-
 // Process = <Closed,Noise,ProcessRequest,ProcessResponse,Noise,IoFailure>
-class Processor{
-  static public function apply<R>(self:ProcessDef,ok_parser:InputParser<R>,no_parser:InputParser<ProcessFailure>,hung : (num_calls:Int, ?last_timestamp:Float) -> Option<Rejection<ProcessFailure>>) : Outlet<R,ProcessFailure> {
+class ProcessorCls<R>{
+  public final process                        : Process;
+  public var stdin(default,null)              : InputParser<R>;
+  public var stderr(default,null)             : InputParser<ProcessFailure>;
+  public final hung                           : (num_calls:Int, ?last_timestamp:Float) -> Option<Rejection<ProcessFailure>>;
+
+  public function new(process,stdin,stderr,hung){
+    this.process  = process;
+    this.stdin    = stdin;
+    this.stderr   = stderr;
+    this.hung     = hung;
+  }
+  public function reply() : Outlet<R,ProcessFailure> {
     var errored   = false;
-    var ok_parser = ok_parser;
-    var no_parser = no_parser;
     function f(self:ProcessDef):OutletDef<R,ProcessFailure>{
       function no_step(arw){
-        return switch(no_parser){
+        return switch(stderr){
           case Emit(o,next) : 
             final next_process_step = arw(PReqInput(o,true));
-            no_parser  = next;
+            stderr  = next;
             f(next_process_step);
           case Wait(tran)   :
             __.ended(End(__.fault().explain(_ -> _.e_input_parser_waiting_on_an_unitialized_process())));
           case Hold(held)   :
             __.belay(held.convert(
-              (next_no_parser) -> {
-                no_parser = next_no_parser;
+              (next_stderr) -> {
+                stderr = next_stderr;
                 return f(self);
               }
             ));
@@ -34,22 +42,22 @@ class Processor{
         }
       }
       function ok_step(arw){
-        __.log().debug(_ -> _.pure(ok_parser));
-        return switch(ok_parser){
+        __.log().debug(_ -> _.pure(stdin));
+        return switch(stdin){
           case Wait(fn)             : 
             __.ended(End(__.fault().explain(_ -> _.e_input_parser_waiting_on_an_unitialized_process())));
           case Emit(e,rest)         : 
             //Pass input request from Output to Process
             final next_proxy                = arw(PReqInput(e,false));
             __.log().debug(_ -> _.pure(next_proxy));
-            ok_parser                       = rest;
+            stdin                       = rest;
             f(next_proxy);
           case Hold(ft)             :
             final status = Io_Process_Hung(1,haxe.Timer.stamp());
             __.belay(
               ft.convert(
-                ok_parserI -> {
-                  ok_parser = ok_parserI;
+                stdinI -> {
+                  stdin = stdinI;
                   //try again with the new parser state.
                   return f(self);
                 }
@@ -108,16 +116,16 @@ class Processor{
             switch(res){
               case Success(ok) : 
                 is_error  = false;
-                ok_parser = ok_parser.provide(ok);
-                switch(ok_parser){
+                stdin = stdin.provide(ok);
+                switch(stdin){
                   case Emit(emit,next) : 
-                    ok_parser = next;
+                    stdin = next;
                     f(arw(PReqInput(emit,false)));
                   case Wait(wait) :
                     f(arw(PReqTouch));
                   case Hold(held) : 
                     __.belay(held.convert(x -> {
-                        ok_parser = x;
+                        stdin = x;
                         return f(self);
                       })
                     );
@@ -136,18 +144,18 @@ class Processor{
                 }
               case Failure(no) :
                 is_error  = true;
-                no_parser = no_parser.provide(no);
-                return switch(no_parser){
+                stderr = stderr.provide(no);
+                return switch(stderr){
                   case Emit(o,next) : 
                     final next_process_step = arw(PReqInput(o,true));
-                    no_parser  = next;
+                    stderr  = next;
                     f(next_process_step);
                   case Wait(tran)   :
                     f(arw(PReqTouch));
                   case Hold(held)   :
                     __.belay(held.convert(
-                      (next_no_parser) -> {
-                        no_parser = next_no_parser;
+                      (next_stderr) -> {
+                        stderr = next_stderr;
                         return f(self);
                       }
                     ));
@@ -172,9 +180,32 @@ class Processor{
         );
        }
     }
-    return f(self);
+    return f(process);
   }
-  // static public function init(next){
+}
+abstract Processor<R>(ProcessorCls<R>) from ProcessorCls<R>{
+  public function new(self) this = self;
+  static public function lift<R>(self:ProcessorCls<R>):Processor<R> return new Processor(self);
 
-  // }
+  static public function make(proc,stdin,stderr,hung){
+    return lift(new ProcessorCls(proc,stdin,stderr,hung));
+  }
+  static public function make0(proc){
+    return make(
+      proc,
+      InputParser.unit(),
+      InputParser.unit().map_r(
+        (parse_result:ParseResult<InputResponse,Bytes>) -> parse_result.map(
+          bytes   -> E_Process_Raw(bytes)
+        )
+      ),
+      (num_calls,?last_timestamp) -> None
+    );
+  }
+  @:to public function toOutlet(){
+    return this.reply();
+  }
+  public function prj():ProcessorCls<R> return this;
+  private var self(get,never):Processor<R>;
+  private function get_self():Processor<R> return lift(this);
 }

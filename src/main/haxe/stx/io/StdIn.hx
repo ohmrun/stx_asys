@@ -60,16 +60,16 @@ abstract StdIn(StdInput) from StdInput{
         prim = apply(this,un);
         __.log().trace('pull ok');
       }catch(e:Eof){
-        __.log().trace('pull fail $e');
+        __.log().error('pull fail $e');
         state = Io_Input_Closed(false);
         prim  = IResSpent;
       }catch(e:haxe.io.Error){
-        __.log().trace('pull fail $e');
+        __.log().error('pull fail $e');
         state = Io_Input_Error(Error.make(Some(Std.string(e))));
         err  = __.fault().of(E_Subsystem(e));
       }catch(e:Dynamic){
         state = Io_Input_Error(Error.make(Some(Std.string(e))));
-        __.log().trace('pull fail $e');
+        __.log().error('pull fail $e');
         err  = __.fault().of(E_Subsystem(Custom(e)));
       }
       __.log().trace('pulled: $prim');

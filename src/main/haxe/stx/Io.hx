@@ -36,7 +36,8 @@ typedef ProcessResponse     = stx.io.process.ProcessResponse;
 typedef ProcessStateDef     = stx.io.process.ProcessState.ProcessStateDef;
 typedef ProcessState        = stx.io.process.ProcessState;
 
-typedef Processor           = stx.io.Processor;
+typedef ProcessorCls<R>     = stx.io.Processor.ProcessorCls<R>;
+typedef Processor<R>        = stx.io.Processor<R>;
 //typedef ProcessorDef        = stx.io.Processor.ProcessorDef;
 
 typedef ProcessStatusSum    = stx.io.process.ProcessStatus.ProcessStatusSum;
