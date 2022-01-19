@@ -12,7 +12,7 @@ class ProcessTest extends TestCase{
   //  this.raises(target.fill.bind(1,2,5678));
   // }
   public function test_unit_processor(async:Async){
-    final proc = Process.make(['haxe',"--help"]);
+    final proc = Process.make0(['haxe',"--help"]);
     final read = Processor.make(
       proc,
       InputParser.unit(),

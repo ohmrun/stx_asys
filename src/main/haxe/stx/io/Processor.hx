@@ -15,7 +15,7 @@ class ProcessorCls<R>{
     this.stderr   = stderr;
     this.hung     = hung;
   }
-  public function reply() : Outlet<R,ProcessFailure> {
+  public function outlet() : Outlet<R,ProcessFailure> {
     var errored   = false;
     function f(self:ProcessDef):OutletDef<R,ProcessFailure>{
       function no_step(arw){
@@ -203,7 +203,7 @@ abstract Processor<R>(ProcessorCls<R>) from ProcessorCls<R>{
     );
   }
   @:to public function toOutlet(){
-    return this.reply();
+    return this.outlet();
   }
   public function prj():ProcessorCls<R> return this;
   private var self(get,never):Processor<R>;

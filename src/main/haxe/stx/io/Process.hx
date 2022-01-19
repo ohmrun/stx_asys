@@ -16,8 +16,8 @@ abstract Process(ProcessDef) from ProcessDef to ProcessDef{
   }
   public function new(self){this = self;}
   //TODO fetch state from io
-  @:noUsing static public function make0(self:sys.io.Process,ins:OutputDef,outs:InputDef,errs:InputDef):Process{
-    __.log().debug('Process.make0');
+  @:noUsing static public function make(self:sys.io.Process,ins:OutputDef,outs:InputDef,errs:InputDef):Process{
+    __.log().debug('Process.make');
     var exit_code                               = None;
     var found_errors                            = false;
     var errors_state                            = None;
@@ -131,7 +131,7 @@ abstract Process(ProcessDef) from ProcessDef to ProcessDef{
     }
     return step(self,ins,outs,errs,PReqState(false));
   }
-  static public function make(command:Cluster<String>,?detached:Bool):Process{
+  static public function make0(command:Cluster<String>,?detached:Bool):Process{
     var exit_code                   = None;
     
     function init():ProcessDef{
@@ -139,7 +139,7 @@ abstract Process(ProcessDef) from ProcessDef to ProcessDef{
       final ins                       = AsysStdOut.lift(self.stdin).reply();
       final outs                      = AsysStdIn.lift(self.stdout).reply();
       final errs                      = AsysStdIn.lift(self.stderr).reply();    
-      return make0(self,ins,outs,errs);
+      return make(self,ins,outs,errs);
     }; 
   
     return lift(__.belay(Belay.fromThunk(init)));
