@@ -27,7 +27,7 @@ class ASys implements ASysApi{
     return new stx.io.Output(std.Sys.stdout());
   }
   public function stdin():stx.io.Input{
-    return new stx.io.Input(std.Sys.stdin());
+    return stx.io.Input.make0(std.Sys.stdin());
   }
   public function local():HasDevice{
     return { device : new Device(new Distro()) };

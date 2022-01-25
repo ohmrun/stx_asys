@@ -36,8 +36,12 @@ typedef ProcessResponse     = stx.io.process.ProcessResponse;
 typedef ProcessStateDef     = stx.io.process.ProcessState.ProcessStateDef;
 typedef ProcessState        = stx.io.process.ProcessState;
 
+typedef ExitCodeDef         = stx.io.process.ExitCode.ExitCodeDef;
+typedef ExitCode            = stx.io.process.ExitCode;
 typedef ProcessorCls<R>     = stx.io.Processor.ProcessorCls<R>;
 typedef Processor<R>        = stx.io.Processor<R>;
+typedef ProcessorRequest    = stx.io.Processor.ProcessorRequest;
+typedef ProcessorResponse   = stx.io.Processor.ProcessorResponse;
 //typedef ProcessorDef        = stx.io.Processor.ProcessorDef;
 
 typedef ProcessStatusSum    = stx.io.process.ProcessStatus.ProcessStatusSum;

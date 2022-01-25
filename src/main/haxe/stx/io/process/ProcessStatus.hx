@@ -21,4 +21,10 @@ abstract ProcessStatus(ProcessStatusSum) from ProcessStatusSum to ProcessStatusS
         Io_Process_Hung(1,haxe.Timer.stamp());
     });
   }
+  public inline function is_open(){
+    return switch(this){
+      case Io_Process_Hung(_,_) : false;
+      default                   : true;
+    }
+  }
 }

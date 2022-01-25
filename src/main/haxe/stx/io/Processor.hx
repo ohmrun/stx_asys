@@ -2,210 +2,127 @@ package stx.io;
 
 import stx.coroutine.Core;
 
-// Process = <Closed,Noise,ProcessRequest,ProcessResponse,Noise,IoFailure>
-class ProcessorCls<R>{
-  public final process                        : Process;
-  public var stdin(default,null)              : InputParser<R>;
-  public var stderr(default,null)             : InputParser<ProcessFailure>;
-  public final hung                           : (num_calls:Int, ?last_timestamp:Float) -> Option<Rejection<ProcessFailure>>;
+typedef ProcessorDef<R> = ProxySum<Closed,Noise,ProcessorRequest,ProcessorResponse,Option<R>,ProcessFailure>;
 
-  public function new(process,stdin,stderr,hung){
-    this.process  = process;
-    this.stdin    = stdin;
-    this.stderr   = stderr;
-    this.hung     = hung;
+enum ProcessorResponse{
+  PRes_InterpreterNeedsInput;
+  PRes_ProcessNeedsInput;
+}
+enum ProcessorRequest{
+  PrReqInput(ipt:InputRequest,err:Bool);
+  //TODO how to integrate feeding into the process?
+  //PrReqOutput 
+}
+class ProcessorCls<R>{
+  private var process       : Process;
+  /**
+    The coroutine produces requests for the processor to interpret and folds over the responses
+  **/
+  private var interpreter   : Coroutine<Outcome<InputResponse,InputResponse>,ProcessRequest,R,ProcessFailure>;
+
+  public function new(process,interpreter){
+    this.process      = process;
+    this.interpreter  = interpreter;
   }
-  public function outlet() : Outlet<R,ProcessFailure> {
-    var errored   = false;
-    function f(self:ProcessDef):OutletDef<R,ProcessFailure>{
-      function no_step(arw){
-        return switch(stderr){
-          case Emit(o,next) : 
-            final next_process_step = arw(PReqInput(o,true));
-            stderr  = next;
-            f(next_process_step);
-          case Wait(tran)   :
-            __.ended(End(__.fault().explain(_ -> _.e_input_parser_waiting_on_an_unitialized_process())));
-          case Hold(held)   :
-            __.belay(held.convert(
-              (next_stderr) -> {
-                stderr = next_stderr;
-                return f(self);
-              }
-            ));
-          case Halt(Production(r))  :
-            __.ended(End(Rejection.fromError(r.error.toError()).errate(E_Process_Parse)));
-          case Halt(Terminated(Stop))  :
-            __.ended(Tap);
-          case Halt(Terminated(Exit(rejection))) :
-            __.ended(End(rejection.errate(E_Process_Parse)));  
-        }
-      }
-      function ok_step(arw){
-        __.log().debug(_ -> _.pure(stdin));
-        return switch(stdin){
-          case Wait(fn)             : 
-            __.ended(End(__.fault().explain(_ -> _.e_input_parser_waiting_on_an_unitialized_process())));
-          case Emit(e,rest)         : 
-            //Pass input request from Output to Process
-            final next_proxy                = arw(PReqInput(e,false));
-            __.log().debug(_ -> _.pure(next_proxy));
-            stdin                       = rest;
-            f(next_proxy);
-          case Hold(ft)             :
-            final status = Io_Process_Hung(1,haxe.Timer.stamp());
-            __.belay(
-              ft.convert(
-                stdinI -> {
-                  stdin = stdinI;
-                  //try again with the new parser state.
-                  return f(self);
-                }
-              )
-            );
-          case Halt(Production(r))  : 
-            r.toRes().fold(
-              opt -> opt.fold(
-                ok -> __.ended(Val(ok)),
-                () -> __.ended(Tap)
-              ),
-              e -> __.ended(e.errate(E_Process_Parse))
-            );
-            //TODO close process
-          case Halt(Terminated(Stop))  :
-            __.ended(Tap);
-          case Halt(Terminated(Exit(rejection)))  :
-             __.ended(End(rejection.errate(E_Process_Parse)));
-        }
-      }
-      __.log().debug(_ -> _.pure(self));
-      return switch(self){
-        case Await(_,arw) : f(arw(Noise));
-        case Yield(y,arw) : switch(y){
+  public function reply():Processor<R>{
+    return Processor.lift(PushCat._.next(
+      Proxy._.map(process.prj(),_ -> None),
+      function f(y:ProcessResponse):Proxy<ProcessRequest,ProcessResponse,ProcessorRequest,ProcessorResponse,Option<R>,ProcessFailure>{
+        return switch(y){
           case PResState(state) : 
             switch(state.status){
-              case Io_Process_Init                            :
-                switch(state.exit_code){
-                  case Some(0) | None      : 
-                    ok_step(arw);
-                  case Some(x)  : 
-                    errored = true;
-                    no_step(arw);
+              case Io_Process_Init | Io_Process_Open: 
+                switch(interpreter){
+                  case Emit(req,emit) : 
+                    //this.process      = process.provide(req);
+                    this.interpreter  = emit;
+                    __.await(req,f);
+                  case Wait(wait)     : 
+                    __.yield(PRes_InterpreterNeedsInput,
+                      (req:ProcessorRequest) -> {
+                        //$type(req);
+                        return switch(req){
+                          case PrReqInput(ipt,err) : 
+                            __.await(PReqInput(ipt,err),f);
+                        }
+                      }
+                    );
+                  case Hold(held)     : 
+                    __.belay(
+                      held.convert(
+                        (next) -> {
+                          this.interpreter = next;
+                          return __.await(PReqTouch,f);
+                        }
+                      )
+                    );
+                  case Halt(Production(r))              : __.ended(Val(Some(r)));
+                  case Halt(Terminated(Stop))           : __.ended(Tap);
+                  case Halt(Terminated(Exit(e)))        : __.ended(End(e));
                 }
-              case Io_Process_Open                            :
-                switch(errored){
-                  case true   : return no_step(arw);
-                  case false  : 
-                    switch(state.exit_code){
-                      case Some(0) | None      : 
-                        ok_step(arw);
-                      case Some(x)  : 
-                        errored = true;
-                        no_step(arw);
-                    }
-                }
-              case Io_Process_Hung(num_calls,last_timestamp) :
-                switch(hung(num_calls,last_timestamp)){
-                  case None             : __.belay(Belay.fromThunk(f.bind(arw(PReqTouch))));
-                  case Some(rejection)  : __.ended(End(rejection));
-                } 
+              case Io_Process_Hung(_,_) : 
+                __.await(PReqTouch,f);
             }
           case PResValue(res)   :
-            //Outcome<InputResponse,InputResponse>
-            var is_error = null;
-            switch(res){
-              case Success(ok) : 
-                is_error  = false;
-                stdin = stdin.provide(ok);
-                switch(stdin){
-                  case Emit(emit,next) : 
-                    stdin = next;
-                    f(arw(PReqInput(emit,false)));
-                  case Wait(wait) :
-                    f(arw(PReqTouch));
-                  case Hold(held) : 
-                    __.belay(held.convert(x -> {
-                        stdin = x;
-                        return f(self);
-                      })
-                    );
-                  case Halt(Production(r)) :
-                    r.toRes().fold(
-                      opt -> opt.fold(
-                        ok -> __.ended(Val(ok)),
-                        () -> __.ended(Tap)
-                      ),
-                      e -> __.ended(e.errate(E_Process_Parse))
-                    );
-                  case Halt(Terminated(Stop))  :
-                    __.ended(Tap);
-                  case Halt(Terminated(Exit(rejection)))  :
-                      __.ended(End(rejection.errate(E_Process_Parse)));
-                }
-              case Failure(no) :
-                is_error  = true;
-                stderr = stderr.provide(no);
-                return switch(stderr){
-                  case Emit(o,next) : 
-                    final next_process_step = arw(PReqInput(o,true));
-                    stderr  = next;
-                    f(next_process_step);
-                  case Wait(tran)   :
-                    f(arw(PReqTouch));
-                  case Hold(held)   :
-                    __.belay(held.convert(
-                      (next_stderr) -> {
-                        stderr = next_stderr;
-                        return f(self);
-                      }
-                    ));
-                  case Halt(Production(r))  :
-                    __.ended(End(Rejection.fromError(r.error.toError()).errate(E_Process_Parse)));
-                  case Halt(Terminated(Stop))  :
-                    __.ended(Tap);
-                  case Halt(Terminated(Exit(rejection))) :
-                    __.ended(End(rejection.errate(E_Process_Parse)));  
-                }
+            this.interpreter = this.interpreter.provide(res);
+            switch(interpreter){
+              case Halt(Production(r))              : __.ended(Val(Some(r)));
+              case Halt(Terminated(Stop))           : __.ended(Tap);
+              case Halt(Terminated(Exit(e)))        : __.ended(End(e));
+              case Hold(held)                       :
+                __.belay(
+                  held.convert(
+                    (next) -> {
+                      this.interpreter = next;
+                      return __.await(PReqTouch,f);
+                    }
+                  )
+                );
+              case Emit(req,emit) : 
+                //this.process      = process.provide(req);
+                this.interpreter  = emit;
+                __.await(req,f);
+              case Wait(wait)     : 
+                __.await(PReqTouch,f);
             }
-          case PResError(raw)   :
+          case PResError(raw)  :
+            //Rejection<ProcessFailure>
             __.ended(End(raw));
-        } 
-        case Defer(ft)    : __.belay(ft.mod(f));
-        case Ended(res)   : __.ended(
-          res.fold(
-            _ -> Tap,//TODO check this
-            End,
-            () -> Tap
-          )
-        );
-       }
-    }
-    return f(process);
+          case PResOffer(req)   : 
+            //ProcessRequest
+            __.await(req,f);
+        }
+      }
+    ));
   }
 }
-abstract Processor<R>(ProcessorCls<R>) from ProcessorCls<R>{
+@:using(stx.io.Processor.ProcessorLift)
+abstract Processor<R>(ProcessorDef<R>) from ProcessorDef<R> to ProcessorDef<R>{
   public function new(self) this = self;
-  static public function lift<R>(self:ProcessorCls<R>):Processor<R> return new Processor(self);
+  static public function lift<R>(self:ProcessorDef<R>):Processor<R> return new Processor(self);
 
-  static public function make(proc,stdin,stderr,hung){
-    return lift(new ProcessorCls(proc,stdin,stderr,hung));
-  }
-  static public function make0(proc){
-    return make(
-      proc,
-      InputParser.unit(),
-      InputParser.unit().map_r(
-        (parse_result:ParseResult<InputResponse,Bytes>) -> parse_result.map(
-          bytes   -> E_Process_Raw(bytes)
-        )
-      ),
-      (num_calls,?last_timestamp) -> None
-    );
-  }
-  @:to public function toOutlet(){
-    return this.outlet();
-  }
-  public function prj():ProcessorCls<R> return this;
+  public function prj():ProcessorDef<R> return this;
   private var self(get,never):Processor<R>;
   private function get_self():Processor<R> return lift(this);
+
+  @:to public function toProxy():Proxy<Closed,Noise,ProcessorRequest,ProcessorResponse,Option<R>,ProcessFailure>{
+    return Proxy.lift(this);
+  }
+}
+class ProcessorLift{
+  static public function toOutlet<R>(self:ProcessorDef<R>):Outlet<Option<R>,ProcessFailure>{
+    function f(self:ProcessorDef<R>):OutletDef<Option<R>,ProcessFailure>{
+      return switch(self){
+        case Yield(y,yield) : 
+          f(yield(PrReqInput(IReqTotal(),false)));
+        case Await(a,await)  : 
+          __.await(a,await.then(f));
+        case Ended(chk)   : 
+          __.ended(chk);
+        case Defer(belay) : 
+          __.belay(belay.mod(f));
+      }
+    }
+    return Outlet.lift(f(self));
+  }
 }

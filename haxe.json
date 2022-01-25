@@ -1,5 +1,6 @@
 {
   "build" : { 
+    "--connect" : "9090",
     "-lib" : [
       "tink_core",
       "stx_pico",
@@ -13,6 +14,7 @@
       "pml"
     ],
     "-D"    : [
+      "no-deprecation-warnings",
       "stx.log.filter.show=false",
       "haxe.issue_9359"
     ],

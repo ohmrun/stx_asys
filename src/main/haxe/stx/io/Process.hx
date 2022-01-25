@@ -7,145 +7,109 @@ import stx.io.StdOut in AsysStdOut;
 
 typedef ProcessDef = ServerDef<ProcessRequest,ProcessResponse,Noise,ProcessFailure>;
 
-@:using(stx.Proxy.ProxyLift)
-@:using(stx.io.Process.ProcessLift)
-abstract Process(ProcessDef) from ProcessDef to ProcessDef{
-  static public var _(default,never) = ProcessLift;
-  @:noUsing static public function lift(self:ProcessDef):Process{
-    return new Process(self);
-  }
-  public function new(self){this = self;}
-  //TODO fetch state from io
-  @:noUsing static public function make(self:sys.io.Process,ins:OutputDef,outs:InputDef,errs:InputDef):Process{
-    __.log().debug('Process.make');
-    var exit_code                               = None;
-    var found_errors                            = false;
-    var errors_state                            = None;
-    var output_state                            = None; 
-    var process_status :  ProcessStatus         = Io_Process_Open;
+class ProcessCls{
+  private var proc                  : sys.io.Process;
+  private var stdin                 : Output;
+  private var stdout                : Input;
+  private var stderr                : Input;
 
-    function get_process_state(){
-      return ProcessState.make(process_status,exit_code,errors_state,output_state);
-    }
-    function step(self:sys.io.Process,ins:OutputDef,outs:InputDef,errs:InputDef,req:ProcessRequest):ProcessDef{
-      return __.yield(
-        PResState(ProcessState.make(process_status)),
-        function rec(req:ProcessRequest):ProcessDef{
-          __.log().debug(_ -> _.pure(req));
-          return switch (req){
-            case PReqTouch                   : __.yield(PResState(get_process_state()),rec);
-            case PReqState(block)            :
-              exit_code       = __.option(self.exitCode(__.option(block).defv(true))); 
-              function get_state(x) return switch(x){
-                case IResState(state)     : __.option(x);
-                default                   : None;
-              }
-              function choose_first_state_response(x,y){
-                return switch(y){
-                  case Some(IResState(x)) : y;
-                  default                 : x;
-                };
-              }
-              final out_state = Emiter._.derive(
-                Tunnel._.emiter(outs,Emiter.pure(IReqState)),
-                get_state,
-                choose_first_state_response,
-                None
-              ).map(
-                res -> switch(res){
-                  case Some(IResState(state)) : __.option(state);
-                  default                     : __.option(null);
-                }
-              );
-              final err_state = Emiter._.derive(
-                Tunnel._.emiter(errs,Emiter.pure(IReqState)),
-                get_state,
-                choose_first_state_response,
-                None
-              ).map(
-                res -> switch(res){
-                  case Some(IResState(state)) : __.option(state);
-                  default                     : __.option(null);
-                }
-              );
-              final either = err_state.zip(out_state);
-              final apply  = Action.fromEffect(
-                either.secure(
-                  Secure.handler(
-                  (x:Couple<Option<InputState>,Option<InputState>>) -> {
-                    x.decouple(
-                      (out,err) -> {
-                          output_state  = out;
-                          errors_state  = err;
-                      }
-                    );
-                  }
-                  )
-                )
-              );
-              //$type(apply);
-              // RespondCat._.next(
-              //   apply,
-              //   (_)  ->  __.yield(PResState(get_process_state()),rec)
-              // );
-              //TODO call this;
-              __.yield(PResState(get_process_state()),rec);
-            case PReqInput(req,false)      : 
-              switch(outs.provide(req)){
-                case Emit(x,next)       : __.yield(PResValue(Success(x)),step.bind(self,ins,next,errs));
-                case Wait(arw)          : 
-                    process_status = Io_Process_Open;
-                  __.yield(PResState(get_process_state()),step.bind(self,ins,__.wait(arw),errs));
-                case Hold(held)         : 
-                  process_status = process_status.hang();
-                  //TODO The state report is *behind the asynchronous gap
-                  __.belay(
-                    stx.proxy.core.Belay.lift(
-                      held.map(
-                        next -> __.yield(PResState(get_process_state()),step.bind(self,ins,next,errs)) 
-                      )
-                    )
-                  );
-                case Halt(ret)          : __.yield(PResValue(Success(IResSpent)),step.bind(self,ins,Halt(ret),errs));
-              }
-              case PReqInput(req,true)      : 
-                switch(errs.provide(req)){
-                  case Emit(x,next)       : __.yield(PResValue(Success(x)),step.bind(self,ins,outs,next));
-                  case Wait(arw)          : 
-                    process_status = Io_Process_Open;
-                    __.yield(PResState(get_process_state()),step.bind(self,ins,outs,__.wait(arw)));
-                  case Hold(held)         : 
-                    process_status = process_status.hang();
-                    __.belay(
-                      stx.proxy.core.Belay.lift(held.map(
-                        next -> __.yield(PResState(get_process_state()),step.bind(self,ins,outs,next))
-                      ))
-                    );
-                  case Halt(ret)          : __.yield(PResValue(Success(IResSpent)),step.bind(self,ins,outs,Halt(ret)));
-                }
-              case PReqOutput(req)  :   
-                __.yield(PResState(get_process_state()),step.bind(self,ins.provide(req),outs,errs));
-          }
+  public var state(default,null)    : ProcessState;
+
+  static public function make0(command:Cluster<String>,?detached:Bool):ProcessCls{
+    final proc                        = new sys.io.Process(command.head().fudge(), Std.downcast(command.tail(),Array),detached);
+    final ins   : Output              = AsysStdOut.lift(proc.stdin).reply();
+    final outs  : Input               = AsysStdIn.lift(proc.stdout).reply();
+    final errs  : Input               = AsysStdIn.lift(proc.stderr).reply();    
+    return new ProcessCls(proc, ins, outs, errs);
+  }
+  public function new(proc:sys.io.Process,stdin:Output,stdout:Input,stderr:Input,?state:ProcessState){
+    this.proc   = proc;
+    this.stdin  = stdin;
+    this.stdout = stdout;
+    this.stderr = stderr; 
+    this.state  = __.option(state).defv(ProcessState.make(Io_Process_Init));
+  }
+  private function get_state(?block = false){
+    this.stdout = this.stdout.mandate(
+      IReqState,
+      (res) -> {
+        switch(res){
+          case Accept(IResState(s)) : 
+            this.state = this.state.with_stdout(s);
+          case Reject(err)          : 
+            this.state = err.val.fold(
+              (declination) -> declination.fold(
+                (e) -> this.state.with_stdout(Io_Input_Error(e)),
+                (d) -> this.state.with_stdout(Io_Input_Error(E_Io_Digest(d)))
+              ),
+              ()  -> this.state.with_stdout(Io_Input_Error(E_Io_UnsupportedValue))
+            );
+          default                   : 
+            this.state = this.state.with_stdout(Io_Input_Error(E_Io_UnsupportedValue));
         }
-      );
-    }
-    return step(self,ins,outs,errs,PReqState(false));
+      }
+    );
+    this.stderr  = this.stderr.mandate(
+      IReqState,
+      (res) -> {
+        switch(res){
+          case Accept(IResState(s)) : 
+            this.state = this.state.with_stderr(s);
+          case Reject(err)          : 
+            this.state = err.val.fold(
+              (declination) -> declination.fold(
+                (e) -> this.state.with_stderr(Io_Input_Error(e)),
+                (d) -> this.state.with_stderr(Io_Input_Error(E_Io_Digest(d)))
+              ),
+              ()  -> this.state.with_stderr(Io_Input_Error(E_Io_UnsupportedValue))
+            );
+          default                   : 
+            this.state = this.state.with_stderr(Io_Input_Error(E_Io_UnsupportedValue));
+        }
+      }
+    );
+    this.state = this.state.with_exit_code(ExitCode.lift(proc.exitCode(block)));
   }
-  static public function make0(command:Cluster<String>,?detached:Bool):Process{
-    var exit_code                   = None;
-    
-    function init():ProcessDef{
-      final self                      = new sys.io.Process(command.head().fudge(), Std.downcast(command.tail(),Array),detached);
-      final ins                       = AsysStdOut.lift(self.stdin).reply();
-      final outs                      = AsysStdIn.lift(self.stdout).reply();
-      final errs                      = AsysStdIn.lift(self.stderr).reply();    
-      return make(self,ins,outs,errs);
-    }; 
-  
-    return lift(__.belay(Belay.fromThunk(init)));
-  }
-  public function prj():ProcessDef{
-    return this;
+  public function reply():ProcessDef{
+    return __.yield(
+      PResState(this.state),
+      function rec(req:ProcessRequest){
+        return switch(this.state){
+          case { status : ( Io_Process_Init | Io_Process_Open ) } :
+            switch(req){
+              case PReqTouch                : reply();
+              case PReqState(block)         : 
+                get_state(block);
+                reply();
+              case PReqInput(req,false)     : 
+                final source = Future.trigger();
+                this.stdout  = stdout.mandate(
+                  req,
+                  res -> res.fold(
+                    ok -> source.trigger(__.yield(PResValue(Success(ok)),rec)),
+                    no -> source.trigger(__.ended(End(no.errate(E_Process_Io))))
+                  )
+                );
+                __.belay(Belay.fromFuture(() -> source.asFuture()));
+              case PReqInput(req,true)      : 
+                final source = Future.trigger();
+                this.stderr  = stderr.mandate(
+                  req,
+                  res -> res.fold(
+                    ok -> source.trigger(__.yield(PResValue(Failure(ok)),rec)),
+                    no -> source.trigger(__.ended(End(no.errate(E_Process_Io))))
+                  )
+                );
+                __.belay(Belay.fromFuture(() -> source.asFuture()));
+              case PReqOutput(req)          : 
+                this.stdin  = stdin.provide(req);
+                reply();
+            }
+          case { status : x } :
+            __.yield(PResState(this.state),rec);
+        }
+      }
+    );
   }
 }
 class ProcessLift{
@@ -158,5 +122,18 @@ class ProcessLift{
   static public function drain(self:ProcessDef,?buffer):Process{
     var that  = provide(self,PReqInput(IReqTotal(buffer),false));
     return that;
+  }
+}
+@:using(stx.io.Process.ProcessLift)
+abstract Process(ProcessDef) from ProcessDef to ProcessDef{
+  public function new(self) this = self;
+  static public function lift(self:ProcessDef):Process return new Process(self);
+
+  public function prj():ProcessDef return this;
+  private var self(get,never):Process;
+  private function get_self():Process return lift(this);
+
+  static public function make0(command:Cluster<String>,?detached:Bool):Process{
+    return Process.lift(ProcessCls.make0(command,detached).reply());
   }
 }

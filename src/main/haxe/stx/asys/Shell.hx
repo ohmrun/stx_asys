@@ -32,7 +32,7 @@ class Shell implements ShellApi extends Clazz{
     return Future.irreversible(cb -> {std.Sys.println(v);cb(Noise);});
   }  
   public function stdin(){
-    return new Input(new StdIn(std.Sys.stdin()));
+    return Input.make0(new StdIn(std.Sys.stdin()));
   }
   public function stdout(){
     return new Output(new StdOut(std.Sys.stdout()));

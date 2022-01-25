@@ -43,7 +43,7 @@ abstract StdIn(StdInput) from StdInput{
           switch(state){
             case Io_Input_Closed(_) : 
             default : 
-              state = Io_Input_Closed(true);
+              state = Io_Input_Closed(None,true);
               ip.close(); 
           }
           IResSpent;
@@ -61,16 +61,16 @@ abstract StdIn(StdInput) from StdInput{
         __.log().trace('pull ok');
       }catch(e:Eof){
         __.log().error('pull fail $e');
-        state = Io_Input_Closed(false);
+        state = Io_Input_Closed(None,false);
         prim  = IResSpent;
       }catch(e:haxe.io.Error){
         __.log().error('pull fail $e');
-        state = Io_Input_Error(Error.make(Some(Std.string(e))));
-        err  = __.fault().of(E_Subsystem(e));
+        state = Io_Input_Closed(Some(Error.make(Some(Std.string(e)))),false);
+        err  = __.fault().of(E_Io_Subsystem(e));
       }catch(e:Dynamic){
-        state = Io_Input_Error(Error.make(Some(Std.string(e))));
+        state = Io_Input_Closed(Some(Error.make(Some(Std.string(e)))),false);
         __.log().error('pull fail $e');
-        err  = __.fault().of(E_Subsystem(Custom(e)));
+        err  = __.fault().of(E_Io_Subsystem(Custom(e)));
       }
       __.log().trace('pulled: $prim');
       var out : Res<InputResponse,IoFailure> = __.option(err).map(__.reject).def(
@@ -83,16 +83,16 @@ abstract StdIn(StdInput) from StdInput{
       function rec(ipt:InputRequest):Coroutine<InputRequest,InputResponse,Noise,IoFailure>{
         return switch([state,ipt]){
           case [_,IReqState]                        : __.emit(IResState(state),__.tran(rec));
-          case [Io_Input_Closed(_),IReqValue(_)]    : __.quit(__.fault().of(E_EndOfFile));
-          case [Io_Input_Closed(_),IReqBytes(_,_)]  : __.quit(__.fault().of(E_EndOfFile));
+          case [Io_Input_Closed(_),IReqValue(_)]    : __.quit(__.fault().of(E_Io_EndOfFile));
+          case [Io_Input_Closed(_),IReqBytes(_,_)]  : __.quit(__.fault().of(E_Io_EndOfFile));
           case [Io_Input_Closed(_),IReqClose]       : __.stop();
-          case [Io_Input_Closed(_),IReqTotal(_)]    : __.quit(__.fault().of(E_EndOfFile));
+          case [Io_Input_Closed(_),IReqTotal(_)]    : __.quit(__.fault().of(E_Io_EndOfFile));
           case [_,IReqClose]      :
             switch(state){
               case Io_Input_Closed(_) : 
               default                 : 
                 this.close(); 
-                state = Io_Input_Closed(true);
+                state = Io_Input_Closed(None,true);
             }
             __.stop();
           case [_,x]              :

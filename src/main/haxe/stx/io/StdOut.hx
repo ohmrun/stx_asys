@@ -32,7 +32,7 @@ abstract StdOut(StdOutput) from StdOutput{
             case Byteal(NInt(fl))   :          valAsInt     = Some(fl);
             //case PInt(int):             valAsInt    = Some(int);
             default:
-              __.fault().of(E_UnsupportedValue);
+              __.fault().of(E_Io_UnsupportedValue);
           }
           try{
             switch(packet.type){
@@ -84,7 +84,7 @@ abstract StdOut(StdOutput) from StdOutput{
                 for (val in valAsString){ this.writeString(val); }
             }
         }catch(e:Dynamic){
-          output = Report.pure(__.fault().of(E_Subsystem(e)));
+          output = Report.pure(__.fault().of(E_Io_Subsystem(e)));
         }
       }
       __.log()('pushed $output');
