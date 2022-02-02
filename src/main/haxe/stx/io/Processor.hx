@@ -28,6 +28,7 @@ class ProcessorCls<R>{
     return Processor.lift(PushCat._.next(
       Proxy._.map(process.prj(),_ -> None),
       function f(y:ProcessResponse):Proxy<ProcessRequest,ProcessResponse,ProcessorRequest,ProcessorResponse,Option<R>,ProcessFailure>{
+        __.log().debug(_ -> _.pure(y));
         return switch(y){
           case PResState(state) : 
             switch(state.status){
@@ -108,6 +109,9 @@ abstract Processor<R>(ProcessorDef<R>) from ProcessorDef<R> to ProcessorDef<R>{
   @:to public function toProxy():Proxy<Closed,Noise,ProcessorRequest,ProcessorResponse,Option<R>,ProcessFailure>{
     return Proxy.lift(this);
   }
+  // @:noUsing static public function pure(process:Process):Processor<haxe.io.Bytes>{
+  //   return stx.io.processor.term.Unit
+  // }
 }
 class ProcessorLift{
   static public function toOutlet<R>(self:ProcessorDef<R>):Outlet<Option<R>,ProcessFailure>{
