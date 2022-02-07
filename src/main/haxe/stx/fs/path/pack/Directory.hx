@@ -61,7 +61,7 @@ typedef DirectoryDef = {
   public function components():Cluster<String>
     return this.drive.fold(
       (v) -> Track.pure(v).concat(this.track),
-      () -> this.track
+      ()  -> this.track
     );
 
   
@@ -80,6 +80,9 @@ class DirectoryLift{
   static public function down(self:Directory,next:String):Directory{
     return Directory.make(self.drive,self.track.snoc(next));
   }
+  /**
+    Returns a cluster of the files and directories
+  **/
   static public function entries(self:Directory):Attempt<HasDevice,Cluster<Either<String,Entry>>,FsFailure>{
     return (env:HasDevice) -> {
       var sep     = env.device.sep;
@@ -111,6 +114,9 @@ class DirectoryLift{
       );
     };
   }
+  /**
+    Attaches the directory to the file system in HasDevice.
+  **/
   static public function attach(self:Directory):Command<HasDevice,FsFailure>{
     return (env:HasDevice) -> {
       var str = self.canonical(env.device.sep);
@@ -122,6 +128,9 @@ class DirectoryLift{
       }
     };
   }
+  /**
+    Attaches the directory to the Device if it does not exist.
+  **/
   static public function ensure(self:Directory):Command<HasDevice,FsFailure>{
     return exists(self).reframe().commandeer(
       (bool:Bool) -> bool.if_else(
@@ -130,6 +139,9 @@ class DirectoryLift{
       )
     );
   }
+  /**
+    Attaches the directory to the Device no matter how many intermediary directories need creating.
+  **/
   static public function inject(self:Directory):Command<HasDevice,FsFailure>{
     return (env:HasDevice) -> {
       return Execute.bind_fold(
@@ -218,7 +230,8 @@ class DirectoryLift{
     //$type(f);
     return Modulate.lift(f);
   }
-  static public function search_ancestry(self:Directory,arw:Modulate<Directory,Bool,FsFailure>):Produce<Option<Directory>,FsFailure>{
+  //TODO: I should probably `HasDevice` this.
+  static public function search_ancestors(self:Directory,arw:Modulate<Directory,Bool,FsFailure>):Produce<Option<Directory>,FsFailure>{
     return arw.reclaim(
       Convert.Fun(
         (b:Bool) -> b.if_else(
@@ -227,7 +240,7 @@ class DirectoryLift{
             Fletcher.Sync(
               (that:Directory) -> eq(self).comply(self,that).is_ok().if_else(
                 () -> Produce.pure(None),
-                () -> that.search_ancestry(arw)
+                () -> that.search_ancestors(arw)
               )
             )
           ).flat_map(x -> x)
