@@ -17,7 +17,6 @@ typedef DirectoryDef = {
   public function new(self) this = self;
   static public var _(default,never) = DirectoryLift;
   
-  
   static public function lift(self:DirectoryDef):Directory    return new Directory(self);
   @:noUsing static public function make(drive:Drive,track:Track):Directory{
     return Directory.lift({
@@ -59,9 +58,9 @@ typedef DirectoryDef = {
   public function toString():String{
     return canonical(cast "::");
   }
-  public function components():Array<String>
+  public function components():Cluster<String>
     return this.drive.fold(
-      (v) -> [v].concat(this.track),
+      (v) -> Track.pure(v).concat(this.track),
       () -> this.track
     );
 
@@ -75,6 +74,9 @@ typedef DirectoryDef = {
   static public var pos = __.here();
 }
 class DirectoryLift{
+  static public function eq(self:Directory):Eq<Directory>{
+    return new stx.assert.eq.term.fs.path.Directory();
+  }
   static public function down(self:Directory,next:String):Directory{
     return Directory.make(self.drive,self.track.snoc(next));
   }
@@ -150,8 +152,7 @@ class DirectoryLift{
   }
   static public function parent(self:Directory):Produce<Directory,FsFailure>{
     var fn = () -> {
-      var track = self.track.snapshot();
-          track.pop();
+      var track = self.track.snapshot().rdropn(1);
 
       return Directory.make(
         self.drive,
@@ -199,7 +200,23 @@ class DirectoryLift{
     //$type(d);
     //$type(e);
     //$type(f);
-
     return Modulate.lift(f);
+  }
+  static public function search_ancestry(self:Directory,arw:Modulate<Directory,Bool,FsFailure>):Produce<Option<Directory>,FsFailure>{
+    return arw.reclaim(
+      Convert.Fun(
+        (b:Bool) -> b.if_else(
+          () -> Produce.pure(Some(self)),
+          () -> self.parent().convert(
+            Fletcher.Sync(
+              (that:Directory) -> eq(self).comply(self,that).is_ok().if_else(
+                () -> Produce.pure(None),
+                () -> that.search_ancestry(arw)
+              )
+            )
+          ).flat_map(x -> x)
+        )
+      )
+    ).produce(__.accept(self));
   }
 }

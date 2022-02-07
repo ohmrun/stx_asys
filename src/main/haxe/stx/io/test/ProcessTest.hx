@@ -17,7 +17,7 @@ class ProcessTest extends TestCase{
     final process     = Process.make0(['echo',"'hello'"]);
     final processor   = new Unit(process);
     final proxy       = processor.reply().toOutlet();
-          proxy.bring().handle(
+          proxy.pledge().handle(
             x -> {
               trace(x);
               async.done();

@@ -24,7 +24,11 @@ class Path{
             .provide(s.reader())
             .convert(
               (res:ParseResult<String,Array<Token>>) -> __.log().through()(res).is_ok().if_else(
-                ()      -> __.option(res.value).flat_map((x:Option<Array<Token>>) -> x).resolve(f -> f.explain(_ -> _.e_undefined())),
+                ()      -> 
+                  __.option(res.value)
+                    .flat_map((x:Option<Array<Token>>) -> x)
+                    .resolve(f -> f.explain(_ -> _.e_undefined()))
+                    .map(Cluster.lift),
                 ()      -> res.fails().toRes().map(x -> x.defv([])).errate( (e) -> e.toPathParseFailure().toPathFailure() ) 
             )
             )
@@ -116,7 +120,7 @@ typedef Portal                        = PortalDef;
 /**
   `Array` of parsed path `Token`s.
 **/
-typedef RawDef = Array<Token>;
+typedef RawDef = Cluster<Token>;
 typedef Raw    = stx.fs.path.pack.Raw;
 /**
  * A description of `Move`s between a `Stem` and a filesystem resource.

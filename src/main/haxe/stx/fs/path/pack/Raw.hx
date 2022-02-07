@@ -1,7 +1,7 @@
 package stx.fs.path.pack;
 
 @:using(stx.fs.path.pack.Raw.RawLift)
-@:forward(head,tail,length) abstract Raw(RawDef) from RawDef to RawDef{
+@:forward(head,tail,length,lfold) abstract Raw(RawDef) from RawDef to RawDef{
   static public var _(default,never) = RawLift;
   public function new(self) this = self;
   static public function lift(self:RawDef):Raw return new Raw(self);
@@ -83,12 +83,12 @@ class RawLift {
 							}
 						));
 					}else{
-						[];
+						Track.unit();
 					}
 					__.accept(Address.make(
 						head,
 						is_denormalised.if_else(
-							() -> Left(body),
+							() -> Left(Route.fromArray(body)),
 							() -> Right(track)
 						),
 						tail
@@ -102,7 +102,7 @@ class RawLift {
 			case Some(FPTDrive(head)) : 
 				var drive : Drive = head;
 				var track = raw.tail().lfold(
-					(next:Token,memo:Res<Array<String>,PathFailure>) -> memo.fold(
+					(next:Token,memo:Res<Cluster<String>,PathFailure>) -> memo.fold(
 						(arr) -> switch(next){
 							case FPTDrive(_) 	: __.reject(__.fault().of(E_Path_PathParse(E_PathParse_MisplacedHeadNode)));
 							case FPTRel				: __.reject(__.fault().of(E_Path_PathParse(E_PathParse_MisplacedHeadNode)));

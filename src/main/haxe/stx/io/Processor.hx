@@ -35,7 +35,6 @@ class ProcessorCls<R>{
               case Io_Process_Init | Io_Process_Open: 
                 switch(interpreter){
                   case Emit(req,emit) : 
-                    //this.process      = process.provide(req);
                     this.interpreter  = emit;
                     __.await(req,f);
                   case Wait(wait)     : 
