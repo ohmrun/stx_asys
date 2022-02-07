@@ -80,16 +80,32 @@ class DirectoryLift{
   static public function down(self:Directory,next:String):Directory{
     return Directory.make(self.drive,self.track.snoc(next));
   }
-  static public function entries(self:Directory):Attempt<HasDevice,Array<Either<String,Entry>>,FsFailure>{
+  static public function entries(self:Directory):Attempt<HasDevice,Cluster<Either<String,Entry>>,FsFailure>{
     return (env:HasDevice) -> {
       var sep     = env.device.sep;
       var path    = self.canonical(sep);
       var out     = __.reject(__.fault().of(AlreadyExists));
       return out  = __.accept(
-        FileSystem.readDirectory(path).map(
+        Cluster.lift(FileSystem.readDirectory(path)).map(
           (str:String) ->  FileSystem.isDirectory(self.into([str]).canonical(sep)).if_else(
             () -> stx.pico.Either.left(str),
             () -> stx.pico.Either.right(Entry.parse(str))
+          )
+        )
+      );
+    };
+  }
+  static public function files(self:Directory):Attempt<HasDevice,Cluster<String>,FsFailure>{
+    return (env:HasDevice) -> {
+      var sep     = env.device.sep;
+      var path    = self.canonical(sep);
+      return __.accept(
+        Cluster.lift(
+          FileSystem.readDirectory(path)
+        ).map_filter(
+          str -> FileSystem.isDirectory(self.into([str]).canonical(sep)).if_else(
+            () -> Some(str),
+            () -> None
           )
         )
       );
@@ -164,18 +180,18 @@ class DirectoryLift{
     );
   }
   static public function tree(dir:Directory):Modulate<HasDevice,Expr<Entry>,FsFailure>{
-    __.log().debug('tree: $dir');
-    var init  = Arrange.fromFun1Attempt(entries);
-    var c     = Modulate.pure(dir).reframe().arrange(entries);
+    __.log().trace('tree: $dir');
+    var init  = Arrange.fromFun1Attempt(entries).convert(Convert.Fun((x:Cluster<Either<String,Entry>>) -> x.toIterable()));
+    var c     = Modulate.pure(dir).reframe().arrange(entries).convert(Convert.Fun((x:Cluster<Either<String,Entry>>) -> x.toIterable()));
     
     function fn(either:Either<String,Entry>,t:Expr<Entry>):Modulate<HasDevice,Expr<Entry>,FsFailure>{
-      __.log().debug(_ -> _.pure(either));
+      __.log().trace(_ -> _.pure(either));
       return switch(either){
         case Left(string) : 
           var into = dir.into([string]);
-          __.log().debug(_ -> _.pure(into));
+          __.log().trace(_ -> _.pure(into));
           var next = tree(into);
-          __.log().debug(_ -> _.pure(next));
+          __.log().trace(_ -> _.pure(next));
           
           next.convert(
             function(t1){
