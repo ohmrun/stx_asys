@@ -7,7 +7,7 @@ function reg(str) return __.parse().reg(str);
 function log(wildcard){
 	return stx.Log.ZERO.tag('stx/parse/path');
 }
-class Base extends ParserCls<String,Array<Token>>{
+class Base extends ParserCls<String,Cluster<Token>>{
 	var is_windows : Bool;
 	public function new(is_windows,?id:Pos){
 		this.is_windows = is_windows;
@@ -26,7 +26,7 @@ class Base extends ParserCls<String,Array<Token>>{
 			_ -> FPTSep
 		).with_tag('p_sep');
 	}
-	public function p_root():Parser<String,Array<Token>>{
+	public function p_root():Parser<String,Cluster<Token>>{
 		__.log().trace(is_windows);
 		return if(is_windows) {
 				"[A-Za-z]:".reg()
@@ -129,7 +129,7 @@ class Base extends ParserCls<String,Array<Token>>{
 	public function p_rel_root(){
 		return '.'.id().and_('.'.id().not().and(p_sep().option())).then( (_) -> FPTRel);
 	}
-	public function p_rel():Parser<String,Array<Token>>{ 
+	public function p_rel():Parser<String,Cluster<Token>>{ 
 		return p_rel_root().or(p_junction())
 		.and(p_sep().option().with_tag("HSDF"))
 		.and(
@@ -143,14 +143,14 @@ class Base extends ParserCls<String,Array<Token>>{
 			).option()
 		).then(
 			(tp) -> tp.decouple(
-				(tp,c:Option<Array<Token>>) -> tp.decouple(
+				(tp,c:StdOption<Cluster<Token>>) -> tp.decouple(
 					(a:Null<Token>,b:Option<Token>) -> switch([a,b,c]){
-						case [null,None,None]							: [FPTRel];
-						case [null,None,Some(v)] 	 				: [FPTRel].concat(v);
-						case [head,None,Some(v)]  				: [head].concat(v);
-						case [head,Some(tail),Some(v)]  	: [head,tail].concat(v);
-						case [head,Some(tail),None]  			: [head,tail];
-						case [head,None,None]  						: [head];
+						case [null,None,None]							: [FPTRel].imm();
+						case [null,None,Some(v)] 	 				: [FPTRel].imm().concat(v);
+						case [head,None,Some(v)]  				: [head].imm().concat(v);
+						case [head,Some(tail),Some(v)]  	: [head,tail].imm().concat(v);
+						case [head,Some(tail),None]  			: [head,tail].imm();
+						case [head,None,None]  						: [head].imm();
 					}
 				)
 			)
@@ -163,7 +163,7 @@ class Base extends ParserCls<String,Array<Token>>{
 			.then(
 				(tp) -> {
 					__.log().debug('${tp.tup()}');
-					return ((l:Array<Token>,r:Option<Token>) -> switch(r){
+					return ((l:Cluster<Token>,r:Option<Token>) -> switch(r){
 						case Some(v): l.concat([v]);
 						case None 	: l;
 					})(tp.fst(),tp.snd());
@@ -174,10 +174,10 @@ class Base extends ParserCls<String,Array<Token>>{
 				)
 			).and_(Parsers.Eof().lookahead());
 	}               
-	public function defer(i:ParseInput<String>,cont:Terminal<ParseResult<String,Array<Token>>,Noise>):Work{
+	public function defer(i:ParseInput<String>,cont:Terminal<ParseResult<String,Cluster<Token>>,Noise>):Work{
 		return p_path().defer(i,cont);
 	}
-	public function format(arr:Array<Token>){
+	public function format(arr:Cluster<Token>){
 		var o = arr.lfold(
 			function(e,init){
 				switch (e) {

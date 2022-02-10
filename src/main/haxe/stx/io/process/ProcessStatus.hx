@@ -16,7 +16,7 @@ abstract ProcessStatus(ProcessStatusSum) from ProcessStatusSum to ProcessStatusS
   public function hang():ProcessStatus{
     return lift(switch(this){
       case Io_Process_Hung(calls,last) : 
-        Io_Process_Hung(calls == null ? 1 : calls + 1, last == null ? haxe.Timer.stamp() : last);
+        Io_Process_Hung(__.option(calls).map(x -> x + 1).defv(1), last == null ? haxe.Timer.stamp() : last);
       default : 
         Io_Process_Hung(1,haxe.Timer.stamp());
     });
