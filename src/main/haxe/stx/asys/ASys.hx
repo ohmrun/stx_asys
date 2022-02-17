@@ -1,5 +1,6 @@
 package stx.asys;
 
+typedef StdFile = stx.asys.alias.StdFile;
 
 interface ASysApi{
   public function local():HasDevice;
