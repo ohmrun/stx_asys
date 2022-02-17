@@ -17,7 +17,7 @@ class Volume implements VolumeApi extends Clazz{
     return Produce.fromFunXR(
       FileSystem.readDirectory.bind(dir.canonical(sep))
     ).errata(
-      e -> e.fault().of(CannotReadDirectory)
+      e -> e.fault().of(E_Fs_CannotReadDirectory)
     );
   }
   public function parent(dir:Directory):Res<Directory,PathFailure>{
@@ -31,14 +31,14 @@ class Volume implements VolumeApi extends Clazz{
     return () -> try{
       __.accept(StdFile.read(archive.canonical(sep),binary));
     }catch(e:Dynamic){
-      __.reject(__.fault().of(FileUnreadable(e)));
+      __.reject(__.fault().of(E_Fs_FileUnreadable(e)));
     }
   }
   public function write(archive:Archive,?binary = false):Produce<FileOutput,FsFailure>{
     return () -> try{
       __.accept(StdFile.write(archive.canonical(sep),binary));
     }catch(e:Dynamic){
-      __.reject(__.fault().of(FileUnwriteable(e)));
+      __.reject(__.fault().of(E_Fs_FileUnwriteable(e)));
     }
   }
   // public function has(path:Path):Channel<Shell,Bool>{

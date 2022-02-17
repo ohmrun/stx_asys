@@ -2,8 +2,9 @@ package stx.fs;
 
 using stx.fs.path.Logging;
 
-typedef LiftString = stx.fs.path.lift.LiftString;
-
+typedef LiftString            = stx.fs.path.lift.LiftString;
+typedef PathParseFailure      = stx.fail.PathParseFailure;
+typedef PathParseFailureSum   = stx.fail.PathParseFailure.PathParseFailureSum;
 
 class PathApi extends Clazz{
   
@@ -102,6 +103,7 @@ typedef Move                          = MoveSum;
 typedef Name                          = String;
 
 typedef PathFailure                   = stx.fail.PathFailure;
+typedef PathFailureSum                = stx.fail.PathFailure.PathFailureSum;
 
 typedef AddressDef                    = stx.fs.path.pack.Address.AddressDef;
 /**

@@ -16,5 +16,6 @@ enum TokenSum{
   FPTFile(str:String,?ext:String);
 }
 
-typedef Token             = TokenSum;
-typedef PathParseFailure  = stx.fail.PathParseFailure;
+typedef Token                 = TokenSum;
+typedef PathParseFailure      = stx.fail.PathParseFailure;
+typedef PathParseFailureSum   = stx.fail.PathParseFailure.PathParseFailureSum;

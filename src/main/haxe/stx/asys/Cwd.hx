@@ -22,7 +22,7 @@ class Cwd implements CwdApi extends Clazz{
         try{
           __.sys().cwd().put(dir.canonical(env.device.sep));
         }catch(e:Dynamic){
-          val = Report.pure(__.fault().of(CannotSetWorkingDirectory(dir.canonical(env.device.sep),e)));
+          val = Report.pure(__.fault().of(E_Fs_CannotSetWorkingDirectory(dir.canonical(env.device.sep),e)));
         }
         return val;
       }

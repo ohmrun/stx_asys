@@ -87,7 +87,7 @@ class DirectoryLift{
     return (env:HasDevice) -> {
       var sep     = env.device.sep;
       var path    = self.canonical(sep);
-      var out     = __.reject(__.fault().of(AlreadyExists));
+      var out     = __.reject(__.fault().of(E_Fs_AlreadyExists));
       return out  = __.accept(
         Cluster.lift(FileSystem.readDirectory(path)).map(
           (str:String) ->  FileSystem.isDirectory(self.into([str]).canonical(sep)).if_else(
@@ -124,7 +124,7 @@ class DirectoryLift{
         FileSystem.createDirectory(str);
         Report.unit();
       }catch(e:Dynamic){
-        Report.pure(__.fault().of(CannotCreate(str)));
+        Report.pure(__.fault().of(E_Fs_CannotCreate(str)));
       }
     };
   }
@@ -175,7 +175,7 @@ class DirectoryLift{
     return (env:HasDevice) -> try{
       __.accept(FileSystem.exists(self.canonical(env.device.sep)));
     }catch(e:Dynamic){
-      __.reject(__.fault().of(UnknownFSError(e)));
+      __.reject(__.fault().of(E_Fs_UnknownFSError(e)));
     }  
   }
   static public function parent(self:Directory):Produce<Directory,FsFailure>{
@@ -188,7 +188,7 @@ class DirectoryLift{
       );
     };
     return Produce.fromFunXR(fn).errata(
-      (e) -> e.fault().of(UnknownFSError(e.val))
+      (e) -> e.fault().of(E_Fs_UnknownFSError(e.val))
     );
   }
   static public function tree(dir:Directory):Modulate<HasDevice,Expr<Entry>,FsFailure>{

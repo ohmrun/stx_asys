@@ -3,7 +3,7 @@ package stx.fail;
 import stx.fs.path.pack.Raw;
 
 @:using(stx.fail.PathParseFailure.PathParseFailureLift)
-enum PathParseFailure{
+enum PathParseFailureSum{
   //E_Path_Parse_Parse
   E_PathParse_UnexpectedToken(token:Token,raw:Raw);
   //MalformedSource
@@ -19,14 +19,27 @@ enum PathParseFailure{
   E_PathParse_NoFileFoundOnAttachment(raw:Raw);
   E_PathParse_NoFileOnPath(raw:Raw);
 }
+@:using(stx.fail.PathParseFailure.PathParseFailureLift)
+@:transitive abstract PathParseFailure(PathParseFailureSum) from PathParseFailureSum to PathParseFailureSum{
+  public function new(self) this = self;
+  static public function lift(self:PathParseFailureSum):PathParseFailure return new PathParseFailure(self);
+
+  public function prj():PathParseFailureSum return this;
+  private var self(get,never):PathParseFailure;
+  private function get_self():PathParseFailure return lift(this);
+
+  @:from static public function fromParseErrorInfo(self:stx.parse.core.ParseError){
+    return lift(E_PathParse_ParseErrorInfo(self));
+  }
+}
 class PathParseFailureLift{
-  static public function toPathFailure(self:PathParseFailure):PathFailure{
+  static public function toPathFailure(self:PathParseFailureSum):PathFailure{
     return E_Path_PathParse(self);
   }
-  static public function toFsFailure(self:PathParseFailure):FsFailure{
+  static public function toFsFailure(self:PathParseFailureSum):FsFailure{
     return self.toPathFailure().toFsFailure();
   }
-  static public function toASysFailure(self:PathParseFailure):ASysFailure{
+  static public function toASysFailure(self:PathParseFailureSum):ASysFailure{
     return self.toPathFailure().toFsFailure().toASysFailure();
   }
 }

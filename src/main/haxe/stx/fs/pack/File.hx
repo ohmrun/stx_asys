@@ -10,7 +10,7 @@ class File extends Clazz{
       try{
         out = __.accept(StdFile.read(path,binary));
       }catch(e:Dynamic){
-        out = __.reject(__.fault().of(FileUnreadable(e)));
+        out = __.reject(__.fault().of(E_Fs_FileUnreadable(e)));
       }  
       return out;
     }
@@ -21,7 +21,7 @@ class File extends Clazz{
       try{
         out = __.accept(FileSystem.exists(str));
       }catch(e:Dynamic){
-        out = __.reject(__.fault().of(UnknownFSError(e)));
+        out = __.reject(__.fault().of(E_Fs_UnknownFSError(e)));
       }  
       return out;
     };
@@ -32,7 +32,7 @@ class File extends Clazz{
       try{
         out = __.accept(FileSystem.isDirectory(str));
       }catch(e:Dynamic){
-        out = __.reject(__.fault().of(UnknownFSError(e)));
+        out = __.reject(__.fault().of(E_Fs_UnknownFSError(e)));
       }  
       return out;
     };
@@ -43,7 +43,7 @@ class File extends Clazz{
       try{
         StdFile.saveContent(archive.canonical(env.device.sep),data);
       }catch(e:Dynamic){
-        out = Report.pure(__.fault().of(UnknownFSError(e)));
+        out = Report.pure(__.fault().of(E_Fs_UnknownFSError(e)));
       }
       return out;
     }

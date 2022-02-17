@@ -11,6 +11,9 @@ class LiftASys{
 typedef ASysApi           = stx.asys.ASys.ASysApi; 
 typedef ASys              = stx.asys.ASys; 
 
+typedef ASysFailure       = stx.fail.ASysFailure;
+typedef ASysFailureSum    = stx.fail.ASysFailure.ASysFailureSum;
+
 typedef Packet            = stx.asys.Packet;
 typedef Distro            = stx.asys.Distro;
 typedef EnvApi            = stx.asys.Env.EnvApi;
@@ -25,5 +28,5 @@ typedef HasDevice         = stx.asys.HasDevice;
 
 typedef Shell             = stx.asys.Shell;
 
-typedef TargetSum         = stx.asys.Target.TargetSum;
-typedef Target            = stx.asys.Target;
+// typedef TargetSum         = stx.asys.Target.TargetSum;
+// typedef Target            = stx.asys.Target;

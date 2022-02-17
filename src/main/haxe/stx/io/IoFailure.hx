@@ -1,6 +1,6 @@
 package stx.io;
 
-enum IoFailure{
+enum IoFailureSum{
   E_Io_Subsystem(e:haxe.io.Error);
   E_Io_TypeError;
   E_Io_SourceNotFound;
@@ -11,6 +11,14 @@ enum IoFailure{
 
 }
 
+@:transitive abstract IoFailure(IoFailureSum) from IoFailureSum to IoFailureSum{
+  public function new(self) this = self;
+  static public function lift(self:IoFailureSum):IoFailure return new IoFailure(self);
+
+  public function prj():IoFailureSum return this;
+  private var self(get,never):IoFailure;
+  private function get_self():IoFailure return lift(this);
+}
 /**
 	The possible Produce errors that can occur
 **/

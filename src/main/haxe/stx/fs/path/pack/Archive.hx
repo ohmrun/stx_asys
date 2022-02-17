@@ -48,7 +48,7 @@ class ArchiveLift{
       try{
         StdFile.saveContent(self.canonical(env.device.sep),data);
       }catch(e:Dynamic){
-        out = Some(__.fault().of(UnknownFSError(e)));
+        out = Some(__.fault().of(E_Fs_UnknownFSError(e)));
       }
       return out;
     }).broker(
@@ -69,11 +69,11 @@ class ArchiveLift{
       }catch(e:Dynamic){
         //__.log().trace(e);
         if(Std.string(e) == '[file_contents,$canonical]'){
-          __.reject(__.fault().of(E_FileNotFound(self)));
+          __.reject(__.fault().of(E_Fs_FileNotFound(self)));
         }else if(Std.string(e) == 'Could not read file $canonical'){
-          __.reject(__.fault().of(E_FileNotFound(self)));
+          __.reject(__.fault().of(E_Fs_FileNotFound(self)));
         }else{
-          __.reject(__.fault().of(UnknownFSError(e)));
+          __.reject(__.fault().of(E_Fs_UnknownFSError(e)));
         }
       }
     });

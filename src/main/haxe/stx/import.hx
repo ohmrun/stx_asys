@@ -2,7 +2,6 @@ package stx;
 
 import stx.alias.StdThread;
 
-import stx.fail.FsFailure;
 import stx.fail.PathFailure;
 import stx.fail.PathParseFailure;
 import stx.fail.ASysFailure;

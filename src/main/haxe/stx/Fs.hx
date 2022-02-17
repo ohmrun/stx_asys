@@ -1,6 +1,9 @@
 package stx;
 
-  typedef FsString      = stx.fs.pack.FsString;
+typedef FsFailure       = stx.fail.FsFailure;
+typedef FsFailureSum    = stx.fail.FsFailure.FsFailureSum;
+
+typedef FsString        = stx.fs.pack.FsString;
 
 #if (sys || hxnodejs)
   typedef File          = stx.fs.pack.File;

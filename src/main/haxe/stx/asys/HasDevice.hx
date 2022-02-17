@@ -1,5 +1,5 @@
 package stx.asys;
 
 typedef HasDevice = { 
-  public var device(default,null):Device;
+  public final device:Device;
 };
