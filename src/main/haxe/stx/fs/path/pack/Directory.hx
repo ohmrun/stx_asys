@@ -114,6 +114,22 @@ class DirectoryLift{
       );
     };
   }
+  static public function directories(self:Directory):Attempt<HasDevice,Cluster<String>,FsFailure>{
+    return (env:HasDevice) -> {
+      var sep     = env.device.sep;
+      var path    = self.canonical(sep);
+      return __.accept(
+        Cluster.lift(
+          FileSystem.readDirectory(path)
+        ).map_filter(
+          str -> FileSystem.isDirectory(self.into([str]).canonical(sep)).if_else(
+            () -> None,
+            () -> Some(str)
+          )
+        )
+      );
+    };
+  }
   /**
     Attaches the directory to the file system in HasDevice.
   **/
@@ -231,21 +247,21 @@ class DirectoryLift{
     return Modulate.lift(f);
   }
   //TODO: I should probably `HasDevice` this.
-  static public function search_ancestors(self:Directory,arw:Modulate<Directory,Bool,FsFailure>):Produce<Option<Directory>,FsFailure>{
-    return arw.reclaim(
-      Convert.Fun(
+  static public function search_ancestors(self:Directory,arw:Modulate<HasDevice & EnquireDef<Directory>,Bool,FsFailure>):Modulate<HasDevice,Option<Directory>,FsFailure>{
+    return Modulate.fromFun1Produce((state:HasDevice) -> return arw.flat_map(
+    (
         (b:Bool) -> b.if_else(
-          () -> Produce.pure(Some(self)),
-          () -> self.parent().convert(
-            Fletcher.Sync(
+          () -> Modulate.pure(Some(self)),
+          () -> self.parent().toModulate().modulate(
+            Modulate.fromFun1Produce(
               (that:Directory) -> eq(self).comply(self,that).is_ok().if_else(
                 () -> Produce.pure(None),
-                () -> that.search_ancestors(arw)
+                () -> search_ancestors(that,arw).produce(__.accept(state))
               )
             )
-          ).flat_map(x -> x)
+          )
         )
       )
-    ).produce(__.accept(self));
+    ).produce(__.accept({ device : state.device, enquire : self })));
   }
 }
