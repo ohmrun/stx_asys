@@ -1,6 +1,8 @@
 package stx.fail;
 
 import stx.fs.path.pack.Archive;
+import stx.fs.path.pack.Directory;
+
 
 @:using(stx.fail.FsFailure.FsFailureLift)
 enum FsFailureSum{
@@ -9,6 +11,7 @@ enum FsFailureSum{
   E_Fs_FileUnwriteable(dyn:Dynamic);
   E_Fs_UnknownFSError(?dyn:Dynamic);
   E_Fs_FileNotFound(archive:Archive);
+  E_Fs_DirectoryNotFound(dir:Directory);
   E_Fs_AlreadyExists;
   E_Fs_CannotReadDirectory;
   E_Fs_CannotSetWorkingDirectory(target:String,details:Dynamic);
