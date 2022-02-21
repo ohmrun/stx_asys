@@ -19,4 +19,7 @@ enum ASysFailureSum{
   @:from static public function fromFsFailure(self:FsFailure):ASysFailure{
     return E_ASys_Fs(self);
   }
+  @:from static public function fromPathFailure(self:PathFailure):ASysFailure{
+    return E_ASys_Fs(E_Fs_Path(self));
+  }
 }
