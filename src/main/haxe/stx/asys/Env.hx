@@ -13,4 +13,7 @@ class Env implements EnvApi extends Clazz{
       __.reject(__.fault().of(E_EnvironmentVariablesInaccessible));
     });
   }
+  static public function Shim(map:haxe.ds.Map<String,String>){
+    return new stx.asys.env.term.Shim(map);
+  }
 }
