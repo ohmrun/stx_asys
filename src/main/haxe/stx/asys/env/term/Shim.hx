@@ -1,11 +1,12 @@
 package stx.asys.env.term;
 
-class Shim implements EnvApi{
+class Shim extends Env{
   final map : haxe.ds.Map<String,String>;
   public function new(map){
+    super();
     this.map = map;
   }
-  public function get(string:String): Produce<Option<String>,ASysFailure>{
+  override public function get(string:String): Produce<Option<String>,ASysFailure>{
     return Produce.pure(
       __.option(map.get(string))
     );
