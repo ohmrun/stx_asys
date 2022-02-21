@@ -54,7 +54,18 @@ class Base extends ParserCls<String,Cluster<Token>>{
 
 
 	public function p_path_chars(){
-		return p_sep().not().tag_error('p_path_chars.p_sep')._and(char_and_space.or(p_special_chars)).one_many().tokenize().with_tag('p_path_chars'); 
+		final not_sep = p_sep().not().tag_error('p_path_chars.p_sep');
+		final char 		= char_and_space.or(p_special_chars); 
+		return 
+			not_sep._and(char.or(".".id()))
+			.and(
+				not_sep._and(char).many()
+			).then(
+				__.decouple(
+					(x:String,r:Cluster<String>) -> r.cons(x)
+				)
+			).tokenize()
+			 .with_tag('p_path_chars'); 
 	}		
 	public function p_file_chars(){
 		return char_and_space.or(p_special_chars).one_many().tokenize().with_tag('p_file_chars');

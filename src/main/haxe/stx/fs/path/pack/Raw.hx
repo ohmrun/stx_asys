@@ -115,6 +115,7 @@ class RawLift {
 					),
 					__.accept([])
 				);
+				__.log().debug(_ -> _.pure(track));
 				track.map(
 					(track:Track) -> Directory.make(drive,track)
 				);
