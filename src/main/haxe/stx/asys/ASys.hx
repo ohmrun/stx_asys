@@ -31,6 +31,6 @@ class ASys implements ASysApi{
     return stx.io.Input.make0(std.Sys.stdin());
   }
   public function local():HasDevice{
-    return { device : new Device(new Distro()) };
+    return { device : Device.make0(new Distro()) };
   }
 }

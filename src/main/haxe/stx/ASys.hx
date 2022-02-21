@@ -5,7 +5,7 @@ class LiftASys{
     return new stx.asys.Module();
   } 
   static public function localhost(__:Wildcard):Device{
-    return new Device(new Distro());
+    return Device.make0(new Distro());
   }
 }
 typedef ASysApi           = stx.asys.ASys.ASysApi; 

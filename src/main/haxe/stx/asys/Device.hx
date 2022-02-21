@@ -1,37 +1,57 @@
 package stx.asys;
 
 interface DeviceApi{
-  public var distro(default,null)     : Distro;
-  public var volume(default,null)     : VolumeApi;
-  public var shell(default,null)      : Shell;
-  public var sep(default,null)        : Separator;
+  public final distro     : Distro;
+  public final sep        : Separator;
+  public final volume     : VolumeApi;
+  public final shell      : Shell;
+  public final env        : Env;
 }
 
 class Device implements DeviceApi{
-  public function new(distro){
-    this.distro   = distro;
-    this.sep      = distro.is_windows() ? WinSeparator : PosixSeparator;
-    this.env      = new Env();
-    this.volume   = new Volume(sep);
-    this.shell    = new Shell();
+  static public function make(distro,sep,volume,shell,env):Device{
+    return new Device(
+      distro,
+      sep,
+      volume,
+      shell,
+      env
+    );
   }
-  public var sep(default,null)        : Separator;
+  static public function make0(distro:Distro):Device{
+    final sep = distro.is_windows() ? WinSeparator : PosixSeparator;
+    return make(
+      distro,
+      sep,
+      new Volume(sep),
+      new Shell(),
+      new Env()
+    );
+  }
+  private function new(distro,sep,volume,shell,env){
+    this.distro = distro;
+    this.sep    = sep;
+    this.volume = volume;
+    this.shell  = shell;
+    this.env    = env;
+  }
+  public final distro     : Distro;
+  public final sep        : Separator;
+  public final volume     : VolumeApi;
+  public final shell      : Shell;
 
-  public var distro(default,null)     : Distro;
-  public var env(default,null)        : Env;
-  public var volume(default,null)     : VolumeApi;
-  public var shell(default,null)      : Shell;
+  public final env        : Env;
 
   @:to public function toHasDevice():HasDevice{
     return { device : this }
   }
   static public function local():HasDevice{
-    return { device : new Device(new Distro()) };
+    return { device : Device.make0(new Distro()) };
   }
   static public function windows():HasDevice{
-    return { device : new Device(Windows) };
+    return { device : Device.make0(Windows) };
   }
   static public function linux():HasDevice{
-    return { device : new Device(Linux) };
+    return { device : Device.make0(Linux) };
   }
 }
