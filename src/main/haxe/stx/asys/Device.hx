@@ -28,6 +28,17 @@ class Device implements DeviceApi{
       new Env()
     );
   }
+  static public function make1(?distro,?sep,?volume,?shell,?env){
+    final distro  = __.option(distro).defv(new Distro()); 
+    final sep     = __.option(sep).defv(distro.is_windows() ? WinSeparator : PosixSeparator);
+    return make(
+      distro,
+      sep,
+      __.option(volume).defv(volume),
+      __.option(shell).defv(new Shell()),
+      __.option(env).defv(new Env())
+    );
+  }
   private function new(distro,sep,volume,shell,env){
     this.distro = distro;
     this.sep    = sep;
