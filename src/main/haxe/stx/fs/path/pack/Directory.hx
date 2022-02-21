@@ -38,6 +38,9 @@ typedef DirectoryDef = {
       F -> lift
     );
   }
+  static public function parse(string:String){
+    return Path.parse(string).attempt(Raw._.toDirectory);
+  }
   public function attach():Command<HasDevice,FsFailure>       return _.attach(self);
   public function inject():Command<HasDevice,FsFailure>       return _.inject(self);
 
@@ -263,5 +266,9 @@ class DirectoryLift{
         )
       )
     ).produce(__.accept({ device : state.device, enquire : self })));
+  }
+
+  @:noUsing static public inline function into(self:Directory,track:TrackDef):Directory{
+    return self.into(track);
   }
 }
