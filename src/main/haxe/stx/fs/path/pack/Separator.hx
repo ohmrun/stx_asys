@@ -14,4 +14,7 @@ package stx.fs.path.pack;
       this = "PosixSeparator";
     #end
   }
+  static public function unit(){
+    return new Separator();
+  }
 }

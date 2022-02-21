@@ -39,6 +39,9 @@ class Device implements DeviceApi{
       __.option(env).defv(new Env())
     );
   }
+  static public function unit(){
+    return make0(new Distro());
+  }
   private function new(distro,sep,volume,shell,env){
     this.distro = distro;
     this.sep    = sep;
