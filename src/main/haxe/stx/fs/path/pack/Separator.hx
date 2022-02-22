@@ -9,9 +9,9 @@ package stx.fs.path.pack;
   }
   public function new(){
     #if sys
-      this = new Distro() == Windows ? "WinSeparator" : "PosixSeparator";
+      this = new Distro() == Windows ? WinSeparator : PosixSeparator;
     #else
-      this = "PosixSeparator";
+      this = PosixSeparator;
     #end
   }
   static public function unit(){
