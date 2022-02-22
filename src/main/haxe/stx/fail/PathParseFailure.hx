@@ -10,7 +10,8 @@ enum PathParseFailureSum{
   E_PathParse_ParseErrorInfo(v:stx.parse.core.ParseError);
   E_PathParse_EmptyInput;
   E_PathParse_MalformedRaw(raw:Raw);
-
+  
+  E_PathParse_ExpectedEntry(raw:Raw);
   E_PathParse_NoHeadNode;
   E_PathParse_MisplacedHeadNode;
   E_PathParse_UnexpectedDenormalisedPath(raw:Raw);

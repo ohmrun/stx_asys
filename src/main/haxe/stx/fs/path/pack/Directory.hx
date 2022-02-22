@@ -52,10 +52,12 @@ typedef DirectoryDef = {
 
   public function canonical(sep:Separator){
     var head    = this.drive.fold(
-      (v) -> v + sep,
-      () -> sep
+      (v) -> v + '$sep',
+      () -> '$sep'
     );
-    var body    = this.track.join(sep);
+    var body    = this.track.canonical(sep);
+    __.log().debug(_ -> _.pure(head));
+    __.log().debug(_ -> _.pure(body));
     return head + body;
   }
   public function toString():String{
@@ -165,6 +167,7 @@ class DirectoryLift{
     return (env:HasDevice) -> {
       return Execute.bind_fold(
         (next:Array<String>,memo:Report<FsFailure>) -> {
+          __.log().trace('inject');
           var path = Directory.fromArray(next);
           return memo.fold(
             (v:Rejection<FsFailure>) -> Execute.pure(v),

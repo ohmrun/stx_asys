@@ -1,5 +1,0 @@
--lib hxnodejs
---macro define("sys")
--main Main
---js bin/main.js
-

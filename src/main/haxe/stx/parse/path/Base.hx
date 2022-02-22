@@ -85,21 +85,23 @@ class Base extends ParserCls<String,Cluster<Token>>{
 		).and_then(
 			(str:String) -> {
 				__.log().trace(' ###$str###');
-				return switch(str){
-					case '.' 		: Parsers.Failed('not a term');
-					case '..' 	: Parsers.Failed('not a term');
-					default  		: 
-						var all = str.split(".");
-						var ext = null;
-						if(all.length>1 && all[1] != null && str!='.'){
-							ext = all.pop();
-						}
-					return if(ext==null){
-						Parsers.Succeed(FPTDown(str));
-					}else{
-						Parsers.Succeed(FPTFile(all.join('.'),ext));
-					}
-				}
+				//There's no way to tell without context
+				return Parsers.Succeed(FPTDown(str));
+				// return switch(str){
+				// 	case '.' 		: Parsers.Failed('not a term');
+				// 	case '..' 	: Parsers.Failed('not a term');
+				// 	default  		: 
+				// 		var all = str.split(".");
+				// 		var ext = null;
+				// 		if(all.length>1 && all[1] != null && str!='.'){
+				// 			ext = all.pop();
+				// 		}
+				// 	return if(ext==null){
+						
+				// 	}else{
+				// 		Parsers.Succeed(FPTFile(all.join('.'),ext));
+				// 	}
+				// }
 			}
 		).with_tag('p_term');
 	}
@@ -183,7 +185,7 @@ class Base extends ParserCls<String,Cluster<Token>>{
 				p_term().then(
 					(x) -> [x]
 				)
-			).and_(Parsers.Eof().lookahead());
+			).and_(Parsers.Eof());
 	}               
 	public function defer(i:ParseInput<String>,cont:Terminal<ParseResult<String,Cluster<Token>>,Noise>):Work{
 		return p_path().defer(i,cont);

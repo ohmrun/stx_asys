@@ -10,3 +10,6 @@ class Test{
     );
   }
 }
+class ParseTest extends TestCase{
+   
+}

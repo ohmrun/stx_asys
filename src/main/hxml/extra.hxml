@@ -1,4 +1,0 @@
--cp src/main/haxe
-
--D error_stack
--D test=stx_asys
