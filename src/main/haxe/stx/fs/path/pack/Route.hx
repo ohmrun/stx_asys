@@ -5,6 +5,7 @@ package stx.fs.path.pack;
 **/
 typedef RouteDef = Cluster<Move>;
 
+@:using(stx.fs.path.pack.Route.RouteLift)
 @:forward(lfold) abstract Route(RouteDef) from RouteDef to RouteDef{
   public function new(self) this = self;
   static public function lift(self:RouteDef):Route return new Route(self);
@@ -29,4 +30,7 @@ typedef RouteDef = Cluster<Move>;
   public function prj():RouteDef return this;
   private var self(get,never):Route;
   private function get_self():Route return lift(this);
+}
+class RouteLift{
+  
 }
