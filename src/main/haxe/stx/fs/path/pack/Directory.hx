@@ -276,4 +276,29 @@ class DirectoryLift{
   @:noUsing static public inline function into(self:Directory,track:TrackDef):Directory{
     return self.into(track);
   }
+  static public function archive(self:Directory,that:Attachment):Res<Archive,FsFailure>{
+    return that.track.lfold(
+      (next:Move,memo:Res<Track,FsFailure>) -> switch([next,memo]){
+          case [Into(name),Accept(dir)] : __.accept(dir.concat([name]));
+          case [From,Accept(dir)]       : dir.up().errate(e -> (e:FsFailure));
+          case [_,Reject(_)]            : memo;
+      },
+      __.accept(self.track)
+    ).map(
+      (next:Track) -> Archive.lift({
+        drive : self.drive,
+        track : next,
+        entry : that.entry
+      })
+    );
+  }
+  static public function is_root(self:Directory):Bool{
+    return !self.track.is_defined();
+  }
+  // static public function up(self:Directory){
+  //   return is_root(self).if_else(
+  //     () -> __.reject(__.fault().of(E_Path_ReachedRoot).errate(e -> (e:FsFailure))),
+  //     () -> self.track.up().map(track -> Dir.make(dir.drive,track))
+  //   );
+  // }
 }
