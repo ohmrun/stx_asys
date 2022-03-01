@@ -29,6 +29,12 @@ typedef TrackDef = Cluster<String>;
   public function concat(that:Track):Track{
     return lift(this.concat(that.prj()));
   }
+  public function up():Res<Track,PathFailure>{
+    return this.is_defined().if_else(
+      () -> __.accept(lift(this.rdropn(1))),
+      () -> __.reject(__.fault().of(E_Path_ReachedRoot))
+    );
+  }
   public function prj():TrackDef return this;
   private var self(get,never):Track;
   private function get_self():Track return lift(this);
