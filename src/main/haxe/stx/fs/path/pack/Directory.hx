@@ -192,7 +192,7 @@ class DirectoryLift{
           []
         )
       );
-    }
+    });
   }
 
   static public function exists(self:Directory):Attempt<HasDevice,Bool,FsFailure>{
