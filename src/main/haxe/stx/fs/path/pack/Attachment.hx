@@ -7,7 +7,7 @@ typedef AttachmentDef = {
 /**
   A headless path to a file.
 **/
-abstract Attachment(AttachmentDef) from AttachmentDef to AttachmentDef{
+@:forward abstract Attachment(AttachmentDef) from AttachmentDef to AttachmentDef{
   public function new(self) this = self;
   static public function lift(self:AttachmentDef):Attachment return new Attachment(self);
   @:noUsing static public function make(entry:Entry,route:Route):Attachment{
