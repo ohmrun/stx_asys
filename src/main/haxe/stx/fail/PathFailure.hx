@@ -5,6 +5,8 @@ enum PathFailureSum{
   //ParseFailed
   E_Path_PathParse(pf:PathParseFailure);
   E_Path_ReachedRoot;
+  E_Path_ExpectedAbsolutePath;
+  E_Path_ExpectedEntry;
   //E_Path_No
 }
 @:using(stx.fail.PathFailure.PathFailureLift)

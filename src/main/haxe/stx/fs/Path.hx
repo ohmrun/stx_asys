@@ -126,20 +126,15 @@ typedef Route                         = stx.fs.path.Route;
 
 typedef Separator                     = stx.fs.path.Separator;
 
-/**
- * Represents the root of a volume, whether named or not.
-**/
-enum StemDef{
-  Here;
-  Root(drive:Drive);
-}
-typedef Stem                          = StemDef;
 
 /**
   * A normalized, unidirectional description of moves between a `Stem` and a filesystem resource. 
 **/
 typedef TrackDef                      = stx.fs.path.Track.TrackDef;
 typedef Track                         = stx.fs.path.Track;
+
+typedef StemSum                       = stx.fs.path.Stem.StemSum;
+typedef Stem                          = stx.fs.path.Stem;
 
 typedef AttachmentDef                 = stx.fs.path.Attachment.AttachmentDef;
 typedef Attachment                    = stx.fs.path.Attachment;

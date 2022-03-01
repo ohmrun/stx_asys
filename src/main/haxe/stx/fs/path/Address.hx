@@ -5,7 +5,7 @@ package stx.fs.path;
 **/
 typedef AddressDef = {
   var drive : Stem;
-  var track : Either<Route,Track>;
+  var tread : Either<Route,Track>;
   var entry : Option<Entry>;
 }
 @:using(stx.fs.path.Address.AddressLift)
@@ -15,10 +15,10 @@ typedef AddressDef = {
   @:noUsing static public inline function unit():Address{
     return make(Here,Right([]),None);
   }
-  @:noUsing static public inline function make(drive:Stem,track:Either<Route,Track>,entry:Option<Entry>):Address{
+  @:noUsing static public inline function make(drive:Stem,tread:Either<Route,Track>,entry:Option<Entry>):Address{
     return lift({
       drive : drive,
-      track : track,
+      tread : tread,
       entry : entry
     });
   }
@@ -28,7 +28,7 @@ typedef AddressDef = {
       case Root(Some(v))      : '${v}/';
       case Root(None)         : '/';
     }
-    var body = switch(this.track){
+    var body = switch(this.tread){
       case Left(route)  : route.canonical(sep);
       case Right(track) : track.canonical(sep);
     }
@@ -46,7 +46,7 @@ typedef AddressDef = {
   private function get_self():Address return lift(this);
 
   public function with_entry(entry:Entry){
-    return make(this.drive,this.track,Some(entry));
+    return make(this.drive,this.tread,Some(entry));
   }
 
   public function isDirectory():Bool{
@@ -54,8 +54,35 @@ typedef AddressDef = {
   }
 }
 class AddressLift{
-  static public function toDirectory(){
-    return switch()
-  }()
-  //static public function materialize()
+  static public function get_track(self:Address):Res<Track,PathFailure>{
+    return switch(self.tread){
+      case Left(route)  : route.toTrack();
+      case Right(track) : __.accept(track);
+    }
+  }
+  static public function toDirectory(self:Address):Res<Directory,PathFailure>{
+    return get_track(self).flat_map(
+      (track) -> switch(self.drive){
+        case Here     : __.reject(__.fault().of(E_Path_ExpectedAbsolutePath));
+        case Root(d)  : __.accept(Directory.make(d,track));
+      }
+    );
+  }
+  static public function toArchive(self:Address):Res<Archive,PathFailure>{
+    return
+        self.drive.fold(
+          () -> __.reject(__.fault().of(E_Path_ExpectedEntry)), 
+          x -> __.accept(x)
+        ).zip(get_track(self))
+         .zip_with(
+            self.entry.resolve(_ -> _.of(E_Path_ExpectedEntry)),
+            (couple,entry) -> Archive.make(couple.fst(),couple.snd(),entry)
+          );
+  }
+  static public function materialize(self:Address):Res<Either<Directory,Archive>,PathFailure>{
+    return self.isDirectory().if_else(
+      () -> toDirectory(self).map(Left),
+      () -> toArchive(self).map(Right)
+    );
+  }
 }

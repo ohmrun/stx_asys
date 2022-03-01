@@ -36,17 +36,18 @@ typedef RouteDef = Cluster<Move>;
 class RouteLift{
  static public function toTrack(self:Route):Res<Track,PathFailure>{
   return self.lfold(
-    (next:Move,memo:Cluster<String>) -> {
-      return memo.fold(
+    (next:Move,memo:Res<Cluster<String>,PathFailure>) -> {
+      return memo.flat_map(
         ok -> switch(next){
           case Into(name) : __.accept(ok.snoc(name));
-          case From       : switch(ok.is_defined()).if_else(
+          case From       : (ok.is_defined()).if_else(
             () -> __.accept(ok.rdropn(1)),
             () -> __.reject(__.fault().of(E_Path_ReachedRoot))
           );
         }
       );
-    }
+    },
+    __.accept(Cluster.unit())
   );
  } 
 }
