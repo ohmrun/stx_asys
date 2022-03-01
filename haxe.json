@@ -10,6 +10,7 @@
       "stx_proxy",
       "stx_coroutine",
       "stx_parse",
+      "stx_bake",
       "fletcher",
       "pml"
     ],
@@ -35,6 +36,12 @@
           "-main" : "stx.fs.path.Test"
         },
         "--interp" : true
+      },
+      "neko" : {
+        "test" : {
+          "-main" : "stx.fs.path.Test",
+          "-neko" : "build/neko/test/main.n"
+        }
       }
     },
     "stx.parse.path" : {
@@ -53,5 +60,10 @@
         }
       }
     }
+  },
+  "run" : {
+    "stx.fs.path/test/neko:run" : [
+      ["neko","build/neko/test/main.n"]
+    ]
   } 
 }
