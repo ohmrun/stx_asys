@@ -139,7 +139,7 @@ class DirectoryLift{
     Attaches the directory to the file system in HasDevice.
   **/
   static public function attach(self:Directory):Command<HasDevice,FsFailure>{
-    return (env:HasDevice) -> {
+    return __.command((env:HasDevice) -> {
       var str = self.canonical(env.device.sep);
       return try{
         FileSystem.createDirectory(str);
@@ -147,7 +147,7 @@ class DirectoryLift{
       }catch(e:Dynamic){
         Report.pure(__.fault().of(E_Fs_CannotCreate(str)));
       }
-    };
+    });
   }
   /**
     Attaches the directory to the Device if it does not exist.
@@ -164,7 +164,9 @@ class DirectoryLift{
     Attaches the directory to the Device no matter how many intermediary directories need creating.
   **/
   static public function inject(self:Directory):Command<HasDevice,FsFailure>{
-    return (env:HasDevice) -> {
+    trace(self);
+    return Command.fromFun1Execute((env:HasDevice) -> {
+      __.log().debug("inject:0");
       return Execute.bind_fold(
         (next:Array<String>,memo:Report<FsFailure>) -> {
           __.log().trace('inject');

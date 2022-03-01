@@ -43,7 +43,7 @@ typedef ArchiveDef = {
 
 class ArchiveLift{
   static public function update(self:Archive,data:String):Command<HasDevice,FsFailure>{
-    return ((env:HasDevice) -> {
+    return __.command((env:HasDevice) -> {
       var out = None;
       try{
         StdFile.saveContent(self.canonical(env.device.sep),data);
@@ -51,9 +51,7 @@ class ArchiveLift{
         out = Some(__.fault().of(E_Fs_UnknownFSError(e)));
       }
       return out;
-    }).broker(
-      F -> Command.fromFun1Option
-    );
+    });
   }
   static public function upsert(self:Archive,data:String){
     var lhs = self.directory().inject();
@@ -85,4 +83,5 @@ class ArchiveLift{
       return __.accept(exists);
     }
   }
+
 }

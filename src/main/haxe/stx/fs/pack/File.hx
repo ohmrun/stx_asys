@@ -38,7 +38,7 @@ class File extends Clazz{
     };
   }
   public function put(archive:Archive,data:String):Command<HasDevice,FsFailure>{
-    return (env:HasDevice) -> {
+    return __.command((env:HasDevice) -> {
       var out = Report.unit();
       try{
         StdFile.saveContent(archive.canonical(env.device.sep),data);
@@ -46,6 +46,6 @@ class File extends Clazz{
         out = Report.pure(__.fault().of(E_Fs_UnknownFSError(e)));
       }
       return out;
-    }
+    });
   }
 }
