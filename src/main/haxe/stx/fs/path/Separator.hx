@@ -7,6 +7,7 @@ package stx.fs.path;
   @:to public function toString():String{
     return Std.string(this);
   }
+  
   public function new(){
     #if sys
       this = new Distro() == Windows ? WinSeparator : PosixSeparator;

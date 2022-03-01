@@ -16,7 +16,9 @@ typedef AttachmentDef = {
       track : route
     });
   }
-  
+  @:from static public function fromEntry(entry:Entry):Attachment{
+    return make(entry,Route.unit());
+  }
 
   public function prj():AttachmentDef return this;
   private var self(get,never):Attachment;

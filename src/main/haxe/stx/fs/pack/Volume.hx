@@ -5,6 +5,7 @@ interface VolumeApi{
   public function parent(dir:Directory):Res<Directory,PathFailure>;
 
   public function read(archive:Archive,?binary : Bool = false):Produce<FileInput,FsFailure>;
+  public function isDirectory(self:Raw):Attempt<HasDevice,Bool,FsFailure>;
 }
 
 class Volume implements VolumeApi extends Clazz{
@@ -40,6 +41,15 @@ class Volume implements VolumeApi extends Clazz{
     }catch(e:Dynamic){
       __.reject(__.fault().of(E_Fs_FileUnwriteable(e)));
     }
+  }
+  public function isDirectory(self:Raw):Attempt<HasDevice,Bool,FsFailure>{
+    return __.attempt(
+      (state:HasDevice) -> {
+        final canonical = self.canonical(state.device.sep);
+        final is_dir    = sys.FileSystem.isDirectory(canonical);
+        return __.accept(is_dir);
+      }
+    );
   }
   // public function has(path:Path):Channel<Shell,Bool>{
   //   return ((env:Shell) -> {

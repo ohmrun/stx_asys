@@ -4,8 +4,10 @@ package stx.fs.path;
 @:forward(head,tail,length,lfold,last) abstract Raw(RawDef) from RawDef to RawDef{
   static public var _(default,never) = RawLift;
   public function new(self) this = self;
-  static public function lift(self:RawDef):Raw return new Raw(self);
-  
+  @:noUsing static public function lift(self:RawDef):Raw return new Raw(self);
+	static public function unit():Raw{
+		return lift(Cluster.unit());
+	}
   @:arrayAccess
   public function at(i:Int){
     return this[i];
@@ -13,10 +15,20 @@ package stx.fs.path;
   public function prj():RawDef return this;
   private var self(get,never):Raw;
   private function get_self():Raw return lift(this);
+
+	public function snoc(token:Token):Raw{
+		return lift(this.snoc(token));
+	}
+	public function rdropn(n):Raw{
+		return lift(this.rdropn(n));
+	} 
 }
 
 
 class RawLift {
+	static public function canonical(self:Raw,sep:Separator){
+		return self.prj().map(token -> token.canonical(sep)).lfold1((x,y) -> '${x}${y}').defv(".");
+	}
   static public function toAddress(arr:Raw):Res<Address,PathFailure>{
 		var head = arr.head();
 		var rest = arr.tail();
@@ -24,7 +36,7 @@ class RawLift {
 			case None :
 				__.accept(Address.unit());
 			case Some(v) :
-				var is_denormalised 					= false;
+				var is_denormalized 					= false;
 				var is_absolute 							= false;
 				var head : Stem								= Here;
 				var body : Array<Move> 				= [];
@@ -36,7 +48,7 @@ class RawLift {
 						is_absolute = true;
 						head 				= Root(drive);
   				case FPTUp									:
-						is_denormalised = true;
+						is_denormalized = true;
 						body.prj().push(From);
 					case FPTFile(str, null)			:
 						tail 	= Some(Entry.fromName(str));
@@ -75,7 +87,7 @@ class RawLift {
 				if(error!=null){
 					__.reject(error);
 				}else{
-					var track = if(!is_denormalised){
+					var track = if(!is_denormalized){
 						Track.lift(body.map(
 							(x) -> switch(x){
 								case Into(v) : v;
@@ -87,7 +99,7 @@ class RawLift {
 					}
 					__.accept(Address.make(
 						head,
-						is_denormalised.if_else(
+						is_denormalized.if_else(
 							() -> Left(Route.fromArray(body)),
 							() -> Right(track)
 						),
@@ -107,7 +119,7 @@ class RawLift {
 						(arr) -> switch(__.log().level(TRACE).through()(next)){
 							case FPTDrive(_) 	: __.reject(__.fault().of(E_Path_PathParse(E_PathParse_MisplacedHeadNode)));
 							case FPTRel				: __.reject(__.fault().of(E_Path_PathParse(E_PathParse_MisplacedHeadNode)));
-							case FPTUp				: __.reject(__.fault().of(E_Path_PathParse(E_PathParse_UnexpectedDenormalisedPath(raw))));
+							case FPTUp				: __.reject(__.fault().of(E_Path_PathParse(E_PathParse_UnexpectedDenormalizedPath(raw))));
 							case FPTSep				: __.accept(arr);
 							case FPTDown(str) : __.accept(arr.snoc(str));
 							case FPTFile(_,_) : __.reject(__.fault().of(E_Path_PathParse(E_PathParse_UnexpectedFileInDirectory(raw))));
@@ -154,7 +166,7 @@ class RawLift {
 					(x) -> last.map(y -> __.couple(Entry.fromToken(y),x))
 				).flat_map(
 					(x) -> x.fst().fold(
-						(drive) -> __.accept(Attachment.make($type(drive),x.snd().snd())),
+						(drive) -> __.accept(Attachment.make((drive),x.snd().snd())),
 						() 			-> __.reject(__.fault().of(E_Path_PathParse(E_PathParse_NoFileFoundOnAttachment(raw))))
 					)
 				)
@@ -170,7 +182,7 @@ class RawLift {
 						(tp) -> switch(next){
 							case FPTDrive(_) 				: __.reject(__.fault().of(E_Path_PathParse(E_PathParse_MisplacedHeadNode)));
 							case FPTRel							: __.reject(__.fault().of(E_Path_PathParse(E_PathParse_MisplacedHeadNode)));
-							case FPTUp							: __.reject(__.fault().of(E_Path_PathParse(E_PathParse_UnexpectedDenormalisedPath(raw))));
+							case FPTUp							: __.reject(__.fault().of(E_Path_PathParse(E_PathParse_UnexpectedDenormalizedPath(raw))));
 							case FPTSep							: memo;
 							case FPTDown(str) 			: memo.map( arr -> arr.snoc(str));
 							case FPTFile(nm,ext) 	  : __.reject(__.fault().of(E_Path_PathParse(E_PathParse_MalformedRaw(raw))));
@@ -196,27 +208,33 @@ class RawLift {
 					__.reject(__.fault().of(E_Path_PathParse(E_PathParse_NoHeadNode)));
 		});
 	}
-	static public function kind(arr:Raw){
+	static public function kind(arr:Raw):Kind{
     var absolute              = false;
-    var normalised            = true;
+    var normalized            = true;
     var has_trailing_slash    = false;
+		var file 									= Nay;
     for(i in 0...arr.length){
       var token = arr[i];
       if(i == 0){
-        absolute = token.match(FPTDrive(None));
+        absolute = token.prj().match(FPTDrive(None));
       }
       if(token == FPTUp){
-        normalised = false;
+        normalized = false;
       }
       if(i == arr.length-1){
-        has_trailing_slash = token.match(FPTSep);
+        has_trailing_slash = token.prj().match(FPTSep);
+				file = switch(token){
+					case FPTDown(_) 			: Maybe;
+					case FPTFile(_,_) 		: Yay;
+					default 							: Nay;
+				}
       }
     };
     return {
       absolute              : absolute,
-      normalised            : normalised,
+      normalized            : normalized,
       has_trailing_slash    : has_trailing_slash,
-      file                  : false
+      file                  : file
     }
 	}
 	static public function toTrack(raw:Raw):Res<Track,PathFailure>{
@@ -231,6 +249,53 @@ class RawLift {
 			),
 			__.accept([])
 		);
+	}
+	static public function realize(self:Raw):Attempt<HasDevice,Address,FsFailure>{
+		return __.attempt(
+			(state:HasDevice) -> {
+				final kind = kind(self);
+				if(!kind.normalized){
+					self = normalize(self);
+				}
+				final next = state.device.volume.isDirectory(self).adjust(
+					(bool) -> bool.if_else(
+						() -> (self.toAddress().errate(e -> (e:FsFailure))),
+						() -> {
+							final body = self.rdropn(1);
+							final tail = self.last().resolve(
+								_ -> _.of(E_PathParse_NoFileOnPath(self)).errate(e -> (e:FsFailure))
+							);
+							//$type(body);
+							final next = 
+								(body.toAddress().errate(e -> (e:FsFailure))).zip(
+									tail.flat_map(
+										(x:Token) -> Entry.fromToken(x)
+											 .resolve(
+												 _ -> _.of(E_PathParse_NoFileOnPath(self)).errate(e -> (e:FsFailure))
+											 )
+									)
+								)
+								.map(__.decouple((address:Address,entry:Entry) -> address.with_entry(entry)));
+							//$type(next);
+							return next;
+						}
+					)
+				);
+				return null;
+			}
+		); 
+	}
+	static public function normalize(self:Raw){
+		final rest = self.lfold(
+			(next:Token,memo:Raw) -> switch(next){
+					case FPTUp 														: 
+							memo.rdropn(1);
+					case FPTDrive(_) | FPTRel | FPTSep | FPTDown(_) | FPTFile(_,_) : 
+						memo.snoc(next);
+				},
+			Raw.unit()
+		);
+		return rest;
 	}
 }
 

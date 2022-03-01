@@ -9,7 +9,9 @@ typedef RouteDef = Cluster<Move>;
 @:forward(lfold) abstract Route(RouteDef) from RouteDef to RouteDef{
   public function new(self) this = self;
   static public function lift(self:RouteDef):Route return new Route(self);
-  
+  @:noUsing static public function unit(){
+    return fromArray([]);
+  }
   @:from static public inline function fromArray(self:Array<Move>){
     return lift(Cluster.lift(self));
   }
@@ -32,5 +34,19 @@ typedef RouteDef = Cluster<Move>;
   private function get_self():Route return lift(this);
 }
 class RouteLift{
-  
+ static public function toTrack(self:Route):Res<Track,PathFailure>{
+  return self.lfold(
+    (next:Move,memo:Cluster<String>) -> {
+      return memo.fold(
+        ok -> switch(next){
+          case Into(name) : __.accept(ok.snoc(name));
+          case From       : switch(ok.is_defined()).if_else(
+            () -> __.accept(ok.rdropn(1)),
+            () -> __.reject(__.fault().of(E_Path_ReachedRoot))
+          );
+        }
+      );
+    }
+  );
+ } 
 }

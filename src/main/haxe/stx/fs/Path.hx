@@ -77,11 +77,11 @@ typedef Folder = {
  * Info about a resource.
 **/
 typedef Kind = {
-  public var absolute(default,null):Bool;
-  public var normalised(default,null):Bool;
+  final absolute:Bool;
+  final normalized:Bool;
 
-  public var has_trailing_slash(default,null):Bool;
-  public var has_ext(default,null):Bool;
+  final has_trailing_slash:Bool;
+  final file:Trivalent;
 }
 typedef Location = {
   var drive : Drive;

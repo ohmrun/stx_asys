@@ -8,14 +8,14 @@ typedef AddressDef = {
   var track : Either<Route,Track>;
   var entry : Option<Entry>;
 }
-
+@:using(stx.fs.path.Address.AddressLift)
 @:forward abstract Address(AddressDef) from AddressDef to AddressDef{
   public function new(self) this = self;
   @:noUsing static public function lift(self:AddressDef):Address return new Address(self);
   @:noUsing static public inline function unit():Address{
     return make(Here,Right([]),None);
   }
-  @:noUsing static public inline function make(drive,track,entry):Address{
+  @:noUsing static public inline function make(drive:Stem,track:Either<Route,Track>,entry:Option<Entry>):Address{
     return lift({
       drive : drive,
       track : track,
@@ -45,4 +45,17 @@ typedef AddressDef = {
   private var self(get,never):Address;
   private function get_self():Address return lift(this);
 
+  public function with_entry(entry:Entry){
+    return make(this.drive,this.track,Some(entry));
+  }
+
+  public function isDirectory():Bool{
+    return this.entry.is_defined();
+  }
+}
+class AddressLift{
+  static public function toDirectory(){
+    return switch()
+  }()
+  //static public function materialize()
 }

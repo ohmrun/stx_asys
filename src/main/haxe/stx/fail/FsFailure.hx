@@ -35,6 +35,9 @@ enum FsFailureSum{
   @:from static public function fromPathFailure(self:PathFailure):FsFailure{
     return E_Fs_Path(self);
   }
+  @:from static public function fromPathParseFailure(self:PathParseFailure):FsFailure{
+    return E_Fs_Path(E_Path_PathParse(self));
+  }
 }
 class FsFailureLift{
   static public function toASysFailure(self:FsFailure):ASysFailure{
