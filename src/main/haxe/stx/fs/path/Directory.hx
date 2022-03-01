@@ -1,8 +1,8 @@
-package stx.fs.path.pack;
+package stx.fs.path;
 
 using eu.ohmrun.Pml;
 
-using stx.fs.path.pack.Directory;
+using stx.fs.path.Directory;
 
 /**
   Represents an absolute path between the root of a file system
@@ -12,7 +12,7 @@ typedef DirectoryDef = {
   var drive : Drive;
   var track : Track;
 }
-@:using(stx.fs.path.pack.Directory.DirectoryLift)
+@:using(stx.fs.path.Directory.DirectoryLift)
 @:forward abstract Directory(DirectoryDef) from DirectoryDef to DirectoryDef{
   public function new(self) this = self;
   static public var _(default,never) = DirectoryLift;

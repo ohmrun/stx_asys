@@ -1,4 +1,4 @@
-package stx.fs.path.pack;
+package stx.fs.path;
 
 @:enum abstract Separator(String) to String{
   var WinSeparator   = "\\\\";

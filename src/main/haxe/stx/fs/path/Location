@@ -1,4 +1,4 @@
-package stx.fs.path.pack;
+package stx.fs.path;
 
 import stx.fs.path.type.Location in LocationT;
 

@@ -43,15 +43,15 @@ class Path{
 /**
  * An absolute path to an `Entry`.
 **/
-typedef ArchiveDef                    = stx.fs.path.pack.Archive.ArchiveDef;
-typedef Archive                       = stx.fs.path.pack.Archive;
+typedef ArchiveDef                    = stx.fs.path.Archive.ArchiveDef;
+typedef Archive                       = stx.fs.path.Archive;
 
 
 /**
  * An absolute path with no `Entry`.
 **/
-typedef DirectoryDef                  = stx.fs.path.pack.Directory.DirectoryDef;
-typedef Directory                     = stx.fs.path.pack.Directory;
+typedef DirectoryDef                  = stx.fs.path.Directory.DirectoryDef;
+typedef Directory                     = stx.fs.path.Directory;
 
 /**
  * A reference to the root of a volume.
@@ -62,8 +62,8 @@ typedef Drive                         = DriveDef;
 /**
  * A name and possible extension of a resource found in a `Directory`;
 **/
-typedef EntryDef                      = stx.fs.path.pack.Entry.EntryDef;
-typedef Entry                         = stx.fs.path.pack.Entry;
+typedef EntryDef                      = stx.fs.path.Entry.EntryDef;
+typedef Entry                         = stx.fs.path.Entry;
 
 
 /**
@@ -89,8 +89,8 @@ typedef Location = {
   var entry : Option<Entry>;
 } 
 
-typedef Move    = stx.fs.path.pack.Move;
-typedef MoveSum = stx.fs.path.pack.Move.MoveSum;
+typedef Move    = stx.fs.path.Move;
+typedef MoveSum = stx.fs.path.Move.MoveSum;
 /**
   A valid filesystem node name.
 **/
@@ -99,11 +99,11 @@ typedef Name                          = String;
 typedef PathFailure                   = stx.fail.PathFailure;
 typedef PathFailureSum                = stx.fail.PathFailure.PathFailureSum;
 
-typedef AddressDef                    = stx.fs.path.pack.Address.AddressDef;
+typedef AddressDef                    = stx.fs.path.Address.AddressDef;
 /**
   A representation of the location of any filesystem resource.
 **/
-typedef Address                       = stx.fs.path.pack.Address;
+typedef Address                       = stx.fs.path.Address;
 /**
  * A denormalized `Route` from a `Stem`.
 **/  
@@ -117,14 +117,14 @@ typedef Portal                        = PortalDef;
   `Array` of parsed path `Token`s.
 **/
 typedef RawDef = Cluster<Token>;
-typedef Raw    = stx.fs.path.pack.Raw;
+typedef Raw    = stx.fs.path.Raw;
 /**
  * A description of `Move`s between a `Stem` and a filesystem resource.
 **/
-typedef RouteDef                      = stx.fs.path.pack.Route.RouteDef;
-typedef Route                         = stx.fs.path.pack.Route;
+typedef RouteDef                      = stx.fs.path.Route.RouteDef;
+typedef Route                         = stx.fs.path.Route;
 
-typedef Separator                     = stx.fs.path.pack.Separator;
+typedef Separator                     = stx.fs.path.Separator;
 
 /**
  * Represents the root of a volume, whether named or not.
@@ -138,11 +138,11 @@ typedef Stem                          = StemDef;
 /**
   * A normalized, unidirectional description of moves between a `Stem` and a filesystem resource. 
 **/
-typedef TrackDef                      = stx.fs.path.pack.Track.TrackDef;
-typedef Track                         = stx.fs.path.pack.Track;
+typedef TrackDef                      = stx.fs.path.Track.TrackDef;
+typedef Track                         = stx.fs.path.Track;
 
-typedef AttachmentDef                 = stx.fs.path.pack.Attachment.AttachmentDef;
-typedef Attachment                    = stx.fs.path.pack.Attachment;
+typedef AttachmentDef                 = stx.fs.path.Attachment.AttachmentDef;
+typedef Attachment                    = stx.fs.path.Attachment;
 
 
 class LiftDrive{

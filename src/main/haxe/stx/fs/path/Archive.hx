@@ -1,4 +1,4 @@
-package stx.fs.path.pack;
+package stx.fs.path;
 
 /**
   Represents the description of an absolute path from the root of the filesystem
@@ -9,7 +9,7 @@ typedef ArchiveDef = {
   var track : Track;
   var entry : Entry;
 }
-@:using(stx.fs.path.pack.Archive.ArchiveLift)
+@:using(stx.fs.path.Archive.ArchiveLift)
 @:forward abstract Archive(ArchiveDef) from ArchiveDef to ArchiveDef{
   static public var _(default,never) = ArchiveLift;
   public function new(self) this = self;

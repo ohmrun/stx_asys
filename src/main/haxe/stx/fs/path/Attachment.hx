@@ -1,4 +1,4 @@
-package stx.fs.path.pack;
+package stx.fs.path;
 
 typedef AttachmentDef = {
   var entry : Entry;

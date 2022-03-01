@@ -1,6 +1,6 @@
-package stx.fs.path.pack;
+package stx.fs.path;
 
-@:using(stx.fs.path.pack.Raw.RawLift)
+@:using(stx.fs.path.Raw.RawLift)
 @:forward(head,tail,length,lfold,last) abstract Raw(RawDef) from RawDef to RawDef{
   static public var _(default,never) = RawLift;
   public function new(self) this = self;
@@ -248,7 +248,7 @@ class RawLift {
 			)
 		);
 	}
-	public function name(entry:stx.fs.path.pack.Entry){
+	public function name(entry:stx.fs.path.Entry){
 		return lift(
 			this.mapl(
 				(_) -> Some(entry)

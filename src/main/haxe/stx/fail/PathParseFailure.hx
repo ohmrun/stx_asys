@@ -1,6 +1,6 @@
 package stx.fail;
 
-import stx.fs.path.pack.Raw;
+import stx.fs.path.Raw;
 
 @:using(stx.fail.PathParseFailure.PathParseFailureLift)
 enum PathParseFailureSum{

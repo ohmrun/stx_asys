@@ -1,4 +1,4 @@
-package stx.fs.path.pack;
+package stx.fs.path;
 
 /**
   Denormalized representation of a relative or absolute path, possibly including a file.

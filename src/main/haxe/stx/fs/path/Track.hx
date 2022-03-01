@@ -1,4 +1,4 @@
-package stx.fs.path.pack;
+package stx.fs.path;
 
 /**
   The portion of a normalized path between the `Stem` and the `Entry`

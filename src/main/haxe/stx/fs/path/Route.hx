@@ -1,11 +1,11 @@
-package stx.fs.path.pack;
+package stx.fs.path;
 
 /**
   The portion of a denormalized path between the `Stem` and the `Entry`
 **/
 typedef RouteDef = Cluster<Move>;
 
-@:using(stx.fs.path.pack.Route.RouteLift)
+@:using(stx.fs.path.Route.RouteLift)
 @:forward(lfold) abstract Route(RouteDef) from RouteDef to RouteDef{
   public function new(self) this = self;
   static public function lift(self:RouteDef):Route return new Route(self);

@@ -1,4 +1,4 @@
-package stx.fs.path.pack;
+package stx.fs.path;
 
 typedef EntryDef = {
               var name : String;
@@ -7,7 +7,7 @@ typedef EntryDef = {
 /**
   An entry in a `Directory`, i.e the filename and extension
 **/
-@:using(stx.fs.path.pack.Entry.EntryLift)
+@:using(stx.fs.path.Entry.EntryLift)
 @:forward abstract Entry(EntryDef) from EntryDef to EntryDef{
   public function new(self) this = self;
   static public function lift(self:EntryDef):Entry return new Entry(self);

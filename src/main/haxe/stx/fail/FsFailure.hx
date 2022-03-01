@@ -1,7 +1,7 @@
 package stx.fail;
 
-import stx.fs.path.pack.Archive;
-import stx.fs.path.pack.Directory;
+import stx.fs.path.Archive;
+import stx.fs.path.Directory;
 
 
 @:using(stx.fail.FsFailure.FsFailureLift)
