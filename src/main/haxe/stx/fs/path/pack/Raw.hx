@@ -125,30 +125,40 @@ class RawLift {
 					__.reject(__.fault().of(E_Path_PathParse(E_PathParse_NoHeadNode)));
 		});
 	}
+	//TODO eek out filename from new parsing conventions
 	static public function toAttachment(raw:Raw):Res<Attachment,PathFailure>{
-		return switch(raw.head()){
-			case Some(FPTRel)				: 
-				Res.lift(raw.tail().lfold(
+		__.log().debug(_ -> _.pure(raw.head()));
+		final data = (switch(raw.head()){
+			case Some(FPTRel)						: __.accept(raw.tail());
+			case Some(FPTDown(string))	: __.accept(raw);
+			default : __.reject(__.fault().of(E_Path_PathParse(E_PathParse_MalformedRaw(raw))));
+		});
+
+		final last = (raw.last().resolve(_ -> _.of((E_PathParse_MalformedRaw(raw):PathFailure))));
+		
+		return data.map(c -> c.rdropn(1)).flat_map(
+			raw -> raw.lfold(
 					(next:Token,memo:Res<MaybeAttachment,PathFailure>) -> memo.fold(
 						(v) -> switch(next){
 							case FPTDrive(_) 	: __.reject(__.fault().of(E_Path_PathParse(E_PathParse_MisplacedHeadNode)));
 							case FPTRel				: __.reject(__.fault().of(E_Path_PathParse(E_PathParse_MisplacedHeadNode)));
 							case FPTUp				: __.accept(v.snoc(From));
 							case FPTDown(str) : __.accept(v.snoc(Into(str)));
-							case FPTFile(n,e) : __.accept(v.name({ name : n, ext : e }));
+							case FPTFile(n,e) : __.reject(__.fault().of(E_Path_PathParse(E_PathParse_MalformedRaw(raw))));
 							case FPTSep				: __.accept(v);
 						},
 						__.reject
 					),
 					__.accept(new MaybeAttachment())
-				)).flat_map(
+				).flat_map(
+					(x) -> last.map(y -> __.couple(Entry.fromToken(y),x))
+				).flat_map(
 					(x) -> x.fst().fold(
-						(drive) -> __.accept(Attachment.make(drive,x.snd())),
+						(drive) -> __.accept(Attachment.make($type(drive),x.snd().snd())),
 						() 			-> __.reject(__.fault().of(E_Path_PathParse(E_PathParse_NoFileFoundOnAttachment(raw))))
 					)
-				);
-			default : __.reject(__.fault().of(E_Path_PathParse(E_PathParse_MalformedRaw(raw))));
-		}
+				)
+		);
 	}
 	static public function toArchive(raw:Raw):Res<Archive,PathFailure>{
 		return (switch(raw.head()){
