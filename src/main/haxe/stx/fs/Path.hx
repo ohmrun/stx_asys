@@ -89,14 +89,8 @@ typedef Location = {
   var entry : Option<Entry>;
 } 
 
-/**
-  * A parsed token to walk the directory tree.
-**/
-enum MoveSum{
-  Into(name:String);
-  From;
-}
-typedef Move                          = MoveSum;
+typedef Move    = stx.fs.path.pack.Move;
+typedef MoveSum = stx.fs.path.pack.Move.MoveSum;
 /**
   A valid filesystem node name.
 **/
