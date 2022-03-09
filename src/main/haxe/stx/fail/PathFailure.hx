@@ -7,6 +7,7 @@ enum PathFailureSum{
   E_Path_ReachedRoot;
   E_Path_ExpectedAbsolutePath;
   E_Path_ExpectedEntry;
+  E_Path_ExpectedDirectory;
   //E_Path_No
 }
 @:using(stx.fail.PathFailure.PathFailureLift)

@@ -4,6 +4,7 @@ using eu.ohmrun.Pml;
 
 using stx.fs.path.Directory;
 
+//TODO change `attach` to something else
 /**
   Represents an absolute path between the root of a file system
   to a known directory.
@@ -24,7 +25,7 @@ typedef DirectoryDef = {
       track : track
     });
   }
-  static public function fromArray(arr:Array<String>):Directory{
+static public function fromArray(arr:Array<String>):Directory{
     return arr.head().flat_map(
       (str) -> (str.charAt(str.length - 1) == ":").if_else(
         () -> Some(str),
@@ -292,6 +293,7 @@ class DirectoryLift{
       })
     );
   }
+  
   static public function is_root(self:Directory):Bool{
     return !self.track.is_defined();
   }
@@ -301,4 +303,7 @@ class DirectoryLift{
   //     () -> self.track.up().map(track -> Dir.make(dir.drive,track))
   //   );
   // }
+  static public function toAddress(self:DirectoryDef):Address{
+    return Address.make(self.drive,self.track,None);
+  }
 }

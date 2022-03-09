@@ -9,7 +9,7 @@ interface CwdApi{
 
 class Cwd implements CwdApi extends Clazz{
   public function pop():Attempt<HasDevice,Directory,FsFailure>{
-    trace(__.sys().cwd().get());
+    __.log().debug(__.sys().cwd().get());
     return 
       Path.parse(__.sys().cwd().get())
       .attempt(Raw._.toDirectory)

@@ -99,11 +99,23 @@ typedef Name                          = String;
 typedef PathFailure                   = stx.fail.PathFailure;
 typedef PathFailureSum                = stx.fail.PathFailure.PathFailureSum;
 
+/**
+  A denormalized absolute representation of steps to any filesystem node which may or may not have an Entry.
+**/
 typedef AddressDef                    = stx.fs.path.Address.AddressDef;
 /**
-  A representation of the location of any filesystem resource.
+  A denormalized absolute representation of steps to any filesystem node which may or may not have an Entry.
 **/
 typedef Address                       = stx.fs.path.Address;
+
+/**
+  A denormalized representation of steps to any filesystem node which may or may not be absolute.
+**/
+typedef JourneyDef                    = stx.fs.path.Journey.JourneyDef;
+/**
+  A denormalized representation of steps to any filesystem node which may or may not be absolute.
+**/
+typedef Journey                       = stx.fs.path.Journey;
 /**
  * A denormalized `Route` from a `Stem`.
 **/  

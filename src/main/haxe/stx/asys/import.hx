@@ -4,6 +4,8 @@ using Lambda;
 
 import tink.CoreApi;
 
+using stx.asys.Logging;
+
 #if (sys)
   import sys.FileSystem;
   import stx.Io.StdFile;

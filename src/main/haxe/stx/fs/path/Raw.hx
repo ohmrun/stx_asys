@@ -29,12 +29,12 @@ class RawLift {
 	static public function canonical(self:Raw,sep:Separator){
 		return self.prj().map(token -> token.canonical(sep)).lfold1((x,y) -> '${x}${y}').defv(".");
 	}
-  static public function toAddress(arr:Raw):Res<Address,PathFailure>{
+  static public function toJourney(arr:Raw):Res<Journey,PathFailure>{
 		var head = arr.head();
 		var rest = arr.tail();
 		return switch(head){
 			case None :
-				__.accept(Address.unit());
+				__.accept(Journey.unit());
 			case Some(v) :
 				var is_denormalized 					= false;
 				var is_absolute 							= false;
@@ -66,14 +66,14 @@ class RawLift {
 				}
 				for(node in rest){
 					switch (node){
-						case FPTSep : 
-						case FPTDrive(name):
+						case FPTSep 					: 
+						case FPTDrive(name) 	:
 							error = __.fault().of(E_Path_PathParse(E_PathParse_MisplacedHeadNode));
-						case FPTRel:
+						case FPTRel 					:
 							error = __.fault().of(E_Path_PathParse(E_PathParse_MisplacedHeadNode));
-						case FPTUp:
+						case FPTUp 						:
 							body.prj().push(From);
-						case FPTDown(str):
+						case FPTDown(str) 		:
 							body.prj().push(Into(str));
 						case FPTFile(str,null):
 							tail = Some(Entry.fromName(str));
@@ -97,7 +97,7 @@ class RawLift {
 					}else{
 						Track.unit();
 					}
-					__.accept(Address.make(
+					__.accept(Journey.make(
 						head,
 						is_denormalized.if_else(
 							() -> Left(Route.fromArray(body)),
@@ -172,7 +172,7 @@ class RawLift {
 				)
 		);
 	}
-	static public function toArchive(raw:Raw):Res<Archive,PathFailure>{
+	static public function toAddress(raw:Raw):Res<Address,PathFailure>{
 		return (switch(raw.head()){
 			case Some(FPTDrive(head)) : 
 				var drive : Drive = head;
@@ -194,19 +194,27 @@ class RawLift {
 				track.flat_map(
 					cluster -> entry.fold(
 						token -> switch(token){
-							case FPTDown(str) 		: __.accept(__.couple(Entry.make(str,null),cluster));
-							case FPTFile(nm,ext)	: __.accept(__.couple(Entry.make(nm,ext),cluster));
-							case FPTSep						: __.reject(__.fault().of(E_Path_PathParse(E_PathParse_ExpectedEntry(raw))));
+							case FPTDown(str) 		: __.accept(__.couple(None,cluster.snoc(str)));
+							case FPTFile(nm,ext)	: __.accept(__.couple(Some(Entry.make(nm,ext)),cluster));
+							case FPTSep						: __.accept(__.couple(None,cluster));
 							default 							: __.reject(__.fault().of(E_Path_PathParse(E_PathParse_MalformedRaw(raw))));
 						},
 						() -> __.reject(__.fault().of(E_Path_PathParse(E_PathParse_MalformedRaw(raw))))
 					)
 				).map(
-					(entry) -> Archive.make(drive,entry.snd(),entry.fst())
+					(entry) -> Address.make(drive,entry.snd(),entry.fst())
 				);
 			default : 
 					__.reject(__.fault().of(E_Path_PathParse(E_PathParse_NoHeadNode)));
 		});
+	}
+	static public function toArchive(raw:Raw):Res<Archive,PathFailure>{
+		return toAddress(raw).adjust(
+			(address) -> address.entry.fold(
+				ok -> __.accept(Archive.make(address.drive,address.track,ok)),
+				() -> __.reject(__.fault().of(E_Path_PathParse(E_PathParse_ExpectedEntry(raw))))
+			)
+		);
 	}
 	static public function kind(arr:Raw):Kind{
     var absolute              = false;
@@ -245,43 +253,30 @@ class RawLift {
 					case FPTSep  			: __.accept(arr);
 					default 					: __.reject(__.fault().of(E_Path_PathParse(E_PathParse_UnexpectedToken(next,raw))));
 				},
-				__.reject
+				 __.reject
 			),
 			__.accept([])
 		);
 	}
-	static public function realize(self:Raw):Attempt<HasDevice,Address,FsFailure>{
+	static public function absolutize(self:Raw):Attempt<HasDevice,Address,FsFailure>{
 		return __.attempt(
 			(state:HasDevice) -> {
 				final kind = kind(self);
 				if(!kind.normalized){
 					self = normalize(self);
 				}
-				final next = state.device.volume.isDirectory(self).adjust(
-					(bool) -> bool.if_else(
-						() -> (self.toAddress().errate(e -> (e:FsFailure))),
-						() -> {
-							final body = self.rdropn(1);
-							final tail = self.last().resolve(
-								_ -> _.of(E_PathParse_NoFileOnPath(self)).errate(e -> (e:FsFailure))
-							);
-							//$type(body);
-							final next = 
-								(body.toAddress().errate(e -> (e:FsFailure))).zip(
-									tail.flat_map(
-										(x:Token) -> Entry.fromToken(x)
-											 .resolve(
-												 _ -> _.of(E_PathParse_NoFileOnPath(self)).errate(e -> (e:FsFailure))
-											 )
-									)
-								)
-								.map(__.decouple((address:Address,entry:Entry) -> address.with_entry(entry)));
-							//$type(next);
-							return next;
-						}
-					)
-				);
-				return null;
+				final a = if(!kind.absolute){
+					state.device.shell.cwd.pop().adjust(
+						(dir) -> toTrack(self).map(
+							track -> dir.into(track)
+						).errate(e -> (e:FsFailure))
+					).map(
+						(dir) -> dir.toAddress()
+					);
+				}else{
+					__.attempt( (s:HasDevice) -> toAddress(self) ).errate(e -> (e:FsFailure));
+				}
+				return a.produce(state);
 			}
 		); 
 	}

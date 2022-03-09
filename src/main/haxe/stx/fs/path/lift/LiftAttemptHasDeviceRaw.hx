@@ -7,8 +7,8 @@ class LiftAttemptHasDeviceRaw{
   static public function toDirectory(self:Attempt<HasDevice,Raw,PathFailure>){
     return self.attempt(Raw._.toDirectory);
   }
-  static public function toAddress(self:Attempt<HasDevice,Raw,PathFailure>){
-    return self.attempt(Raw._.toAddress);
+  static public function toJourney(self:Attempt<HasDevice,Raw,PathFailure>){
+    return self.attempt(Raw._.toJourney);
   }
   static public function toAttachment(self:Attempt<HasDevice,Raw,PathFailure>){
     return self.attempt(Raw._.toAttachment);
