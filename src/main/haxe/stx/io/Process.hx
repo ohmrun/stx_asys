@@ -15,7 +15,7 @@ class ProcessCls{
 
   public var state(default,null)    : ProcessState;
 
-  static public function make0(command:Cluster<String>,?detached:Bool):ProcessCls{
+  @:noUsing static public function make0(command:Cluster<String>,?detached:Bool):ProcessCls{
     final proc                        = new sys.io.Process(command.head().fudge(), Std.downcast(command.tail(),Array),detached);
     final ins   : Output              = AsysStdOut.lift(proc.stdin).reply();
     final outs  : Input               = AsysStdIn.lift(proc.stdout).reply();
@@ -37,7 +37,7 @@ class ProcessCls{
           case Accept(IResState(s)) : 
             this.state = this.state.with_stdout(s);
           case Reject(err)          : 
-            this.state = err.val.fold(
+            this.state = err.data.fold(
               (declination) -> declination.fold(
                 (e) -> this.state.with_stdout(Io_Input_Error(e)),
                 (d) -> this.state.with_stdout(Io_Input_Error(E_Io_Digest(d)))
@@ -56,7 +56,7 @@ class ProcessCls{
           case Accept(IResState(s)) : 
             this.state = this.state.with_stderr(s);
           case Reject(err)          : 
-            this.state = err.val.fold(
+            this.state = err.data.fold(
               (declination) -> declination.fold(
                 (e) -> this.state.with_stderr(Io_Input_Error(e)),
                 (d) -> this.state.with_stderr(Io_Input_Error(E_Io_Digest(d)))
@@ -127,13 +127,13 @@ class ProcessLift{
 @:using(stx.io.Process.ProcessLift)
 abstract Process(ProcessDef) from ProcessDef to ProcessDef{
   public function new(self) this = self;
-  static public function lift(self:ProcessDef):Process return new Process(self);
+  @:noUsing static public function lift(self:ProcessDef):Process return new Process(self);
 
   public function prj():ProcessDef return this;
   private var self(get,never):Process;
   private function get_self():Process return lift(this);
 
-  static public function make0(command:Cluster<String>,?detached:Bool):Process{
+  @:noUsing static public function make0(command:Cluster<String>,?detached:Bool):Process{
     return Process.lift(ProcessCls.make0(command,detached).reply());
   }
 }

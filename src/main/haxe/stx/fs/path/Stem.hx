@@ -9,7 +9,7 @@ enum StemSum{
 }
 abstract Stem(StemSum) from StemSum to StemSum{
   public function new(self) this = self;
-  static public function lift(self:StemSum):Stem return new Stem(self);
+  @:noUsing static public function lift(self:StemSum):Stem return new Stem(self);
 
   public function prj():StemSum return this;
   private var self(get,never):Stem;

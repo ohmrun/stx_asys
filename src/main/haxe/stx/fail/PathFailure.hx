@@ -13,7 +13,7 @@ enum PathFailureSum{
 @:using(stx.fail.PathFailure.PathFailureLift)
 @:transitive abstract PathFailure(PathFailureSum) from PathFailureSum to PathFailureSum{
   public function new(self) this = self;
-  static public function lift(self:PathFailureSum):PathFailure return new PathFailure(self);
+  @:noUsing static public function lift(self:PathFailureSum):PathFailure return new PathFailure(self);
 
   public function prj():PathFailureSum return this;
   private var self(get,never):PathFailure;

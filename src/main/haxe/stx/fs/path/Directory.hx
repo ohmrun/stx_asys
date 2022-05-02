@@ -18,7 +18,7 @@ typedef DirectoryDef = {
   public function new(self) this = self;
   static public var _(default,never) = DirectoryLift;
   
-  static public function lift(self:DirectoryDef):Directory    return new Directory(self);
+  @:noUsing static public function lift(self:DirectoryDef):Directory    return new Directory(self);
   @:noUsing static public function make(drive:Drive,track:Track):Directory{
     return Directory.lift({
       drive : drive,
@@ -173,7 +173,7 @@ class DirectoryLift{
           __.log().trace('inject');
           var path = Directory.fromArray(next);
           return memo.fold(
-            (v:Rejection<FsFailure>) -> Execute.pure(v),
+            (v:Refuse<FsFailure>) -> Execute.pure(v),
             ()  -> exists(path).provide(env).point(
               (b) -> b.if_else(
                 () -> Execute.unit(),//TODO wtf
@@ -213,15 +213,15 @@ class DirectoryLift{
       );
     };
     return Produce.fromFunXR(fn).errata(
-      (e) -> e.fault().of(E_Fs_UnknownFSError(e.val))
+      (e) -> e.fault().of(E_Fs_UnknownFSError(e.data))
     );
   }
-  static public function tree(dir:Directory):Modulate<HasDevice,Expr<Entry>,FsFailure>{
+  static public function tree(dir:Directory):Modulate<HasDevice,PExpr<Entry>,FsFailure>{
     __.log().trace('tree: $dir');
     var init  = Arrange.fromFun1Attempt(entries).convert(Convert.Fun((x:Cluster<Either<String,Entry>>) -> x.toIterable()));
     var c     = Modulate.pure(dir).reframe().arrange(entries).convert(Convert.Fun((x:Cluster<Either<String,Entry>>) -> x.toIterable()));
     
-    function fn(either:Either<String,Entry>,t:Expr<Entry>):Modulate<HasDevice,Expr<Entry>,FsFailure>{
+    function fn(either:Either<String,Entry>,t:PExpr<Entry>):Modulate<HasDevice,PExpr<Entry>,FsFailure>{
       __.log().trace(_ -> _.pure(either));
       return switch(either){
         case Left(string) : 
@@ -232,7 +232,7 @@ class DirectoryLift{
           
           next.convert(
             function(t1){
-              return t.conflate(Group(Cons(Label(string),Cons(t1,Nil))));
+              return t.conflate(Group(Cons(Group(Cons(Label(string),Cons(t1,Nil))),Nil)));
             }
           );
         case Right(entry) : Modulate.pure(

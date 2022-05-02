@@ -10,7 +10,7 @@ enum ASysFailureSum{
 }
 @:transitive abstract ASysFailure(ASysFailureSum) from ASysFailureSum to ASysFailureSum{
   public function new(self) this = self;
-  static public function lift(self:ASysFailureSum):ASysFailure return new ASysFailure(self);
+  @:noUsing static public function lift(self:ASysFailureSum):ASysFailure return new ASysFailure(self);
 
   public function prj():ASysFailureSum return this;
   private var self(get,never):ASysFailure;

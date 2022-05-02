@@ -28,7 +28,7 @@ private class Interpreter{
               case IResState(state)  : switch(state){
                 case Io_Input_Closed(error,_) :
                   switch(error){
-                    case Some(err) : __.term(err.toRejection());
+                    case Some(err) : __.term(err.toRefuse());
                     case None      : __.term(__.fault().explain(_ -> _.e_input_unexpected_end()));
                   }
                 case Io_Input_Error(f)        : 

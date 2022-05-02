@@ -7,7 +7,7 @@ enum PathParseFailureSum{
   //E_Path_Parse_Parse
   E_PathParse_UnexpectedToken(token:Token,raw:Raw);
   //MalformedSource
-  E_PathParse_ParseErrorInfo(v:stx.parse.core.ParseError);
+  E_PathParse_ParseErrorInfo(v:stx.parse.core.ParseRefuse);
   E_PathParse_EmptyInput;
   E_PathParse_MalformedRaw(raw:Raw);
   
@@ -23,13 +23,13 @@ enum PathParseFailureSum{
 @:using(stx.fail.PathParseFailure.PathParseFailureLift)
 @:transitive abstract PathParseFailure(PathParseFailureSum) from PathParseFailureSum to PathParseFailureSum{
   public function new(self) this = self;
-  static public function lift(self:PathParseFailureSum):PathParseFailure return new PathParseFailure(self);
+  @:noUsing static public function lift(self:PathParseFailureSum):PathParseFailure return new PathParseFailure(self);
 
   public function prj():PathParseFailureSum return this;
   private var self(get,never):PathParseFailure;
   private function get_self():PathParseFailure return lift(this);
 
-  @:from static public function fromParseErrorInfo(self:stx.parse.core.ParseError){
+  @:from static public function fromParseErrorInfo(self:stx.parse.core.ParseRefuse){
     return lift(E_PathParse_ParseErrorInfo(self));
   }
 }

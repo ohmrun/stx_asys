@@ -23,7 +23,7 @@ enum FsFailureSum{
 @:transitive abstract FsFailure(FsFailureSum) from FsFailureSum to FsFailureSum{
   static public var _(default,never) = FsFailureLift;
   public function new(self) this = self;
-  static public function lift(self:FsFailureSum):FsFailure return new FsFailure(self);
+  @:noUsing static public function lift(self:FsFailureSum):FsFailure return new FsFailure(self);
 
   public function prj():FsFailureSum return this;
   private var self(get,never):FsFailure;

@@ -4,11 +4,11 @@ typedef ExitCodeDef = Option<Int>;
 
 @:forward abstract ExitCode(ExitCodeDef) from ExitCodeDef to ExitCodeDef{
   public function new(self) this = self;
-  static public function lift(self:ExitCodeDef):ExitCode return new ExitCode(self);
+  @:noUsing static public function lift(self:ExitCodeDef):ExitCode return new ExitCode(self);
   static public function unit():ExitCode{
     return lift(None);
   }
-  static public function make(self){
+  @:noUsing static public function make(self){
     return lift(Some(self));
   }
   public function prj():ExitCodeDef return this;

@@ -87,7 +87,7 @@ abstract StdOut(StdOutput) from StdOutput{
           output = Report.pure(__.fault().of(E_Io_Subsystem(e)));
         }
       }
-      __.log()('pushed $output');
+      __.log().debug('pushed $output');
       return output;
     }
     return __.hold(

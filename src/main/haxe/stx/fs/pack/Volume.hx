@@ -5,6 +5,7 @@ interface VolumeApi{
   public function parent(dir:Directory):Res<Directory,PathFailure>;
 
   public function read(archive:Archive,?binary : Bool = false):Produce<FileInput,FsFailure>;
+  //TODO change input to Address
   public function is_directory(self:Raw):Attempt<HasDevice,Bool,FsFailure>;
 }
 

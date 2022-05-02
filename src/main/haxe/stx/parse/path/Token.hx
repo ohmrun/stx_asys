@@ -10,7 +10,7 @@ enum TokenSum{
 }
 abstract Token(TokenSum) from TokenSum to TokenSum{
   public function new(self) this = self;
-  static public function lift(self:TokenSum):Token return new Token(self);
+  @:noUsing static public function lift(self:TokenSum):Token return new Token(self);
 
   public function prj():TokenSum return this;
   private var self(get,never):Token;

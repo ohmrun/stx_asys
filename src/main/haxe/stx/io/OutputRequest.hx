@@ -7,7 +7,7 @@ enum OutputRequestSum{
 }
 abstract OutputRequest(OutputRequestSum) from OutputRequestSum to OutputRequestSum{
   public function new(self) this = self;
-  static public function lift(self:OutputRequestSum):OutputRequest return new OutputRequest(self);
+  @:noUsing static public function lift(self:OutputRequestSum):OutputRequest return new OutputRequest(self);
 
   @:from static public function fromPacket(self:Packet):OutputRequest{
     return OReqValue(self);

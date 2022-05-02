@@ -9,7 +9,7 @@ interface DeviceApi{
 }
 
 class Device implements DeviceApi{
-  static public function make(distro,sep,volume,shell,env):Device{
+  @:noUsing static public function make(distro,sep,volume,shell,env):Device{
     return new Device(
       distro,
       sep,
@@ -18,7 +18,7 @@ class Device implements DeviceApi{
       env
     );
   }
-  static public function make0(distro:Distro):Device{
+  @:noUsing static public function make0(distro:Distro):Device{
     final sep = distro.is_windows() ? WinSeparator : PosixSeparator;
     return make(
       distro,
@@ -28,7 +28,7 @@ class Device implements DeviceApi{
       new Env()
     );
   }
-  static public function make1(?distro,?sep,?volume,?shell,?env){
+  @:noUsing static public function make1(?distro,?sep,?volume,?shell,?env){
     final distro  = __.option(distro).defv(new Distro()); 
     final sep     = __.option(sep).defv(distro.is_windows() ? WinSeparator : PosixSeparator);
     return make(

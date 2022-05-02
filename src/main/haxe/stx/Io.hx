@@ -26,8 +26,8 @@ typedef InputRequest        = stx.io.InputRequest;
 typedef OutputRequestSum    = stx.io.OutputRequest.OutputRequestSum;
 typedef OutputRequest       = stx.io.OutputRequest;
 
-typedef IoFailure           = stx.io.IoFailure;
-typedef IoFailureSum        = stx.io.IoFailure.IoFailureSum;
+typedef IoFailure           = stx.fail.IoFailure;
+typedef IoFailureSum        = stx.fail.IoFailure.IoFailureSum;
 
 typedef Process             = stx.io.Process;
 typedef ProcessDef          = stx.io.Process.ProcessDef;

@@ -9,7 +9,7 @@ enum InputStateSum{
 }
 @:forward abstract InputState(InputStateSum) from InputStateSum to InputStateSum{
   public function new(self) this = self;
-  static public function lift(self:InputStateSum):InputState return new InputState(self);
+  @:noUsing static public function lift(self:InputStateSum):InputState return new InputState(self);
 
   public function prj():InputStateSum return this;
   private var self(get,never):InputState;

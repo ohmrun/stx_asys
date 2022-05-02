@@ -8,7 +8,7 @@ typedef ProcessStateDef = {
 }
 @:forward abstract ProcessState(ProcessStateDef) from ProcessStateDef to ProcessStateDef{
   public function new(self) this = self;
-  static public function lift(self:ProcessStateDef):ProcessState return new ProcessState(self);
+  @:noUsing static public function lift(self:ProcessStateDef):ProcessState return new ProcessState(self);
 
   static public inline function make(status, ?exit_code, stderr = Io_Input_Unknown, stdout = Io_Input_Unknown){
     return lift({

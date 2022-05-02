@@ -12,10 +12,10 @@ typedef InputDef  = CoroutineSum<InputRequest,InputResponse,Noise,IoFailure>;
   public inline function new(self:InputDef){
     this = self;
   } 
-  static public function make0(ipt:StdIn){
+  @:noUsing static public function make0(ipt:StdIn){
     return new Input(ipt.reply());
   }
-  static public function lift(self:InputDef):Input return new Input(self);
+  @:noUsing static public function lift(self:InputDef):Input return new Input(self);
 
   @:from static public function fromTunnel(self:Tunnel<InputRequest,InputResponse,IoFailure>){
     return lift(self.prj());

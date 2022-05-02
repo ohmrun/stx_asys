@@ -13,7 +13,7 @@ typedef ArchiveDef = {
 @:forward abstract Archive(ArchiveDef) from ArchiveDef to ArchiveDef{
   static public var _(default,never) = ArchiveLift;
   public function new(self) this = self;
-  static public function lift(self:ArchiveDef):Archive return new Archive(self);
+  @:noUsing static public function lift(self:ArchiveDef):Archive return new Archive(self);
   @:noUsing static public function make(drive,track,entry) return lift({
     drive : drive,
     track : track,

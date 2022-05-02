@@ -10,7 +10,7 @@ typedef EntryDef = {
 @:using(stx.fs.path.Entry.EntryLift)
 @:forward abstract Entry(EntryDef) from EntryDef to EntryDef{
   public function new(self) this = self;
-  static public function lift(self:EntryDef):Entry return new Entry(self);
+  @:noUsing static public function lift(self:EntryDef):Entry return new Entry(self);
   @:from static public function parse(str:String){
     var val = str.split(".");
     return switch(val.length){

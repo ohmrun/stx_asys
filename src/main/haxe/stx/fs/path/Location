@@ -4,7 +4,7 @@ import stx.fs.path.type.Location in LocationT;
 
 abstract Location(LocationT) from LocationT to LocationT{
   public function new(self) this = self;
-  static public function lift(self:LocationT):Location return new Location(self);
+  @:noUsing static public function lift(self:LocationT):Location return new Location(self);
   
 
   

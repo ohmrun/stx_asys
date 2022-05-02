@@ -9,7 +9,7 @@ enum InputRequestSum{
 }
 abstract InputRequest(InputRequestSum) from InputRequestSum to InputRequestSum{
   public function new(self) this = self;
-  static public function lift(self:InputRequestSum):InputRequest return new InputRequest(self);
+  @:noUsing static public function lift(self:InputRequestSum):InputRequest return new InputRequest(self);
   
   @:from static public function fromIReqValue(bs:ByteSize):InputRequest{
     return lift(IReqValue(bs));

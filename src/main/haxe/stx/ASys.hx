@@ -1,5 +1,6 @@
 package stx;
 
+#if (sys || nodejs)
 class LiftASys{
   static public function asys(__:Wildcard){
     return new stx.asys.Module();
@@ -25,8 +26,10 @@ typedef CharKind          = stx.asys.CharKind;
 
 typedef WorkingDirectory  = stx.asys.WorkingDirectory;
 typedef HasDevice         = stx.asys.HasDevice;
+typedef HasDeviceApi      = stx.asys.HasDeviceApi;
 
 typedef Shell             = stx.asys.Shell;
 
+#end
 // typedef TargetSum         = stx.asys.Target.TargetSum;
 // typedef Target            = stx.asys.Target;

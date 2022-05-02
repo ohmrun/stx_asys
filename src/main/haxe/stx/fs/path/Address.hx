@@ -11,8 +11,8 @@ typedef AddressDef = {
 @:using(stx.fs.path.Address.AddressLift)
 @:forward abstract Address(AddressDef) from AddressDef to AddressDef{
   public function new(self) this = self;
-  static public function lift(self:AddressDef):Address return new Address(self);
-  static public function make(drive,track,entry){
+  @:noUsing static public function lift(self:AddressDef):Address return new Address(self);
+  @:noUsing static public function make(drive,track,entry){
     return lift({
       drive : drive,
       track : track,
@@ -36,7 +36,7 @@ typedef AddressDef = {
   private function get_self():Address return lift(this);
 }
 class AddressLift{
-  static public function lift(self:AddressDef):Address{
+  @:noUsing static public function lift(self:AddressDef):Address{
     return Address.lift(self);
   }
   static public function is_directory(self:AddressDef){
@@ -58,5 +58,8 @@ class AddressLift{
       self.drive,
       self.track
     );
+  }
+  static public function with_entry(self:AddressDef,entry:Entry){
+    return Archive.make(self.drive,self.track,entry);
   }
 }

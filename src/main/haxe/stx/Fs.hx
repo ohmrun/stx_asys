@@ -5,7 +5,7 @@ typedef FsFailureSum    = stx.fail.FsFailure.FsFailureSum;
 
 typedef FsString        = stx.fs.pack.FsString;
 
-#if (sys || hxnodejs)
+#if (sys || nodejs)
   typedef File          = stx.fs.pack.File;
   typedef Volume        = stx.fs.pack.Volume;
   typedef VolumeApi     = stx.fs.pack.Volume.VolumeApi;
@@ -13,7 +13,7 @@ typedef FsString        = stx.fs.pack.FsString;
   
 
 class LiftParseErrorInfoToPathParseFailure{
-  static public function toPathParseFailure(e:stx.parse.core.ParseError):PathParseFailure{
+  static public function toPathParseFailure(e:stx.parse.core.ParseRefuse):PathParseFailure{
     return E_PathParse_ParseErrorInfo(e);
   } 
 }

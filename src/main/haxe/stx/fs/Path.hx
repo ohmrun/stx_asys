@@ -30,7 +30,7 @@ class Path{
                     .flat_map((x:Option<Array<Token>>) -> x)
                     .resolve(f -> f.explain(_ -> _.e_undefined()))
                     .map(Cluster.lift),
-                ()      -> res.fails().toRes().map(x -> x.defv([])).errate( (e) -> e.toPathParseFailure().toPathFailure() ) 
+                ()      -> (res.fails()).toRes().map(x -> x.defv([])).errate( (e) -> e.toPathParseFailure().toPathFailure() ) 
             )
             )
           ).defv(Provide.pure(__.reject(__.fault().of(E_Path_PathParse(E_PathParse_EmptyInput)))))

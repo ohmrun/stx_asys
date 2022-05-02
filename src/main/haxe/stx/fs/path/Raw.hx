@@ -295,7 +295,7 @@ class RawLift {
 }
 
 @:forward abstract MaybeAttachment(Couple<Option<Entry>,Route>){
-	static public function lift(clause:Couple<Option<Entry>,Route>):MaybeAttachment{
+	@:noUsing static public function lift(clause:Couple<Option<Entry>,Route>):MaybeAttachment{
 		return new MaybeAttachment(clause);
 	}
 	public function new(?self:Couple<Option<Entry>,Route>){

@@ -5,10 +5,12 @@ import stx.alias.StdThread;
 import stx.fail.PathFailure;
 import stx.fail.PathParseFailure;
 import stx.fail.ASysFailure;
+import stx.fail.FsFailure;
+import stx.fail.IoFailure;
 
 import haxe.io.Eof;
 
-#if (sys || hxnodejs)
+#if (sys || nodejs)
   import sys.FileSystem;
   import sys.io.FileInput;
   import sys.io.FileOutput;
@@ -22,6 +24,7 @@ using tink.CoreApi;
 
 
 using stx.Pico;
+using stx.Fail;
 using stx.Nano;
 using stx.Log;
 using stx.Fn;

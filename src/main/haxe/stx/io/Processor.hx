@@ -86,7 +86,7 @@ class ProcessorCls<R>{
                 __.await(PReqTouch,f);
             }
           case PResError(raw)  :
-            //Rejection<ProcessFailure>
+            //Refuse<ProcessFailure>
             __.ended(End(raw));
           case PResOffer(req)   : 
             //ProcessRequest
@@ -99,7 +99,7 @@ class ProcessorCls<R>{
 @:using(stx.io.Processor.ProcessorLift)
 abstract Processor<R>(ProcessorDef<R>) from ProcessorDef<R> to ProcessorDef<R>{
   public function new(self) this = self;
-  static public function lift<R>(self:ProcessorDef<R>):Processor<R> return new Processor(self);
+  @:noUsing static public function lift<R>(self:ProcessorDef<R>):Processor<R> return new Processor(self);
 
   public function prj():ProcessorDef<R> return this;
   private var self(get,never):Processor<R>;

@@ -7,7 +7,7 @@ enum ProcessStatusSum{
 }
 abstract ProcessStatus(ProcessStatusSum) from ProcessStatusSum to ProcessStatusSum{
   public function new(self) this = self;
-  static public function lift(self:ProcessStatusSum):ProcessStatus return new ProcessStatus(self);
+  @:noUsing static public function lift(self:ProcessStatusSum):ProcessStatus return new ProcessStatus(self);
 
   public function prj():ProcessStatusSum return this;
   private var self(get,never):ProcessStatus;
