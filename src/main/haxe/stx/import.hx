@@ -22,7 +22,7 @@ import haxe.io.Eof;
 
 using tink.CoreApi;
 
-
+using stx.Ds;
 using stx.Pico;
 using stx.Fail;
 using stx.Nano;

@@ -232,19 +232,19 @@ class DirectoryLift{
           
           next.convert(
             function(t1){
-              return t.conflate(Group(Cons(Group(Cons(Label(string),Cons(t1,Nil))),Nil)));
+              return t.conflate(PGroup(Cons(PGroup(Cons(PLabel(string),Cons(t1,Nil))),Nil)));
             }
           );
         case Right(entry) : Modulate.pure(
-            t.conflate(Value(entry))
+            t.conflate(PValue(entry))
           );
       }
     }
-    var ut  = Arrange.pure(Empty);
+    var ut  = Arrange.pure(PEmpty);
     var d   = Arrange.bind_fold.bind(fn).fn().then( _ -> _.defv(ut));
     var e   = c.arrangement(d).toModulate();
     var f = e.mapi(
-      (env) -> __.couple(Empty,env)
+      (env) -> __.couple(PEmpty,env)
     );
     //$type(a);
     // $type(b);
