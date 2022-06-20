@@ -33,7 +33,7 @@ abstract Keyboard(KeyboardDef) from KeyboardDef to KeyboardDef{
         }
       );
     }
-    return lift((shell.stdin()));
+    return lift(turn(shell.stdin()));
   }
 }
 class KeyboardLift{
