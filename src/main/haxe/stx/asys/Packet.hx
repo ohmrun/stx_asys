@@ -5,6 +5,12 @@ typedef PacketDef = {
   var type : ByteSize;
 }
 @:forward abstract Packet(PacketDef) from PacketDef{
+  @:noUsing static public function make(data,type):Packet{
+    return {
+      data : data,
+      type : type
+    }
+  }
   @:from static public function fromString(str:String):Packet{
   return {
       data : Textal(str),

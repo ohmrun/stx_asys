@@ -17,6 +17,9 @@ typedef InputDef  = CoroutineSum<InputRequest,InputResponse,Noise,IoFailure>;
   }
   @:noUsing static public function lift(self:InputDef):Input return new Input(self);
 
+  static public function Keyboard(shell:ShellApi):Input{
+    return lift(stx.io.input.term.Keyboard.make(shell));
+  }
   @:from static public function fromTunnel(self:Tunnel<InputRequest,InputResponse,IoFailure>){
     return lift(self.prj());
   }

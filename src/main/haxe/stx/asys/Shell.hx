@@ -8,9 +8,10 @@ interface ShellApi{
   public function stderr():Output;
   public function stdout():Output;
 
+ 
+  public final cwd:Cwd;
   
-  public var cwd(default,null):Cwd;
-  
+  public function byte():Produce<Int,ASysFailure>; 
   //public function command
   //public var env(default,null)        : Env;
 }
@@ -23,7 +24,7 @@ class Shell implements ShellApi extends Clazz{
     super();
     cwd = new Cwd();
   }
-  public var cwd(default,null):Cwd;
+  public final cwd:Cwd;
 
   public function print(v:Dynamic):Future<Noise>{
     return Future.irreversible(cb -> {std.Sys.print(v);cb(Noise);});
@@ -40,10 +41,6 @@ class Shell implements ShellApi extends Clazz{
   public function stderr(){
     return new Output(new StdOut(std.Sys.stderr()));
   }
-  // public function char():Produce<Int>{
-  //   return () -> Sys.getChar(false);
-  // }
-
   public function byte():Produce<Int,ASysFailure>{
     return Produce.fromFunXR(std.Sys.getChar.bind(false));
   }
