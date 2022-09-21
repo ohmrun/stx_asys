@@ -2,9 +2,9 @@ package stx.io;
 
 typedef ProcessFailure                  = stx.fail.ProcessFailure;
 
-typedef Process                         = stx.io.process.Process;
-typedef ProcessCls                      = stx.io.process.Process.ProcessCls;
-typedef ProcessDef                      = stx.io.process.Process.ProcessDef;
+typedef ProcessServer                   = stx.io.process.ProcessServer;
+typedef ProcessServerCls                = stx.io.process.ProcessServer.ProcessServerCls;
+typedef ProcessServerDef                = stx.io.process.ProcessServer.ProcessDef;
 
 typedef ProcessClientDef<R>             = stx.io.process.ProcessClient.ProcessClientDef<R>;
 typedef ProcessClient<R>                = stx.io.process.ProcessClient<R>;

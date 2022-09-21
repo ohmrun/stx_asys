@@ -4,10 +4,10 @@ import stx.io.StdIn  in AsysStdIn;
 import stx.io.StdOut in AsysStdOut;
 
 
-typedef ProcessDef = ServerDef<ProcessRequest,ProcessResponse,Noise,ProcessFailure>;
+typedef ProcessServerDef = ServerDef<ProcessRequest,ProcessResponse,Noise,ProcessFailure>;
 
-
-class ProcessCls{
+//ProcessServerConstructor
+class ProcessServerCls{
   private var proc                  : sys.io.Process;
   private var stdin                 : Output;
   private var stdout                : Input;
@@ -70,7 +70,7 @@ class ProcessCls{
     );
     this.state = this.state.with_exit_code(ExitCode.lift(proc.exitCode(block)));
   }
-  public function reply():ProcessDef{
+  public function reply():ProcessServerDef{
     return __.yield(
       PResState(this.state),
       function rec(req:ProcessRequest){
@@ -112,24 +112,24 @@ class ProcessCls{
     );
   }
 }
-class ProcessLift{
-  static inline public function lift(self:ProcessDef):Process{
+class ProcessServerLift{
+  static inline public function lift(self:ProcessServerDef):Process{
     return Process.lift(self);
   }
   static public function provide(self:Process,req:ProcessRequest):Process{
     return lift(Server._.provide(self.prj(),req));
   }
-  static public function drain(self:ProcessDef,?buffer):Process{
+  static public function drain(self:ProcessServerDef,?buffer):Process{
     var that  = provide(self,PReqInput(IReqTotal(buffer),false));
     return that;
   }
 }
 @:using(stx.io.process.Process.ProcessLift)
-abstract Process(ProcessDef) from ProcessDef to ProcessDef{
+abstract ProcessServer(ProcessServerDef) from ProcessServerDef to ProcessServerDef{
   public function new(self) this = self;
-  @:noUsing static public function lift(self:ProcessDef):Process return new Process(self);
+  @:noUsing static public function lift(self:ProcessServerDef):Process return new Process(self);
 
-  public function prj():ProcessDef return this;
+  public function prj():ProcessServerDef return this;
   private var self(get,never):Process;
   private function get_self():Process return lift(this);
 
