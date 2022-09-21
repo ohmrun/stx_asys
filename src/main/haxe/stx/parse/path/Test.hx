@@ -13,7 +13,7 @@ class Test{
           log.includes.push("stx/parse");
           log.includes.push("stx/parse/path");
           log.includes.push("stx/parse/parser/With");
-    __.test(
+    __.test().run(
       [
         new PosixTest(),
         //new Issue1(),

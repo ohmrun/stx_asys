@@ -1,4 +1,4 @@
-package stx.io;
+package stx.io.input;
 
 enum InputResponse{
   IResValue(packet:Packet);
@@ -6,8 +6,3 @@ enum InputResponse{
   IResSpent;
   IResState(state:InputState);
 }
-//type:Option<ByteSize>
-// typedef PacketDef = {
-//   final data : Bytes;
-//   final type : Option<ByteSize>;
-// }

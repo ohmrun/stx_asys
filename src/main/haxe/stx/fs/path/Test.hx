@@ -9,7 +9,7 @@ class Test{
           log.includes.push("eu/ohmrun/fletcher");
           log.includes.push("**/*");
           log.level = TRACE;
-    __.test(
+    __.test().run(
       [new DirectoryTest()],
       []
     );

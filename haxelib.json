@@ -31,8 +31,5 @@
       "fletcher"        : "git:https://github.com/ohmrun/fletcher.git",
       "pml"             : "git:https://github.com/ohmrun/pml.git"
     },
-    "devDependencies" : {
-        "stx_bake"          : "git:https://github.com/ohmrun/stx_bake.git"
-    },
     "classPath": "src/main/haxe"
 }

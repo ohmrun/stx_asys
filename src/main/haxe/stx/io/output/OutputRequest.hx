@@ -1,4 +1,4 @@
-package stx.io;
+package stx.io.output;
 
 enum OutputRequestSum{
   OReqValue(packet:Packet);

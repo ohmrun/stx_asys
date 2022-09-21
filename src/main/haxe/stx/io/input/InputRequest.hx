@@ -1,4 +1,4 @@
-package stx.io;
+package stx.io.input;
 
 enum InputRequestSum{
   IReqState;

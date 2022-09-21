@@ -15,7 +15,7 @@ class Test{
         log.level = DEBUG;
         log.includes.push("stx/io");
     __.log().info('stx.io::Test');
-    __.test([
+    __.test().run([
       new ProcessTest()
     ],[]);
   }

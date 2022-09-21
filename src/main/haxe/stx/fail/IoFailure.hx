@@ -8,7 +8,6 @@ enum IoFailureSum{
   E_Io_UnsupportedValue;
   E_Io_Digest(digest:Digest);
   E_Io_Exhausted(retry:Retry,no_value_found:Bool);
-
 }
 
 @:transitive abstract IoFailure(IoFailureSum) from IoFailureSum to IoFailureSum{

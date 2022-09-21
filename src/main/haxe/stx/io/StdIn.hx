@@ -73,7 +73,7 @@ abstract StdIn(StdInput) from StdInput{
         err  = __.fault().of(E_Io_Subsystem(Custom(e)));
       }
       __.log().trace('pulled: $prim');
-      var out : Res<InputResponse,IoFailure> = __.option(err).map(__.reject).def(
+      var out : Res<InputResponse,IoFailure> = __.option(err).map(e -> __.reject(e)).def(
         ()-> __.accept(prim)
       );
       return out;

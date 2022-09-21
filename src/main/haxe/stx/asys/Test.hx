@@ -15,7 +15,7 @@ class Test{
         f.reinstate  = true;
 
         f.level = TRACE;
-    __.test([
+    __.test().run([
       // new FsParseTest(),
       // new AsysTest(),
       // new SocketTest(),

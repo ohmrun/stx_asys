@@ -159,7 +159,7 @@ class RawLift {
 							case FPTFile(n,e) : __.reject(__.fault().of(E_Path_PathParse(E_PathParse_MalformedRaw(raw))));
 							case FPTSep				: __.accept(v);
 						},
-						__.reject
+						e -> __.reject(e)
 					),
 					__.accept(new MaybeAttachment())
 				).flat_map(
@@ -187,7 +187,7 @@ class RawLift {
 							case FPTDown(str) 			: memo.map( arr -> arr.snoc(str));
 							case FPTFile(nm,ext) 	  : __.reject(__.fault().of(E_Path_PathParse(E_PathParse_MalformedRaw(raw))));
 						},
-						__.reject
+						e -> __.reject(e)
 					),
 					__.accept(Cluster.unit())
 				);
@@ -253,7 +253,7 @@ class RawLift {
 					case FPTSep  			: __.accept(arr);
 					default 					: __.reject(__.fault().of(E_Path_PathParse(E_PathParse_UnexpectedToken(next,raw))));
 				},
-				 __.reject
+				 e -> __.reject(e)
 			),
 			__.accept([])
 		);

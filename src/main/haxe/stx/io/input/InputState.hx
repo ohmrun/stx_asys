@@ -1,4 +1,4 @@
-package stx.io;
+package stx.io.input;
 
 enum InputStateSum{
   Io_Input_Unknown;

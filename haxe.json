@@ -1,6 +1,5 @@
 {
-  "build" : { 
-    "--connect" : "9090",
+  "build" : {
     "-lib" : [
       "tink_core",
       "stx_pico",
@@ -11,6 +10,7 @@
       "stx_coroutine",
       "stx_parse",
       "stx_bake",
+      "stx_test",
       "fletcher",
       "pml"
     ],
