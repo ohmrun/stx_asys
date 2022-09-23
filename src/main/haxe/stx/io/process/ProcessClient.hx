@@ -1,5 +1,8 @@
 package stx.io.process;
 
+/**
+  Await `ProcessRequest`'s to be sent to a `ProcessServer`, handle `ProcessResponse`'s
+**/
 typedef ProcessClientDef<R> = stx.proxy.core.Client.ClientDef<ProcessRequest,ProcessResponse,R,ProcessFailure>;
 
 @:using(stx.io.process.ProcessClient.ProcessClientLift)

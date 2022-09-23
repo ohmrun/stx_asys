@@ -1,0 +1,6 @@
+-cp  src/test
+-main  CharacterPrinter
+-cmd mkdir -p stx/tmp/charater_printer
+-hl    stx/tmp/character_printer/character_printer.c
+#--interp
+-cmd  gcc -O3 -o stx/home/ohmrun.eu/bin/character_printer -std=c11 -I stx/tmp/character_printer/ stx/tmp/character_printer/character_printer.c -lhl        

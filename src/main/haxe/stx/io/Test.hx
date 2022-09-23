@@ -9,6 +9,11 @@ using stx.Test;
 import stx.io.test.*;
 
 class Test{
+  static public function tests(){
+    return [
+      new ProcessCharacteristicsTest()
+    ];
+  }
   static function main(){
     trace('stx.io.Test');
     var log       = __.log().global;
