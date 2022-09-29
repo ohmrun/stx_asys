@@ -53,6 +53,7 @@
       }
     },
     "stx.io" : {
+      "--resource" : "tests.pml@tests",
       "test" : {
         "-main" : "stx.io.Test",
         "interp" : {

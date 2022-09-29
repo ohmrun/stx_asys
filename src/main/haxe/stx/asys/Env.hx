@@ -1,6 +1,6 @@
 package stx.asys;
 
-using stx.Sys;
+using stx.System;
 
 interface EnvApi{ 
   public function get(string:String): Produce<Option<String>,ASysFailure>;
@@ -11,7 +11,7 @@ class Env implements EnvApi extends Clazz{
     return Produce.fromFunXRes(() -> try{
       __.accept(__.sys().env(str));
     }catch(e:Dynamic){
-      __.reject(__.fault().of(E_EnvironmentVariablesInaccessible));
+      __.reject(__.fault().of(E_ASys_EnvironmentVariablesInaccessible(str)));
     });
   }
   static public function Shim(map:haxe.ds.Map<String,String>):Env{

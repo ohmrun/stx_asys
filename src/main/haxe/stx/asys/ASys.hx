@@ -5,6 +5,9 @@ typedef StdFile = stx.asys.alias.StdFile;
 interface ASysApi{
   public function local():HasDevice;
   public function sleep(float:Float):Future<Noise>;
+
+  public function user():UserApi;
+
   public function stderr():stx.io.Output;
   public function stdout():stx.io.Output;
   public function stdin():stx.io.Input;
@@ -32,5 +35,8 @@ class ASys implements ASysApi{
   }
   public function local():HasDevice{
     return { device : Device.make0(new Distro()) };
+  }
+  public function user():UserApi{
+    return new User(local().device);
   }
 }

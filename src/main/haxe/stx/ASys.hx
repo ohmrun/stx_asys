@@ -30,4 +30,7 @@ package stx;
 
   typedef Shell             = stx.asys.Shell;
   typedef ShellApi          = stx.asys.Shell.ShellApi;
+
+  typedef User              = stx.asys.User;
+  typedef UserApi           = stx.asys.User.UserApi;
 #end

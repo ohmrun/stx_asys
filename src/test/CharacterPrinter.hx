@@ -1,5 +1,4 @@
 
-
 class CharacterPrinter{
   static public function main(){
     while(true){

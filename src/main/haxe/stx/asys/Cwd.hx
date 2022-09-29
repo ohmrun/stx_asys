@@ -1,6 +1,6 @@
 package stx.asys;
 
-using stx.Sys;
+using stx.System;
 
 interface CwdApi{
   public function pop():Attempt<HasDevice,Directory,FsFailure>;

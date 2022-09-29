@@ -1,9 +1,9 @@
 package stx.fail;
 
 enum ASysFailureSum{
-
-  E_UnknownDistroName;
-  E_EnvironmentVariablesInaccessible;
+  E_ASys_UndefinedHomePath;
+  E_ASys_UnknownDistroName;
+  E_ASys_EnvironmentVariablesInaccessible(name:String);
   E_ASys_SubSystem(err:Dynamic);
 
   E_ASys_Fs(fs:FsFailure);

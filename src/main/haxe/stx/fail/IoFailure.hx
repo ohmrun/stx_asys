@@ -4,7 +4,10 @@ enum IoFailureSum{
   E_Io_Subsystem(e:haxe.io.Error);
   E_Io_TypeError;
   E_Io_SourceNotFound;
+@stx.fail.of('Eof')
   E_Io_EndOfFile;
+@stx.fail.of('Invalid string')
+  E_Io_InvalidString;
   E_Io_UnsupportedValue;
   E_Io_Digest(digest:Digest);
   E_Io_Exhausted(retry:Retry,no_value_found:Bool);

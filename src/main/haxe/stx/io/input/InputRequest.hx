@@ -1,9 +1,21 @@
 package stx.io.input;
 
 enum InputRequestSum{
+  /**
+    Request State
+  **/
   IReqState;
+  /**
+    Calls readAll under the hood, so won't return until exit.
+  **/
   IReqTotal(?buffer_size:Int);
+  /**
+    Request Typed Value
+  **/
   IReqValue(bs:ByteSize);
+  /**
+    Request Bytes
+  **/
   IReqBytes(pos:Int,len:Int);
   IReqClose;
 }

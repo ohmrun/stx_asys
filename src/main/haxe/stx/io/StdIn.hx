@@ -46,7 +46,7 @@ abstract StdIn(StdInput) from StdInput{
               state = Io_Input_Closed(None,true);
               ip.close(); 
           }
-          IResSpent;
+          IResStarved;
         case IReqTotal(buffer_size) :
           var bytes = ip.readAll(buffer_size);
           IResBytes(bytes);
@@ -62,7 +62,7 @@ abstract StdIn(StdInput) from StdInput{
       }catch(e:Eof){
         __.log().error('pull fail $e');
         state = Io_Input_Closed(None,false);
-        prim  = IResSpent;
+        prim  = IResStarved;
       }catch(e:haxe.io.Error){
         __.log().error('pull fail $e');
         state = Io_Input_Closed(Some(Error.make(Some(Std.string(e)),None,None)),false);
@@ -71,14 +71,14 @@ abstract StdIn(StdInput) from StdInput{
         state = Io_Input_Closed(Some(Error.make(Some(Std.string(e)),None,None)),false);
         __.log().error('pull fail $e');
         err  = __.fault().of(E_Io_Subsystem(Custom(e)));
-      }
+       }
       __.log().trace('pulled: $prim');
       var out : Res<InputResponse,IoFailure> = __.option(err).map(e -> __.reject(e)).def(
         ()-> __.accept(prim)
       );
       return out;
     };
-    //TODO implement Control4
+    //TODO implement Control
     return Tunnel.lift(__.tran(
       function rec(ipt:InputRequest):Coroutine<InputRequest,InputResponse,Noise,IoFailure>{
         return switch([state,ipt]){
