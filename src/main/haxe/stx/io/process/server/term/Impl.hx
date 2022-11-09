@@ -15,6 +15,7 @@ class Impl{
   public var state(default,null)    : ProcessState;
 
   @:noUsing static public function makeI(command:Cluster<String>,?detached:Bool):Impl{
+    __.log().debug(command.join(" "));
     final proc                        = new sys.io.Process(command.head().fudge(), Std.downcast(command.tail(),Array),detached);
     final ins   : Output              = AsysStdOut.lift(proc.stdin).reply();
     final outs  : Input               = AsysStdIn.lift(proc.stdout).reply();
@@ -67,12 +68,19 @@ class Impl{
         }
       }
     );
-    this.state = this.state.with_exit_code(ExitCode.lift(proc.exitCode(block)));
+    this.state = this.state.with_exit_code(
+      #if interp
+        ExitCode.unit()
+      #else
+        ExitCode.lift(proc.exitCode(block))
+      #end
+    );
   }
   public function reply():ProcessServerDef{
     return __.yield(
       PResState(this.state),
       function rec(req:ProcessRequest){
+        __.log().trace(_ -> _.thunk(() -> req));
         return switch(this.state){
           case { status : ( Io_Process_Init | Io_Process_Open ) } :
             switch(req){

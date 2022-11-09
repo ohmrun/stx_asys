@@ -49,13 +49,14 @@ abstract StdIn(StdInput) from StdInput{
           IResStarved;
         case IReqTotal(buffer_size) :
           var bytes = ip.readAll(buffer_size);
+          //trace(bytes.toString());
           IResBytes(bytes);
       }
     }
     final pull = (un:InputRequest) -> {
-      __.log().trace("pulling");
+      __.log().trace('pulling $un');
       var prim : InputResponse              = null;
-      var err  : Refuse<IoFailure>       = null;
+      var err  : Refuse<IoFailure>        = null;
       try{
         prim = apply(this,un);
         __.log().trace('pull ok');

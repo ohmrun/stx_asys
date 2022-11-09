@@ -15,8 +15,14 @@ abstract ProcessClient<R>(ProcessClientDef<R>) from ProcessClientDef<R> to Proce
   private var self(get,never):ProcessClient<R>;
   private function get_self():ProcessClient<R> return lift(this);
 
-static public function Reply():ProcessClient<Bytes>{
+  static public function Reply():ProcessClient<Bytes>{
     return lift(new stx.io.process.client.term.Reply());
+  }
+  static public function NotErrored<R>(next:ProcessClientDef<R>):ProcessClient<R>{
+    return lift(stx.io.process.client.term.NotErrored.make(next));
+  }
+  static public function Timer<R>(next:ProcessClientDef<R>,ms:Int):ProcessClient<R>{
+    return lift(stx.io.process.client.term.Timer.make(ms,next));
   }
 }
 class ProcessClientLift{

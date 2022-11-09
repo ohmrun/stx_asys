@@ -14,29 +14,35 @@ class Path{
     return new PathApi();
   }
   static public function parse(str:String):Attempt<HasDevice,Raw,PathFailure>{
-    return Attempt.fromFun1Produce(
+    return Attempt.fromFun1Res(
       (env:HasDevice) -> {
         __.log().debug(_ -> _.pure(env));
-        return Produce.fromProvide(__.option(str).map(
-            (s:String) -> env.device.distro.is_windows().if_else(
-              () -> new Windows().asBase(),
-              () -> new Posix().asBase()
-            ).asParser()
-            .provide(s.reader())
-            .convert(
-              (res:ParseResult<String,Array<Token>>) -> __.log().through()(res).is_ok().if_else(
-                ()      -> 
-                  __.option(res.value)
-                    .flat_map((x:Option<Array<Token>>) -> x)
-                    .resolve(f -> f.explain(_ -> _.e_undefined()))
-                    .map(Cluster.lift),
-                ()      -> (res.fails()).toRes().map(x -> x.defv([])).errate( (e) -> e.toPathParseFailure().toPathFailure() ) 
-            )
-            )
-          ).defv(Provide.pure(__.reject(__.fault().of(E_Path_PathParse(E_PathParse_EmptyInput)))))
-        );
+          final result = __.option(str).map(
+              (s:String) -> (env.device.distro.is_windows().if_else(
+                () -> new Windows().asBase(),
+                () -> new Posix().asBase()
+              ).asParser().apply(s.reader())).toRes().adjust(
+                opt -> opt.fold(
+                  ok -> __.accept(ok),
+                  () -> __.reject(ParseFailure.make(0,'no output',true).toRefuse())
+                )
+              )
+          ).def(
+            () -> {
+              __.log().trace("default");
+              final reader = "".reader();
+              return reader.no('no input').toRes().adjust(
+                opt -> opt.fold(
+                  ok -> __.accept(ok),
+                  () -> __.reject(ParseFailure.make(0,'no output',true).toRefuse())
+                )
+              );
+            }
+          );
+          __.log().debug(_ -> _.pure(result));
+          return result;
       }
-    );
+    ).errate( (e) -> e.toPathParseFailure().toPathFailure() );
   }
 }
 

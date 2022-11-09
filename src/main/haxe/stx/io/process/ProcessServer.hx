@@ -29,6 +29,9 @@ class ProcessServerLift{
   @:noUsing static public function makeI(command:Cluster<String>,?detached:Bool):ProcessServer{
     return ProcessServer.lift(ProcessServerCls.makeI(command,detached).reply());
   }
+  @:noUsing static public function make(command:Cluster<String>,?detached:Bool):ProcessServer{
+    return ProcessServer.lift(ProcessServerCls.makeI(command,detached).reply());
+  }
   @:to public function toProxy():Proxy<Closed,Noise,ProcessRequest,ProcessResponse,Noise,ProcessFailure>{
     return this.prj();
   }

@@ -1,5 +1,9 @@
 package stx.io;
 
+class Process{
+  
+}
+typedef ProcessFailureSum               = stx.fail.ProcessFailure.ProcessFailureSum;
 typedef ProcessFailure                  = stx.fail.ProcessFailure;
 
 typedef ProcessServer                   = stx.io.process.ProcessServer;
@@ -8,6 +12,10 @@ typedef ProcessServerDef                = stx.io.process.ProcessServer.ProcessSe
 
 typedef ProcessClientDef<R>             = stx.io.process.ProcessClient.ProcessClientDef<R>;
 typedef ProcessClient<R>                = stx.io.process.ProcessClient<R>;
+
+typedef ProcessClientCatDef<R>          = stx.io.process.ProcessClientCat.ProcessClientCatDef<R>;
+typedef ProcessClientCat<R>             = stx.io.process.ProcessClientCat<R>;
+
 
 typedef ProcessRequest                  = stx.io.process.ProcessRequest;
 typedef ProcessResponse                 = stx.io.process.ProcessResponse;

@@ -5,6 +5,7 @@ typedef ProcessStateDef = {
   final exit_code       : ExitCode;
   final stdout          : InputState;
   final stderr          : InputState;
+  
 }
 @:forward abstract ProcessState(ProcessStateDef) from ProcessStateDef to ProcessStateDef{
   public function new(self) this = self;

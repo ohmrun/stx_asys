@@ -31,7 +31,10 @@ using stx.Io;
 using stx.fs.Path;
 
 using stx.ASys;
+
+#if stx_test
 using stx.Test;
+#end 
 
 using stx.asys.Blot;
 

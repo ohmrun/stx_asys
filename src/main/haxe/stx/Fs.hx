@@ -13,7 +13,7 @@ typedef FsString        = stx.fs.pack.FsString;
   
 
 class LiftParseErrorInfoToPathParseFailure{
-  static public function toPathParseFailure(e:stx.parse.core.ParseRefuse):PathParseFailure{
+  static public function toPathParseFailure(e:ParseFailure):PathParseFailure{
     return E_PathParse_ParseErrorInfo(e);
   } 
 }

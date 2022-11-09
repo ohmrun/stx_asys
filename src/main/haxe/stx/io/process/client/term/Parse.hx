@@ -3,7 +3,7 @@ package stx.io.process.client.term;
 /**
 
 **/
-abstract Reply(ProcessClientDef<Bytes>) from ProcessClientDef<Bytes> to ProcessClientDef<Bytes>{
+abstract Parse(ProcessClientDef<Bytes>) from ProcessClientDef<Bytes> to ProcessClientDef<Bytes>{
   public function new(){
     this = __.await(
       PReqInput(IReqTotal(),false),

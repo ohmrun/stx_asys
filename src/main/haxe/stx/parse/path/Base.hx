@@ -2,6 +2,7 @@ package stx.parse.path;
 
 using stx.parse.path.Base;
 
+function alts(str) return __.parse().alts(str);
 function id(str) return __.parse().id(str);
 function reg(str) return __.parse().reg(str);
 function log(wildcard){
@@ -27,9 +28,9 @@ class Base extends ParserCls<String,Cluster<Token>>{
 		).with_tag('p_sep');
 	}
 	public function p_root():Parser<String,Cluster<Token>>{
-		__.log().trace(is_windows);
+		__.log().trace('is_windows? $is_windows');
 		return if(is_windows) {
-				"[A-Za-z]:".reg()
+				Parse.alpha
 				.then( Some.fn().then(FPTDrive) )
 				.and(p_sep().option()).then(
 					(tp) -> switch(tp.snd()){
@@ -50,7 +51,13 @@ class Base extends ParserCls<String,Cluster<Token>>{
 		= Parse.alphanum.or(Parse.whitespace).with_tag('char_and_space');
 
 	public var p_special_chars 
-		= "[^<>:\"\\\\|?*\\/A-Za-z0-9]".reg().with_tag('p_special_chars');
+		= alts(
+			["<>:\"\\|?*/"].map(id)
+		).not()._and(
+			Parse.alphanum.not()
+		)._and(Parsers.Something())
+		 .with_tag('p_special_chars');
+	//= "[^<>:\"\\\\|?*\\/A-Za-z0-9]".reg().with_tag('p_special_chars');
 
 
 	public function p_path_chars(){
@@ -187,8 +194,8 @@ class Base extends ParserCls<String,Cluster<Token>>{
 				)
 			).and_(Parsers.Eof());
 	}               
-	public function defer(i:ParseInput<String>,cont:Terminal<ParseResult<String,Cluster<Token>>,Noise>):Work{
-		return p_path().defer(i,cont);
+	public function apply(i:ParseInput<String>):ParseResult<String,Cluster<Token>>{
+		return p_path().apply(i);
 	}
 	public function format(arr:Cluster<Token>){
 		var o = arr.lfold(
@@ -219,8 +226,5 @@ class Base extends ParserCls<String,Cluster<Token>>{
 	}
 	public function asBase():Base{
 		return this;
-	}
-	public function provide(input){
-		return this.asParser().provide(input);
 	}
 }
