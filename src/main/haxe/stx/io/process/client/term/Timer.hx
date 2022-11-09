@@ -7,7 +7,7 @@ class Timer{
         Future.irreversible.bind(
           function(cb:stx.proxy.core.Client.ClientDef<ProcessRequest,ProcessResponse,R,ProcessFailure>->Void) {
             __.log().debug('Timer started $ms');
-            stx.stream.Delay.comply(
+            stx.pico.Delay.comply(
               () -> {
                 __.log().debug('Timer called');
                 cb(next);
