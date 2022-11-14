@@ -6,12 +6,12 @@ package stx.io.process.client.term;
 abstract Reply(ProcessClientDef<Bytes>) from ProcessClientDef<Bytes> to ProcessClientDef<Bytes>{
   public function new(){
     this = __.await(
-      PReqInput(IReqTotal(),true),
+      PReqInput(IReqTotal(),false),
       cat
     );
   }
   static public function cat(res:ProcessResponse):ProcessClientDef<Bytes>{
-    __.log().debug('$res');
+    __.log().trace('$res');
     return switch(res){
       case PResValue(Failure(IResBytes(bytes))) : __.ended(End(__.fault().of(E_Process_Raw(bytes))));
       case PResValue(Success(IResBytes(bytes))) : __.ended(Val(bytes));

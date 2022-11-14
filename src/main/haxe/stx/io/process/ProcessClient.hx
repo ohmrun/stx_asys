@@ -5,6 +5,7 @@ package stx.io.process;
 **/
 typedef ProcessClientDef<R> = stx.proxy.core.Client.ClientDef<ProcessRequest,ProcessResponse,R,ProcessFailure>;
 
+@:using(stx.proxy.core.Proxy.ProxyLift)
 @:using(stx.io.process.ProcessClient.ProcessClientLift)
 abstract ProcessClient<R>(ProcessClientDef<R>) from ProcessClientDef<R> to ProcessClientDef<R>{
   static public var _(default,never) = ProcessClientLift;

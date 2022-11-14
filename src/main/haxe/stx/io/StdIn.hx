@@ -49,7 +49,6 @@ abstract StdIn(StdInput) from StdInput{
           IResStarved;
         case IReqTotal(buffer_size) :
           var bytes = ip.readAll(buffer_size);
-          //trace(bytes.toString());
           IResBytes(bytes);
       }
     }

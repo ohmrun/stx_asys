@@ -77,10 +77,11 @@ class Impl{
     );
   }
   public function reply():ProcessServerDef{
+    __.log().trace('reply');
     return __.yield(
       PResState(this.state),
       function rec(req:ProcessRequest){
-        __.log().trace(_ -> _.thunk(() -> req));
+        __.log().trace(_ -> _.thunk(() -> '$req ${this.state}'));
         return switch(this.state){
           case { status : ( Io_Process_Init | Io_Process_Open ) } :
             switch(req){

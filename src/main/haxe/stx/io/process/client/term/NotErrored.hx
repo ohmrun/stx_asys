@@ -4,8 +4,9 @@ class NotErrored{
   static public function make<R>(next:ProcessClientDef<R>){
     return __.await(
       PReqState(false),
-      (y) -> {
-        switch(y){
+      (y:ProcessResponse) -> {
+        __.log().trace('$next $y');
+        return switch(y){
           case PResState(p) : switch(p.exit_code.prj()){
             case None     : next;
             case Some(0)  : next;
