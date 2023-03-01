@@ -3,7 +3,7 @@ package stx.io.process.client.term;
 /**
   Requires all the bytes from the stdout of a process.
 **/
-abstract Reply(ProcessClientDef<Bytes>) from ProcessClientDef<Bytes> to ProcessClientDef<Bytes>{
+abstract Byte(ProcessClientDef<Bytes>) from ProcessClientDef<Bytes> to ProcessClientDef<Bytes>{
   public function new(?error=false){
     this = __.await(
       PReqInput(IReqValue(I8),error),
