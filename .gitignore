@@ -1,3 +1,4 @@
+/.haxelib
 /build
 /test/
 node_modules
