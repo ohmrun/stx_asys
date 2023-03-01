@@ -6,9 +6,11 @@ using stx.Test;
 class Test{
   static public function main(){
     final log = __.log().global;
-          log.includes.push("eu/ohmrun/fletcher");
-          log.includes.push("**/*");
-          log.level = TRACE;
+    final flt = Log._.Logic()
+      .pack("eu/ohmrun/fletcher")
+      .pack("**/*")
+      .level(TRACE);
+
     __.test().run(
       [new DirectoryTest()],
       []

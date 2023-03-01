@@ -1,0 +1,87 @@
+{
+  "dependencies": [
+    {
+      "name": "stx_pico",
+      "type": "git",
+      "dir": null,
+      "ref": "master",
+      "url": "https://github.com/ohmrun/stx_pico.git"
+    },
+    {
+      "name": "stx_nano",
+      "type": "git",
+      "dir": null,
+      "ref": "master",
+      "url": "https://github.com/ohmrun/stx_nano.git"
+    },
+    {
+      "name": "stx_fn",
+      "type": "git",
+      "dir": null,
+      "ref": "master",
+      "url": "https://github.com/ohmrun/stx_fn.git"
+    },
+    {
+      "name": "stx_log",
+      "type": "git",
+      "dir": null,
+      "ref": "master",
+      "url": "https://github.com/ohmrun/stx_log.git"
+    },
+    {
+      "name": "stx_assert",
+      "type": "git",
+      "dir": null,
+      "ref": "master",
+      "url": "https://github.com/ohmrun/stx_assert.git"
+    },
+    {
+      "name": "stx_fp",
+      "type": "git",
+      "dir": null,
+      "ref": "master",
+      "url": "https://github.com/ohmrun/stx_fp.git"
+    },
+    {
+      "name": "stx_proxy",
+      "type": "git",
+      "dir": null,
+      "ref": "master",
+      "url": "https://github.com/ohmrun/stx_proxy.git"
+    },
+    {
+      "name": "stx_parse",
+      "type": "git",
+      "dir": null,
+      "ref": "master",
+      "url": "https://github.com/ohmrun/stx_nanoparse"
+    },
+    {
+      "name": "stx_fletcher",
+      "type": "git",
+      "dir": null,
+      "ref": "master",
+      "url": "https://github.com/ohmrun/stx_fletcher.git"
+    },
+    {
+      "name": "stx_pml",
+      "type": "git",
+      "dir": null,
+      "ref": "master",
+      "url": "https://github.com/ohmrun/stx_pml.git"
+    },
+    {
+      "name": "console.hx",
+      "type": "git",
+      "dir": null,
+      "ref": "master",
+      "url": "https://github.com/0b1kn00b/console.hx.git"
+    },{
+      "name": "tink_core",
+      "type": "git",
+      "dir": null,
+      "ref": "master",
+      "url": "https://github.com/haxetink/tink_core.git"
+    }
+  ]
+}

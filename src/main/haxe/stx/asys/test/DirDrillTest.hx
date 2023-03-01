@@ -19,7 +19,7 @@ class DirDrillTest extends TestCase{
   }
   @:timeout(100000)
   public function _test_cwd_submit(async:Async){
-    __.log()('test_cwd_submit');
+    __.log().debug('test_cwd_submit');
     var cwd = new Cwd();
         cwd.pop()
            .environment(
@@ -34,7 +34,7 @@ class DirDrillTest extends TestCase{
   }
   @:timeout(100000)
   public function test(async:Async){
-    __.log()('tedst');
+    __.log().debug('tedst');
     var cwd 	= new Cwd();
 		var host 	= LocalHost.unit().toHasDevice();
     cwd.pop()

@@ -17,8 +17,9 @@ class Test{
   static function main(){
     trace('stx.io.Test');
     var log       = __.log().global;
-        log.level = DEBUG;
-        log.includes.push("stx/io");
+    var ic        = Log._.Logic()
+        .level(DEBUG)
+        .pack("stx/io");
     __.log().info('stx.io::Test');
     __.test().auto();
   }

@@ -5,16 +5,16 @@ using stx.Test;
 class Test{
   static public function main(){
     var f = __.log().global;
-        f.includes.push('stx.fs.path.pack.Directory');
-        //f.includes.push('stx.parse.path');
-        f.includes.push('stx/asys/test');
-        f.includes.push('stx.fs.Path');
-        //f.includes.push('stx.async');
-        //f.includes.push('stx.parse');
-        //f.includes.push('stx.parse.With');
-        f.reinstate  = true;
+    var l = Log._.Logic();
+        l.pack('stx/fs/path/Directory')
+        //.pack('stx/parse/path');
+        .pack('stx/asys/test')
+        .pack('stx.fs.Path')
+        //.pack('stx/async');
+        //.pack('stx/parse');
+        //.pack('stx.parse.With');
+        .level(TRACE);
 
-        f.level = TRACE;
     __.test().run([
       // new FsParseTest(),
       // new AsysTest(),
