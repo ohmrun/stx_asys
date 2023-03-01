@@ -1,4 +1,4 @@
-package stx.io.type.node; 
+package stx.io.node; 
 
 interface Buffer {
 
