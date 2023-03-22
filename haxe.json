@@ -10,7 +10,6 @@
       "stx_coroutine",
       "stx_parse",
       "stx_bake",
-      "stx_test",
       "fletcher",
       "pml"
     ],
@@ -33,12 +32,14 @@
     "stx.fs.path" : {
       "interp" : {
         "test" : {
+          "-lib" : ["stx_test"],
           "-main" : "stx.fs.path.Test"
         },
         "--interp" : true
       },
       "neko" : {
         "test" : {
+          "-lib" : ["stx_test"],
           "-main" : "stx.fs.path.Test",
           "-neko" : "build/neko/test/main.n"
         }
@@ -46,6 +47,7 @@
     },
     "stx.parse.path" : {
       "test" : {
+        "-lib" : ["stx_test"],
         "-main" : "stx.parse.path.Test",
         "interp" : {
           "--interp" : true
@@ -55,6 +57,7 @@
     "stx.io" : {
       "--resource" : "tests.pml@tests",
       "test" : {
+        "-lib" : ["stx_test"],
         "-main" : "stx.io.Test",
         "interp" : {
           "--interp" : true
