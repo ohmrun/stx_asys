@@ -20,15 +20,15 @@ abstract Keyboard(KeyboardDef) from KeyboardDef to KeyboardDef{
           return switch(x){
             case IReqValue(bs)                : switch(bs){
               case I8 : __.hold(
-                shell.byte().map(
+                $type(shell.byte().map(
                   x -> __.emit(IResValue(Packet.make(Byteal(NInt(x)),I8)),__.tran(rec))
-                ).recover(
-                  e -> __.term(e)
+                )).recover(
+                  Recover.fromFunErrR((e:Refuse<ASysFailure>) -> __.quit(e))
                 )
               );
-              default : Tunnel._.mod(stdin.provide(x).prj(),turn);
+              default : Tunnel._.mod(stdin.provide(x).prj(),turn).prj();
             } 
-            case x : Tunnel._.mod(stdin.provide(x),turn);
+            case x : Tunnel._.mod(stdin.provide(x),turn).prj();
           };
         }
       );

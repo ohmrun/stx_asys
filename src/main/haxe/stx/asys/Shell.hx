@@ -41,7 +41,7 @@ class Shell implements ShellApi extends Clazz{
   public function stderr(){
     return new Output(new StdOut(std.Sys.stderr()));
   }
-  public function byte():Produce<Int,ASysFailure>{
+  public function byte():Produce<Int,IoFailure>{
     return Produce.fromFunXR(std.Sys.getChar.bind(false));
   }
 }
