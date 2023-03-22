@@ -20,10 +20,10 @@ abstract Keyboard(KeyboardDef) from KeyboardDef to KeyboardDef{
           return switch(x){
             case IReqValue(bs)                : switch(bs){
               case I8 : __.hold(
-                $type(shell.byte().map(
+                (shell.byte().map(
                   x -> __.emit(IResValue(Packet.make(Byteal(NInt(x)),I8)),__.tran(rec))
                 )).recover(
-                  Recover.fromFunErrR((e:Refuse<ASysFailure>) -> __.quit(e))
+                  Recover.fromFunErrR((e:Refuse<IoFailure>) -> __.quit(e))
                 )
               );
               default : Tunnel._.mod(stdin.provide(x).prj(),turn).prj();

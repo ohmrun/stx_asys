@@ -11,7 +11,7 @@ interface ShellApi{
  
   public final cwd:Cwd;
   
-  public function byte():Produce<Int,ASysFailure>; 
+  public function byte():Produce<Int,IoFailure>; 
   //public function command
   //public var env(default,null)        : Env;
 }
