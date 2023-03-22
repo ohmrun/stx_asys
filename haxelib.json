@@ -27,7 +27,7 @@
       "stx_proxy"       : "",
         
       "stx_parse"       : "",
-
+      "stx_bake"        : "",
       "fletcher"        : "",
       "pml"             : ""
     },
