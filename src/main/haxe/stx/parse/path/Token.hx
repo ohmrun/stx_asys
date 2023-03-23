@@ -1,5 +1,8 @@
 package stx.parse.path;
 
+// TODO why is this causing issues in stx_release?
+import stx.fs.path.Separator;
+
 enum TokenSum{
   FPTDrive(name:Option<String>);
   FPTRel;
