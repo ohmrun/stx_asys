@@ -1,5 +1,8 @@
 package stx.fail;
 
+import stx.fail.ASysFailure;
+import stx.fail.PathFailure;
+import stx.fail.PathParseFailure;
 import stx.fs.path.Archive;
 import stx.fs.path.Directory;
 

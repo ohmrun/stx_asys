@@ -1,5 +1,7 @@
 package stx;
 
+using stx.Nano;
+
 #if (sys || nodejs)
   class LiftASys{
     static public function asys(__:Wildcard){

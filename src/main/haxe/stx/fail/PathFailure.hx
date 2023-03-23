@@ -1,5 +1,8 @@
 package stx.fail;
 
+import stx.fail.ASysFailure;
+import stx.fail.FsFailure;
+
 @:using(stx.fail.PathFailure.PathFailureLift)
 enum PathFailureSum{
   //ParseFailed

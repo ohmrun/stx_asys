@@ -1,5 +1,8 @@
 package stx.fail;
 
+using stx.Pico;
+using stx.Nano;
+
 enum IoFailureSum{
   E_Io_Subsystem(e:haxe.io.Error);
   E_Io_TypeError;

@@ -1,5 +1,8 @@
 package stx;
 
+import stx.fail.PathParseFailure;
+import stx.fail.ParseFailure;
+
 typedef FsFailure       = stx.fail.FsFailure;
 typedef FsFailureSum    = stx.fail.FsFailure.FsFailureSum;
 

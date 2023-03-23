@@ -1,5 +1,8 @@
 package stx.fail;
 
+import stx.fail.PathFailure;
+
+using stx.parse.term.Path;
 import stx.fs.path.Raw;
 
 @:using(stx.fail.PathParseFailure.PathParseFailureLift)

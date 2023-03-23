@@ -1,5 +1,6 @@
 package stx.fs;
 
+using stx.parse.term.Path;
 using stx.fs.path.Logging;
 
 typedef LiftString            = stx.fs.path.lift.LiftString;

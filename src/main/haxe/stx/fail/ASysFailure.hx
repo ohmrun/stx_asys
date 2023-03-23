@@ -1,5 +1,7 @@
 package stx.fail;
 
+import stx.fail.FsFailure;
+
 enum ASysFailureSum{
   E_ASys_UndefinedHomePath;
   E_ASys_UnknownDistroName;
