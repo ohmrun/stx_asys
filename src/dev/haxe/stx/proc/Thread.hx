@@ -1,5 +1,15 @@
 package stx.proc;
 
+import stx.fail.ASysFailure;
+import stx.alias.StdThread;
+
+using stx.Pico;
+using stx.Nano;
+using stx.Fail;
+using eu.ohmrun.Fletcher;
+using tink.CoreApi;
+
+
 typedef ThreadDef       = Coroutine<ThreadInput,ThreadOutput,Noise,ASysFailure>;
 typedef ThreadReadPush  = Dynamic -> Report<ASysFailure>;
 

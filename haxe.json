@@ -25,7 +25,8 @@
         "include('stx.fs',true)",
         "include('stx.asys',true)",
         "include('stx.parse',true)",
-        "include('stx.assert',true)"
+        "include('stx.assert',true)",
+        "include('stx.proc',true)"
       ],
       "interp" : {
         "--interp" : true
