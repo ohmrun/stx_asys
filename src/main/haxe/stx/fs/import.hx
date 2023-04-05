@@ -9,7 +9,7 @@ using stx.Pico;
 using stx.Fail;
 using stx.Nano;
 using stx.ASys;
-using stx.Bake;
+using Bake;
 using stx.Assert;
 using stx.fs.Path;
 using stx.Parse;

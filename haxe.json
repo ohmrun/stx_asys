@@ -9,7 +9,7 @@
       "stx_proxy",
       "stx_coroutine",
       "stx_parse",
-      "stx_bake",
+      "bake",
       "fletcher",
       "pml"
     ],

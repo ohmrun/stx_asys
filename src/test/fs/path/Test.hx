@@ -1,7 +1,7 @@
 package stx.fs.path;
 
 using stx.Test;
-//using stx.Bake;
+//using Bake;
 
 class Test{
   static public function main(){
