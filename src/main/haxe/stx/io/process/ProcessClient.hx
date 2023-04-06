@@ -26,6 +26,9 @@ abstract ProcessClient<R>(ProcessClientDef<R>) from ProcessClientDef<R> to Proce
   static public function Timer<R>(next:ProcessClientDef<R>,ms:Int):ProcessClient<R>{
     return lift(stx.io.process.client.term.Timer.make(ms,next));
   }
+  static public function Request(req):ProcessClient<ProcessResponse>{
+    return lift(new stx.io.process.client.term.Request(req));
+  }
 }
 class ProcessClientLift{
   static public inline function lift<R>(self:ProcessClientDef<R>):ProcessClient<R>{
