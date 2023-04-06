@@ -1,12 +1,15 @@
 package stx.io.process.client.term;
 
 /**
-  Requires all the bytes from the stdout of a process.
+  Requires a chunk from the stdout/stderr of a process.
 **/
 abstract Byte(ProcessClientDef<Bytes>) from ProcessClientDef<Bytes> to ProcessClientDef<Bytes>{
-  public function new(?error=false){
+  public function new(size:ByteSize,?error=false){
+    if(size == null) {
+      size = IReqValue(I8);
+    }
     this = __.await(
-      PReqInput(IReqValue(I8),error),
+      PReqInput(size,error),
       cat
     );
   }
@@ -18,6 +21,7 @@ abstract Byte(ProcessClientDef<Bytes>) from ProcessClientDef<Bytes> to ProcessCl
       case PResError(raw)                       : __.ended(End(raw));
       case PResOffer(req)                       : __.await(req,cat);
       case PResState(state)                     : __.ended(End(__.fault().of(E_ProcessState(state))));
+      case PResBlank                            : __.await(PResTouch,cat);
       default                                   : __.ended(End(__.fault().of(E_Process_Unsupported('$res'))));
     }
   }

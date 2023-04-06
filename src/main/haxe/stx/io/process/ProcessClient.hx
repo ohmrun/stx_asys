@@ -5,6 +5,7 @@ package stx.io.process;
 **/
 typedef ProcessClientDef<R> = stx.proxy.core.Client.ClientDef<ProcessRequest,ProcessResponse,R,ProcessFailure>;
 
+@:transitive
 @:using(stx.proxy.core.Proxy.ProxyLift)
 @:using(stx.io.process.ProcessClient.ProcessClientLift)
 abstract ProcessClient<R>(ProcessClientDef<R>) from ProcessClientDef<R> to ProcessClientDef<R>{
@@ -16,8 +17,8 @@ abstract ProcessClient<R>(ProcessClientDef<R>) from ProcessClientDef<R> to Proce
   private var self(get,never):ProcessClient<R>;
   private function get_self():ProcessClient<R> return lift(this);
 
-  static public function Reply():ProcessClient<Bytes>{
-    return lift(new stx.io.process.client.term.Reply());
+  static public function Reply(?error):ProcessClient<Bytes>{
+    return lift(new stx.io.process.client.term.Reply(error));
   }
   static public function NotErrored<R>(next:ProcessClientDef<R>):ProcessClient<R>{
     return lift(stx.io.process.client.term.NotErrored.make(next));

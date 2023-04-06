@@ -12,4 +12,7 @@ abstract ProcessServerCat(ProcessServerCatDef) from ProcessServerCatDef to Proce
     }
   }
   public function prj():ProcessServerCatDef return this;
+  @:to public function toRespondCat():RespondCat<{command:Cluster<String>,?detached:Bool},Closed,Noise,ProcessRequest,ProcessResponse,Noise,ProcessFailure>{
+    return this;
+  }
 }
