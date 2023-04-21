@@ -1,6 +1,6 @@
 package stx.assert.eq.term.fs.path;
 
-class Track<T> implements EqApi<stx.fs.path.Track> extends Clazz{
+class Track<T> extends stx.assert.eq.term.Base<stx.fs.path.Track>{
   final inner : Eq<StdString>;
   public function new(){
     super();
