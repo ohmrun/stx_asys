@@ -29,7 +29,7 @@ class RawLift {
 	static public function canonical(self:Raw,sep:Separator){
 		return self.prj().map(token -> token.canonical(sep)).lfold1((x,y) -> '${x}${y}').defv(".");
 	}
-  static public function toJourney(arr:Raw):Res<Journey,PathFailure>{
+  static public function toJourney(arr:Raw):Upshot<Journey,PathFailure>{
 		var head = arr.head();
 		var rest = arr.tail();
 		return switch(head){
@@ -115,7 +115,7 @@ class RawLift {
 				var drive : Drive = head;
 				__.log().debug(_ -> _.pure(drive));
 				var track 				= raw.tail().lfold(
-					(next:Token,memo:Res<Cluster<String>,PathFailure>) -> memo.fold(
+					(next:Token,memo:Upshot<Cluster<String>,PathFailure>) -> memo.fold(
 						(arr) -> switch(__.log().level(TRACE).through()(next)){
 							case FPTDrive(_) 	: __.reject(__.fault().of(E_Path_PathParse(E_PathParse_MisplacedHeadNode)));
 							case FPTRel				: __.reject(__.fault().of(E_Path_PathParse(E_PathParse_MisplacedHeadNode)));
@@ -138,7 +138,7 @@ class RawLift {
 		});
 	}
 	//TODO eek out filename from new parsing conventions
-	static public function toAttachment(raw:Raw):Res<Attachment,PathFailure>{
+	static public function toAttachment(raw:Raw):Upshot<Attachment,PathFailure>{
 		__.log().debug(_ -> _.pure(raw.head()));
 		final data = (switch(raw.head()){
 			case Some(FPTRel)						: __.accept(raw.tail());
@@ -150,7 +150,7 @@ class RawLift {
 		
 		return data.map(c -> c.rdropn(1)).flat_map(
 			raw -> raw.lfold(
-					(next:Token,memo:Res<MaybeAttachment,PathFailure>) -> memo.fold(
+					(next:Token,memo:Upshot<MaybeAttachment,PathFailure>) -> memo.fold(
 						(v) -> switch(next){
 							case FPTDrive(_) 	: __.reject(__.fault().of(E_Path_PathParse(E_PathParse_MisplacedHeadNode)));
 							case FPTRel				: __.reject(__.fault().of(E_Path_PathParse(E_PathParse_MisplacedHeadNode)));
@@ -172,13 +172,13 @@ class RawLift {
 				)
 		);
 	}
-	static public function toAddress(raw:Raw):Res<Address,PathFailure>{
+	static public function toAddress(raw:Raw):Upshot<Address,PathFailure>{
 		return (switch(raw.head()){
 			case Some(FPTDrive(head)) : 
 				var drive : Drive = head;
 				var entry 				= raw.last();
 				var track = raw.tail().rdropn(1).lfold(
-					(next:Token,memo:Res<Cluster<String>,PathFailure>) -> memo.fold(
+					(next:Token,memo:Upshot<Cluster<String>,PathFailure>) -> memo.fold(
 						(tp) -> switch(next){
 							case FPTDrive(_) 				: __.reject(__.fault().of(E_Path_PathParse(E_PathParse_MisplacedHeadNode)));
 							case FPTRel							: __.reject(__.fault().of(E_Path_PathParse(E_PathParse_MisplacedHeadNode)));
@@ -208,7 +208,7 @@ class RawLift {
 					__.reject(__.fault().of(E_Path_PathParse(E_PathParse_NoHeadNode)));
 		});
 	}
-	static public function toArchive(raw:Raw):Res<Archive,PathFailure>{
+	static public function toArchive(raw:Raw):Upshot<Archive,PathFailure>{
 		return toAddress(raw).adjust(
 			(address) -> address.entry.fold(
 				ok -> __.accept(Archive.make(address.drive,address.track,ok)),
@@ -245,9 +245,9 @@ class RawLift {
       file                  : file
     }
 	}
-	static public function toTrack(raw:Raw):Res<Track,PathFailure>{
+	static public function toTrack(raw:Raw):Upshot<Track,PathFailure>{
 		return raw.lfold(
-			(next:Token,memo:Res<Track,PathFailure>) -> memo.fold(
+			(next:Token,memo:Upshot<Track,PathFailure>) -> memo.fold(
 				(arr) -> switch(next){
 					case FPTDown(str) : __.accept(arr.snoc(str));
 					case FPTSep  			: __.accept(arr);

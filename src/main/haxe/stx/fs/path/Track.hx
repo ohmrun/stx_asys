@@ -29,7 +29,7 @@ typedef TrackDef = Cluster<String>;
   public function concat(that:Track):Track{
     return lift(this.concat(that.prj()));
   }
-  public function up():Res<Track,PathFailure>{
+  public function up():Upshot<Track,PathFailure>{
     return this.is_defined().if_else(
       () -> __.accept(lift(this.rdropn(1))),
       () -> __.reject(__.fault().of(E_Path_ReachedRoot))

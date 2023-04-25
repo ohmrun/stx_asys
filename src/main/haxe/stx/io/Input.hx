@@ -31,7 +31,7 @@ typedef InputDef  = CoroutineSum<InputRequest,InputResponse,Noise,IoFailure>;
   private function get_self():Input return lift(this);
 }
 class InputLift{
-  static public function mandate(self:InputDef,req:InputRequest,fn:Res<InputResponse,IoFailure> -> Void):Input{
+  static public function mandate(self:InputDef,req:InputRequest,fn:Upshot<InputResponse,IoFailure> -> Void):Input{
     final source  = Pledge.trigger();
     var sent      = false;
     var done      = false;

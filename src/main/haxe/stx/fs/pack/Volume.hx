@@ -2,7 +2,7 @@ package stx.fs.pack;
 
 interface VolumeApi{
   public function index(dir:Directory):Produce<Array<String>,FsFailure>;
-  public function parent(dir:Directory):Res<Directory,PathFailure>;
+  public function parent(dir:Directory):Upshot<Directory,PathFailure>;
 
   public function read(archive:Archive,?binary : Bool = false):Produce<FileInput,FsFailure>;
   //TODO change input to Address
@@ -22,7 +22,7 @@ class Volume implements VolumeApi extends Clazz{
       e -> e.fault().of(E_Fs_CannotReadDirectory)
     );
   }
-  public function parent(dir:Directory):Res<Directory,PathFailure>{
+  public function parent(dir:Directory):Upshot<Directory,PathFailure>{
     return (dir.track.length > 0).if_else(
       () -> __.accept(Directory.make(dir.drive,new Track(dir.track.rdropn(1)))),
       () -> __.reject(__.fault().of(E_Path_ReachedRoot))
@@ -44,7 +44,7 @@ class Volume implements VolumeApi extends Clazz{
     }
   }
   public function is_directory(self:Raw):Attempt<HasDevice,Bool,FsFailure>{
-    return Attempt.fromFun1Res(
+    return Attempt.fromFun1Upshot(
       (state:HasDevice) -> {
         return try{
           final canonical = self.canonical(state.device.sep);

@@ -218,26 +218,43 @@ class DirectoryLift{
   }
   static public function tree(dir:Directory):Modulate<HasDevice,PExpr<Entry>,FsFailure>{
     __.log().trace('tree: $dir');
-    var init  = Arrange.fromFun1Attempt(entries).convert(Convert.Fun((x:Cluster<Either<String,Entry>>) -> x.toIterable()));
-    var c     = Modulate.pure(dir).reframe().arrange(entries).convert(Convert.Fun((x:Cluster<Either<String,Entry>>) -> x.toIterable()));
+    var init  = Arrange.fromFun1Attempt(entries);
+    var c     = Modulate.pure(dir).reframe().arrange(entries);
     
     function fn(either:Either<String,Entry>,t:PExpr<Entry>):Modulate<HasDevice,PExpr<Entry>,FsFailure>{
       __.log().trace(_ -> _.pure(either));
       return switch(either){
         case Left(string) : 
           var into = dir.into([string]);
+          $type(into);
           __.log().trace(_ -> _.pure(into));
           var next = tree(into);
           __.log().trace(_ -> _.pure(next));
           
-          next.convert(
-            function(t1){
-              return t.conflate(PGroup(Cons(PGroup(Cons(PLabel(string),Cons(t1,Nil))),Nil)));
-            }
+          
+          final rest = next.arrange(
+            __.arrange(
+              (t1:PExpr<Entry>) -> {
+                return __.convert(function(dev:HasDevice){
+                  final split = string.split(dev.device.sep);
+                  final entry = Entry.make(split[0],split[1]);
+                  return switch(t){
+                    case PArray(arr) : PArray(arr.snoc(PValue(entry)).snoc(t1));
+                    case PEmpty      : PArray([PValue(entry),t1]);
+                    default          : PArray([PValue(entry),t1]);
+                  }
+                }); 
+              }
+            )
           );
+          $type(rest);
         case Right(entry) : Modulate.pure(
-            t.conflate(PValue(entry))
-          );
+          switch(t){
+            case PArray(arr) : PArray(arr.snoc(PValue(entry)));
+            case PEmpty      : PArray([PValue(entry)]);
+            default          : PArray([PValue(entry)]);
+          }
+        );
       }
     }
     var ut  = Arrange.pure(PEmpty);
@@ -277,9 +294,9 @@ class DirectoryLift{
   @:noUsing static public inline function into(self:Directory,track:TrackDef):Directory{
     return self.into(track);
   }
-  static public function archive(self:Directory,that:Attachment):Res<Archive,FsFailure>{
+  static public function archive(self:Directory,that:Attachment):Upshot<Archive,FsFailure>{
     return that.track.lfold(
-      (next:Move,memo:Res<Track,FsFailure>) -> switch([next,memo]){
+      (next:Move,memo:Upshot<Track,FsFailure>) -> switch([next,memo]){
           case [Into(name),Accept(dir)] : __.accept(dir.concat([name]));
           case [From,Accept(dir)]       : dir.up().errate(e -> (e:FsFailure));
           case [_,Reject(_)]            : memo;

@@ -15,14 +15,14 @@ class Path{
     return new PathApi();
   }
   static public function parse(str:String):Attempt<HasDevice,Raw,PathFailure>{
-    return Attempt.fromFun1Res(
+    return Attempt.fromFun1Upshot(
       (env:HasDevice) -> {
         __.log().debug(_ -> _.pure(env));
           final result = __.option(str).map(
               (s:String) -> (env.device.distro.is_windows().if_else(
                 () -> new Windows().asBase(),
                 () -> new Posix().asBase()
-              ).asParser().apply(s.reader())).toRes().adjust(
+              ).asParser().apply(s.reader())).toUpshot().adjust(
                 opt -> opt.fold(
                   ok -> __.accept(ok),
                   () -> __.reject(ParseFailure.make(0,'no output',true).toRefuse())
@@ -32,7 +32,7 @@ class Path{
             () -> {
               __.log().trace("default");
               final reader = "".reader();
-              return reader.no('no input').toRes().adjust(
+              return reader.no('no input').toUpshot().adjust(
                 opt -> opt.fold(
                   ok -> __.accept(ok),
                   () -> __.reject(ParseFailure.make(0,'no output',true).toRefuse())

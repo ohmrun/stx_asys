@@ -34,9 +34,9 @@ typedef RouteDef = Cluster<Move>;
   private function get_self():Route return lift(this);
 }
 class RouteLift{
- static public function toTrack(self:Route):Res<Track,PathFailure>{
+ static public function toTrack(self:Route):Upshot<Track,PathFailure>{
   return self.lfold(
-    (next:Move,memo:Res<Cluster<String>,PathFailure>) -> {
+    (next:Move,memo:Upshot<Cluster<String>,PathFailure>) -> {
       return memo.flat_map(
         ok -> switch(next){
           case Into(name) : __.accept(ok.snoc(name));

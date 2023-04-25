@@ -54,13 +54,13 @@ typedef JourneyDef = {
   }
 }
 class JourneyLift{
-  static public function get_track(self:Journey):Res<Track,PathFailure>{
+  static public function get_track(self:Journey):Upshot<Track,PathFailure>{
     return switch(self.tread){
       case Left(route)  : route.toTrack();
       case Right(track) : __.accept(track);
     }
   }
-  static public function toDirectory(self:Journey):Res<Directory,PathFailure>{
+  static public function toDirectory(self:Journey):Upshot<Directory,PathFailure>{
     return get_track(self).flat_map(
       (track) -> switch(self.drive){
         case Here     : __.reject(__.fault().of(E_Path_ExpectedAbsolutePath));
@@ -68,7 +68,7 @@ class JourneyLift{
       }
     );
   }
-  static public function toArchive(self:Journey):Res<Archive,PathFailure>{
+  static public function toArchive(self:Journey):Upshot<Archive,PathFailure>{
     return
         self.drive.fold(
           () -> __.reject(__.fault().of(E_Path_ExpectedEntry)), 
@@ -79,7 +79,7 @@ class JourneyLift{
             (couple,entry) -> Archive.make(couple.fst(),couple.snd(),entry)
           );
   }
-  static public function materialize(self:Journey):Res<Either<Directory,Archive>,PathFailure>{
+  static public function materialize(self:Journey):Upshot<Either<Directory,Archive>,PathFailure>{
     return self.isDirectory().if_else(
       () -> toDirectory(self).map(Left),
       () -> toArchive(self).map(Right)

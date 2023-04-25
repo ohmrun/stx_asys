@@ -54,7 +54,7 @@ abstract Thread(ThreadDef) from ThreadDef to ThreadDef{
 }
 enum ThreadDoable{
   TD_Block(block:Void->Void);
-  TD_Receive(res:Dynamic->Res<Bool,Dynamic>);//true if was successful
+  TD_Receive(res:Dynamic->Upshot<Bool,Dynamic>);//true if was successful
 }
 enum ThreadInput{
   TI_Task(task:ThreadDoable);

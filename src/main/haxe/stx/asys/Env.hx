@@ -8,7 +8,7 @@ interface EnvApi{
 }
 class Env implements EnvApi extends Clazz{
   public function get(str:String):Produce<Option<String>,ASysFailure>{
-    return Produce.fromFunXRes(() -> try{
+    return Produce.fromFunXUpshot(() -> try{
       __.accept(__.sys().env(str));
     }catch(e:Dynamic){
       __.reject(__.fault().of(E_ASys_EnvironmentVariablesInaccessible(str)));

@@ -40,7 +40,7 @@ class AddressLift{
     return Address.lift(self);
   }
   static public function is_directory(self:AddressDef){
-    return Attempt.fromFun1Res(
+    return Attempt.fromFun1Upshot(
       (state:HasDevice) -> {
         return try{
           final canonical = lift(self).canonical(state.device.sep);

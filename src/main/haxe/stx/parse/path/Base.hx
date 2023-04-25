@@ -2,9 +2,11 @@ package stx.parse.path;
 
 using stx.parse.path.Base;
 
-function alts(str) return __.parse().alts(str);
-function id(str) return __.parse().id(str);
-function reg(str) return __.parse().reg(str);
+import stx.parse.parsers.StringParsers as SParse;
+
+function alts(str) 	return __.parse().alts(str);
+function id(str) 		return SParse.id(str);
+function reg(str) 	return SParse.reg(str);
 function log(wildcard){
 	return stx.Log.ZERO.tag('stx/parse/path');
 }
@@ -30,7 +32,7 @@ class Base extends ParserCls<String,Cluster<Token>>{
 	public function p_root():Parser<String,Cluster<Token>>{
 		__.log().trace('is_windows? $is_windows');
 		return if(is_windows) {
-				Parse.alpha
+				SParse.alpha
 				.then( Some.fn().then(FPTDrive) )
 				.and(p_sep().option()).then(
 					(tp) -> switch(tp.snd()){
@@ -48,13 +50,13 @@ class Base extends ParserCls<String,Cluster<Token>>{
 
 
 	public var char_and_space
-		= Parse.alphanum.or(Parse.whitespace).with_tag('char_and_space');
+		= SParse.alphanum.or(SParse.whitespace).with_tag('char_and_space');
 
 	public var p_special_chars 
 		= alts(
 			["<>:\"\\|?*/"].map(id)
 		).not()._and(
-			Parse.alphanum.not()
+			SParse.alphanum.not()
 		)._and(Parsers.Something())
 		 .with_tag('p_special_chars');
 	//= "[^<>:\"\\\\|?*\\/A-Za-z0-9]".reg().with_tag('p_special_chars');

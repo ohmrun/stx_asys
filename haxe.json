@@ -66,6 +66,16 @@
           "--interp" : true
         }
       }
+    },
+    "feat" : {
+      "-cp"  : "src/test/haxe",
+      "-lib" : ["stx_test"],
+      "fs.path" : {
+        "-main" : "stx.fs.path.Test",
+        "interp" : {
+          "--interp" : true
+        }
+      }
     }
   },
   "run" : {
