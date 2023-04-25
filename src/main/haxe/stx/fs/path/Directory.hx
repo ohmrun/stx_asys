@@ -219,14 +219,13 @@ class DirectoryLift{
   static public function tree(dir:Directory):Modulate<HasDevice,PExpr<Entry>,FsFailure>{
     __.log().trace('tree: $dir');
     var init  = Arrange.fromFun1Attempt(entries);
-    var c     = Modulate.pure(dir).reframe().arrange(entries);
+    var c     = (Modulate.pure(dir).reframe().arrange(entries)).map(x -> x.toIter());
     
     function fn(either:Either<String,Entry>,t:PExpr<Entry>):Modulate<HasDevice,PExpr<Entry>,FsFailure>{
       __.log().trace(_ -> _.pure(either));
       return switch(either){
         case Left(string) : 
           var into = dir.into([string]);
-          $type(into);
           __.log().trace(_ -> _.pure(into));
           var next = tree(into);
           __.log().trace(_ -> _.pure(next));
@@ -247,7 +246,8 @@ class DirectoryLift{
               }
             )
           );
-          $type(rest);
+          rest;
+          //$type(rest);
         case Right(entry) : Modulate.pure(
           switch(t){
             case PArray(arr) : PArray(arr.snoc(PValue(entry)));
