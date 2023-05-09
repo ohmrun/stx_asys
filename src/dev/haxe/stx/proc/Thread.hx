@@ -10,7 +10,7 @@ using eu.ohmrun.Fletcher;
 using tink.CoreApi;
 
 
-typedef ThreadDef       = Coroutine<ThreadInput,ThreadOutput,Noise,ASysFailure>;
+typedef ThreadDef       = Coroutine<ThreadInput,ThreadOutput,Nada,ASysFailure>;
 typedef ThreadReadPush  = Dynamic -> Report<ASysFailure>;
 
 class EventLoop<T>{

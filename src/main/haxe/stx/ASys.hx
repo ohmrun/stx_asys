@@ -23,4 +23,6 @@ typedef ExitCode                              = stx.asys.ExitCode;
 typedef ConsoleApi                            = stx.asys.ConsoleApi;
 typedef EnvApi                                = stx.asys.EnvApi;
 typedef UserApi                               = stx.asys.UserApi;
+typedef SystemApi                             = stx.asys.SystemApi;
+typedef CwdApi                                = stx.asys.CwdApi;
   

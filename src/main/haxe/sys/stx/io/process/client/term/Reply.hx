@@ -11,7 +11,7 @@ abstract Reply(ProcessClientDef<Bytes>) from ProcessClientDef<Bytes> to ProcessC
       cat
     );
   }
-  static public function cat(res:ProcessResponse):Proxy<ProcessRequest,ProcessResponse,Noise,Closed,Bytes,ProcessFailure>{
+  static public function cat(res:ProcessResponse):Proxy<ProcessRequest,ProcessResponse,Nada,Closed,Bytes,ProcessFailure>{
     __.log().trace('$res');
     return switch(res){
       case PResValue(Failure(IResBytes(bytes))) : __.ended(End(__.fault().of(E_Process_Raw(bytes))));

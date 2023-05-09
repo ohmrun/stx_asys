@@ -8,7 +8,7 @@ interface SystemApi{
   /**
     `ShellApi`
   **/
-  public final Shell  : ShellApi;
+  public final shell  : ShellApi;
 
-  public function sleep(float:Float):Future<Noise>;
+  public function sleep(float:Float):Future<Nada>;
 }

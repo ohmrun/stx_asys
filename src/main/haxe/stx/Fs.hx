@@ -11,3 +11,4 @@ typedef FileSeek        = stx.fs.FileSeek;
 
 typedef VolumeApi       = stx.fs.VolumeApi;
 typedef Separator       = stx.fs.Separator;
+typedef Stat            = stx.fs.Stat;

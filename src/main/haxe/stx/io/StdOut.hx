@@ -10,7 +10,7 @@ abstract StdOut(StdOutput) from StdOutput{
   public function new(self){
     this = self;
   }
-  public function reply():Coroutine<OutputRequest,Report<IoFailure>,Noise,IoFailure>{
+  public function reply():Coroutine<OutputRequest,Report<IoFailure>,Nada,IoFailure>{
     function fn(value:OutputRequest){
       __.log().debug('pushing');
       var output      = Happened;

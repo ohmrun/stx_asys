@@ -3,7 +3,7 @@ package stx.io;
 using stx.Coroutine;
 using stx.coroutine.Core;
 
-typedef InputDef  = CoroutineSum<InputRequest,InputResponse,Noise,IoFailure>;
+typedef InputDef  = CoroutineSum<InputRequest,InputResponse,Nada,IoFailure>;
 
 @:using(stx.coroutine.pack.Tunnel.TunnelLift)
 @:using(stx.io.Input.InputLift)
@@ -62,7 +62,7 @@ class InputLift{
           if(!done){
             __.term(__.fault().of(E_Io_Exhausted(Retry.unit(),true)));
           }else{
-            __.prod(Noise);
+            __.prod(Nada);
           } 
         case Halt(Terminated(Stop))     : __.stop();
         case Halt(Terminated(Exit(e)))  : __.exit(e);

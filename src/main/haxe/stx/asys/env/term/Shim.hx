@@ -1,6 +1,6 @@
 package stx.asys.env.term;
 
-abstract class Shim implements EnvApi{
+class Shim implements EnvApi{
   final map : haxe.ds.Map<String,String>;
   public function new(map){
     this.map = map;
@@ -9,5 +9,8 @@ abstract class Shim implements EnvApi{
     return Produce.pure(
       __.option(map.get(string))
     );
+  }
+  public function toEnvApi():EnvApi{
+    return this;
   }
 }

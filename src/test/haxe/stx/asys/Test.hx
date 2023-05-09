@@ -36,7 +36,7 @@ class EnvTest extends TestCase{
   public function test_get(){
     var env    = __.asys().local().device.env;
     var path   = env.get("UNKNOWN");
-        __.ctx(Noise).load(path).crunch();
+        __.ctx(Nada).load(path).crunch();
   }
 }
 class SocketTest extends TestCase{

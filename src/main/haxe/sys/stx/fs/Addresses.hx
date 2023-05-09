@@ -1,6 +1,9 @@
 package sys.stx.fs;
 
 class Addresses{
+  @:noUsing static public function lift(self:AddressDef):Address{
+    return Address.lift(self);
+  }
   static public function is_directory(self:AddressDef){
     return Attempt.fromFun1Upshot(
       (state:HasDevice) -> {

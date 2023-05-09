@@ -80,7 +80,7 @@ abstract StdIn(StdInput) from StdInput{
     };
     //TODO implement Control
     return Tunnel.lift(__.tran(
-      function rec(ipt:InputRequest):Coroutine<InputRequest,InputResponse,Noise,IoFailure>{
+      function rec(ipt:InputRequest):Coroutine<InputRequest,InputResponse,Nada,IoFailure>{
         return switch([state,ipt]){
           case [_,IReqState]                        : __.emit(IResState(state),__.tran(rec));
           case [Io_Input_Closed(_),IReqValue(_)]    : __.quit(__.fault().of(E_Io_EndOfFile));

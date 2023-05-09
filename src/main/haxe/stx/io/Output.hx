@@ -5,7 +5,7 @@ using stx.Coroutine;
 /**
  * Coroutine for an Output 
  */
-typedef OutputDef = Coroutine<OutputRequest,Report<IoFailure>,Noise,IoFailure>;
+typedef OutputDef = Coroutine<OutputRequest,Report<IoFailure>,Nada,IoFailure>;
 
 /**
  * Coroutine for an Output 
@@ -24,7 +24,7 @@ typedef OutputDef = Coroutine<OutputRequest,Report<IoFailure>,Noise,IoFailure>;
   }
 }
 class OutputLift{
-  static public function relate(self:OutputDef):Relate<OutputRequest,Noise,IoFailure>{
+  static public function relate(self:OutputDef):Relate<OutputRequest,Nada,IoFailure>{
     return Coroutine._.relate(self,x -> x);
   }
 }

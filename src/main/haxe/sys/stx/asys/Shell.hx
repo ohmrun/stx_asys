@@ -4,9 +4,12 @@ class Shell implements ShellApi extends Clazz{
   static public function unit(){
     return new Shell();
   }
+  public final env : EnvApi;
+  
   public function new(){
     super();
-    cwd = new Cwd();
+    this.cwd = new Cwd();
+    this.env = new sys.stx.asys.Env();
   }
   public final cwd:Cwd;
   

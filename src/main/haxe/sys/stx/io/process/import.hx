@@ -1,5 +1,6 @@
 package sys.stx.io.process;
 
+using stx.Log;
 using stx.Nano;
 using stx.Proxy;
 using stx.io.Process;
