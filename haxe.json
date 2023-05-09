@@ -21,6 +21,7 @@
     "-cp" : "src/main/haxe",
     "unit" : {
       "--macro" : [
+        "include('sys',true)",
         "include('stx.io',true)",
         "include('stx.asys.fs',true)",
         "include('stx.asys',true)",
@@ -28,6 +29,9 @@
         "include('stx.assert',true)",
         "include('stx.proc',true)"
       ],
+      "thread"  : {},
+      "event"   : {},
+      "single"  : {},
       "interp" : {
         "--interp" : true
       },

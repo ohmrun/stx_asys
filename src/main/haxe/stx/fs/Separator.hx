@@ -8,14 +8,11 @@ package stx.fs;
     return Std.string(this);
   }
   
-  public function new(){
+  public function new(distro){
     #if sys
-      this = new Distro() == Windows ? WinSeparator : PosixSeparator;
+      this = distro == Windows ? WinSeparator : PosixSeparator;
     #else
       this = PosixSeparator;
     #end
-  }
-  static public function unit(){
-    return new Separator();
   }
 }

@@ -1,16 +1,14 @@
 package stx.asys;
 
 enum abstract Distro(String){
-  static public function unit():Distro{
-    return new Distro();
-  }
+  
   var Windows;
   var Linux;
   var BSD;
   var Mac;
 
-  public function new(){
-    this = switch(std.Sys.systemName()){
+  public function new(system_name:String){
+    this = switch(system_name){
       case "Windows"  : "Windows"; 
       case "Linux"    : "Linux";
       case "BSD"      : "BSD";

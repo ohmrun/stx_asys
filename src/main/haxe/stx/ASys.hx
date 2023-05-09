@@ -2,6 +2,12 @@ package stx;
 
 using stx.Nano;
 
+
+class ASys{
+  static public function asys(wildcard:Wildcard){
+    return new stx.asys.Module();
+  }
+}
 class LiftASys{
 }
 
