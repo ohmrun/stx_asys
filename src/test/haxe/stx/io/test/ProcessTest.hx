@@ -3,7 +3,7 @@ package stx.io.test;
 import stx.fail.ProcessFailure;
 
 using stx.Parse;
-import stx.io.Process;
+import stx.asys.io.Process;
 import haxe.io.Bytes;
 
 class ProcessTest extends TestCase{

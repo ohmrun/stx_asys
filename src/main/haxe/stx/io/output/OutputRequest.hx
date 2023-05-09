@@ -1,5 +1,8 @@
 package stx.io.output;
 
+/**
+ * Represents a request to an `Output`
+ */
 enum OutputRequestSum{
   OReqValue(packet:Packet);
   OReqBytes(bytes:Bytes);

@@ -2,9 +2,8 @@ package stx;
 
 class Io{}
 
-#if (sys || nodejs)
-typedef StdFile             = sys.io.File;
-#end
+typedef Packet              = stx.io.Packet;
+
 typedef StdPath             = haxe.io.Path;
 
 typedef StdInput            = haxe.io.Input;
@@ -30,11 +29,19 @@ typedef InputRequest        = stx.io.input.InputRequest;
 typedef InputState          = stx.io.input.InputState;
 typedef InputStateSum       = stx.io.input.InputState.InputStateSum;
 
+typedef FileInput           = stx.io.FileInput;
+typedef FileOutput          = stx.io.FileOutput;
+
+typedef FileInputRequest    = stx.io.file.FileInputRequest;
+typedef FileInputResponse   = stx.io.file.FileInputResponse;
+
+typedef FileOutputRequest    = stx.io.file.FileOutputRequest;
+typedef FileOutputResponse   = stx.io.file.FileOutputResponse;
+
+
 
 typedef IoFailure           = stx.fail.IoFailure;
 typedef IoFailureSum        = stx.fail.IoFailure.IoFailureSum;
 
-typedef ExitCodeDef         = stx.io.process.ExitCode.ExitCodeDef;
-typedef ExitCode            = stx.io.process.ExitCode;
 
 typedef LiftInputResponse   = stx.io.lift.LiftInputResponse;

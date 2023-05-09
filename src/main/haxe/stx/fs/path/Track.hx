@@ -5,6 +5,9 @@ package stx.fs.path;
 **/
 typedef TrackDef = Cluster<String>;
 
+/**
+  The portion of a normalized path between the `Stem` and the `Entry`
+**/
 @:forward abstract Track(TrackDef) from TrackDef to TrackDef{
   public function new(?self:Cluster<String>) this = __.option(self).defv(Cluster.lift([]));
   @:noUsing static public function lift(self:TrackDef):Track return new Track(self);

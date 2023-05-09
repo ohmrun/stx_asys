@@ -1,5 +1,5 @@
 package stx.asys;
 
 typedef HasDevice = { 
-  public final device:Device;
+  public final device:DeviceApi;
 }

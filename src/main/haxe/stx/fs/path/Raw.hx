@@ -258,27 +258,22 @@ class RawLift {
 			__.accept([])
 		);
 	}
-	static public function absolutize(self:Raw):Attempt<HasDevice,Address,FsFailure>{
-		return __.attempt(
-			(state:HasDevice) -> {
-				final kind = kind(self);
-				if(!kind.normalized){
-					self = normalize(self);
-				}
-				final a = if(!kind.absolute){
-					state.device.shell.cwd.pop().adjust(
-						(dir) -> toTrack(self).map(
-							track -> dir.into(track)
-						).errate(e -> (e:FsFailure))
-					).map(
-						(dir) -> dir.toAddress()
-					);
-				}else{
-					__.attempt( (s:HasDevice) -> toAddress(self) ).errate(e -> (e:FsFailure));
-				}
-				return a.produce(state);
-			}
-		); 
+	static public function absolutize(self:Raw,base:Directory):Upshot<Address,FsFailure>{
+		final kind = kind(self);
+		if(!kind.normalized){
+			self = normalize(self);
+		}
+		final a = if(!kind.absolute){
+			toTrack(self).map(
+				track -> base.into(track)
+			).errate(e -> (e:FsFailure)
+			).map(
+				(dir) -> dir.toAddress()
+			);
+		}else{
+			toAddress(self).errate(e -> e.toFsFailure());
+		}
+		return a;
 	}
 	static public function normalize(self:Raw){
 		final rest = self.lfold(

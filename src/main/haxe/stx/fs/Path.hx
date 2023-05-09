@@ -1,9 +1,7 @@
 package stx.fs;
 
 using stx.parse.term.Path;
-using stx.fs.path.Logging;
 
-typedef LiftString            = stx.fs.path.lift.LiftString;
 typedef PathParseFailure      = stx.fail.PathParseFailure;
 typedef PathParseFailureSum   = stx.fail.PathParseFailure.PathParseFailureSum;
 
@@ -143,7 +141,6 @@ typedef Raw    = stx.fs.path.Raw;
 typedef RouteDef                      = stx.fs.path.Route.RouteDef;
 typedef Route                         = stx.fs.path.Route;
 
-typedef Separator                     = stx.fs.path.Separator;
 
 
 /**
@@ -168,5 +165,3 @@ class LiftDrive{
     }
   }
 }
-
-typedef LiftAttemptHasDeviceRaw       = stx.fs.path.lift.LiftAttemptHasDeviceRaw;

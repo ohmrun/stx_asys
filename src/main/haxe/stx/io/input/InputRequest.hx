@@ -1,5 +1,8 @@
 package stx.io.input;
 
+/**
+ * Represents a request for input.
+ */
 enum InputRequestSum{
   /**
     Request State

@@ -4,6 +4,6 @@ enum ProcessResponse{
   PResBlank;
   PResState(state:ProcessState);
   PResValue(res:Outcome<InputResponse,InputResponse>);
-  PResError(raw:Refuse<ProcessFailure>);
+  PResError(raw:Refuse<stx.fail.ProcessFailure>);
   PResOffer(req:ProcessRequest);
 }

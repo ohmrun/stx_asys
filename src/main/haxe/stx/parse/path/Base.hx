@@ -1,5 +1,6 @@
 package stx.parse.path;
 
+using stx.Pkg;
 using stx.parse.path.Base;
 
 import stx.parse.parsers.StringParsers as SParse;
@@ -7,11 +8,12 @@ import stx.parse.parsers.StringParsers as SParse;
 function alts(str) 	return __.parse().alts(str);
 function id(str) 		return SParse.id(str);
 function reg(str) 	return SParse.reg(str);
-function log(wildcard){
-	return stx.Log.ZERO.tag('stx/parse/path');
+
+function log(wildcard:Wildcard):stx.Log{
+	return new stx.Log().tag(__.pkg().toString());
 }
 class Base extends ParserCls<String,Cluster<Token>>{
-	var is_windows : Bool;
+	public final is_windows : Bool;
 	public function new(is_windows,?id:Pos){
 		this.is_windows = is_windows;
 		super(Some('asys.fs.Path'),id);

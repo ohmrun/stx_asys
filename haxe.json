@@ -22,7 +22,7 @@
     "unit" : {
       "--macro" : [
         "include('stx.io',true)",
-        "include('stx.fs',true)",
+        "include('stx.asys.fs',true)",
         "include('stx.asys',true)",
         "include('stx.parse',true)",
         "include('stx.assert',true)",
@@ -30,20 +30,24 @@
       ],
       "interp" : {
         "--interp" : true
+      },
+      "javascript" : {
+        "--macro" : ["exclude('stx.asys',true)"],
+        "--js" : "build/javascript/unit.js"
       }
     },
-    "stx.fs.path" : {
+    "stx.asys.fs.path" : {
       "interp" : {
         "test" : {
           "-lib" : ["stx_test"],
-          "-main" : "stx.fs.path.Test"
+          "-main" : "stx.asys.fs.path.Test"
         },
         "--interp" : true
       },
       "neko" : {
         "test" : {
           "-lib" : ["stx_test"],
-          "-main" : "stx.fs.path.Test",
+          "-main" : "stx.asys.fs.path.Test",
           "-neko" : "build/neko/test/main.n"
         }
       }
@@ -71,7 +75,7 @@
       "-cp"  : "src/test/haxe",
       "-lib" : ["stx_test"],
       "fs.path" : {
-        "-main" : "stx.fs.path.Test",
+        "-main" : "stx.asys.fs.path.Test",
         "interp" : {
           "--interp" : true
         }
@@ -79,7 +83,7 @@
     }
   },
   "run" : {
-    "stx.fs.path/test/neko:run" : [
+    "stx.asys.fs.path/test/neko:run" : [
       ["neko","build/neko/test/main.n"]
     ]
   } 

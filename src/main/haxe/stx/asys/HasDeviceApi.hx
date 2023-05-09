@@ -1,5 +1,5 @@
 package stx.asys;
 
 interface HasDeviceApi{
-  public final device:Device; 
+  public final device:DeviceApi; 
 }

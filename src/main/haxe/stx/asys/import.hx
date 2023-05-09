@@ -1,5 +1,7 @@
 package stx.asys;
 
+import stx.fail.ASysFailure;
+
 using Lambda;
 
 import tink.CoreApi;
@@ -12,11 +14,13 @@ using stx.asys.Core;
 using eu.ohmrun.Fletcher;
 
 using stx.asys.Logging;
+import stx.asys.alias.StdPath;
 
-#if (sys)
+#if (sys || nodejs)
+
   import sys.FileSystem;
-  import stx.Io.StdFile;
-  import stx.Io.StdPath;
+  import sys.stx.alias.StdFile;
+  
   import stx.Io.StdInput;
   import stx.Io.StdOutput;
 
@@ -43,6 +47,5 @@ using stx.ASys;
 using stx.Test;
 #end 
 
-using stx.asys.Blot;
 
 using eu.ohmrun.Fletcher;

@@ -1,6 +1,8 @@
 package stx.fs.path.lift;
 
+
 class LiftAttemptHasDeviceRaw{
+  #if (sys || nodejs)
   static public function toTrack(self:Attempt<HasDevice,Raw,PathFailure>){
     return self.attempt(Raw._.toTrack);
   }
@@ -16,4 +18,5 @@ class LiftAttemptHasDeviceRaw{
   static public function toArchive(self:Attempt<HasDevice,Raw,PathFailure>){
     return self.attempt(Raw._.toArchive);
   }
+  #end
 }

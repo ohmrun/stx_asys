@@ -38,9 +38,6 @@ typedef JourneyDef = {
     );
     return '${head}${body}${tail}';
   }
-  public function exists<T:HasDevice>():Attempt<T,Bool,FsFailure>{
-    return (env:T) -> __.accept(FileSystem.exists(canonical(env.device.sep)));
-  }
   public function prj():JourneyDef return this;
   private var self(get,never):Journey;
   private function get_self():Journey return lift(this);
