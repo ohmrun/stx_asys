@@ -1,6 +1,6 @@
 package stx.fs;
 
-@:enum abstract Mode(Int){
+enum abstract Mode(Int){
   var EXEC            = 1;
   var WRITE           = 2;
   var WRITE_EXEC      = 3;

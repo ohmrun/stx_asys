@@ -1,6 +1,6 @@
 package stx.fs;
 
-@:enum abstract Separator(String) to String{
+enum abstract Separator(String) to String{
   var WinSeparator   = "\\\\";
   var PosixSeparator = "/";
   
