@@ -22,7 +22,7 @@ class Shell implements ShellApi extends Clazz{
   public function stderr(){
     return new Output(new StdOut(std.Sys.stderr()));
   }
-  public function byte():Produce<Int,IoFailure>{
-    return Produce.fromFunXR(std.Sys.getChar.bind(false));
+  public function byte():Future<Int>{
+    return Future.lazy(std.Sys.getChar.bind(false));
   }
 }

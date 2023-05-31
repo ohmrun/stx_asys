@@ -10,14 +10,14 @@ class Timer{
           return new Future(
             function(cb:stx.proxy.core.Client.ClientDef<ProcessRequest,ProcessResponse,R,ProcessFailure>->Void) {
               //__.log().debug('Timer started $ms');
-              final delay = stx.pico.Delay.comply(
+              final delay = haxe.Timer.delay(
                 () -> {
                   //__.log().debug('Timer called');
                   cb(next);
                 },
                 ms
               );
-              return delay.cancel;//Thanks Juraj
+              return delay.stop;//Thanks Juraj
             }
           );
         }

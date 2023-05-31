@@ -8,5 +8,5 @@ interface ShellApi{
   public function stderr():Output;
   public function stdout():Output;
 
-  public function byte():Produce<Int,IoFailure>; 
+  public function byte():Future<Int>; 
 }

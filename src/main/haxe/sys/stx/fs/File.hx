@@ -1,4 +1,4 @@
-package stx.fs;
+package sys.stx.fs;
 
 #if (sys || nodejs)
 import sys.io.FileInput;
