@@ -4,6 +4,9 @@ using stx.Pico;
 using stx.Nano;
 
 enum IoFailureSum{
+  E_Io_CannotStop;
+  E_Io_CannotStart;
+  E_Io_Exception(e:haxe.Exception);
   E_Io_Subsystem(e:haxe.io.Error);
   E_Io_TypeError;
   E_Io_SourceNotFound;
